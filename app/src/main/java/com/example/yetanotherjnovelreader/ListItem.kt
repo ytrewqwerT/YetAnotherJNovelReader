@@ -5,6 +5,7 @@ interface ListItem {
 
     data class ListItemContents(
         val mTitle: String?,
-        val mText: String?
+        val mText: String?,
+        val mImageUrl: String
     )
 }

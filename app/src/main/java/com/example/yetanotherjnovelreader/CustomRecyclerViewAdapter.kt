@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.toolbox.NetworkImageView
 import kotlinx.android.synthetic.main.recycler_item.view.*
 
 class CustomRecyclerViewAdapter<T : ListItem>
@@ -24,13 +25,17 @@ class CustomRecyclerViewAdapter<T : ListItem>
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val contents = items[position].getListItemContents()
+
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
+        val repository = RemoteRepository.getInstance(holder.imageView.context)
+        holder.imageView.setImageUrl(contents.mImageUrl, repository.imageLoader)
     }
     override fun getItemCount(): Int = items.size
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
         val subText: TextView = view.subText
+        val imageView: NetworkImageView = view.image
     }
 }
