@@ -17,6 +17,6 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val repository = RemoteRepository.getInstance(applicationContext)
-        repository.login("carl@dota.com", "IInvokeThee")
+        repository.getSeries { recyclerViewAdapter.setItems(it) }
     }
 }
