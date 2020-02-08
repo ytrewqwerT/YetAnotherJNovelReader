@@ -5,6 +5,7 @@ import org.json.JSONObject
 
 class LocalRepository private constructor() {
     companion object {
+        @Volatile
         private var INSTANCE: LocalRepository? = null
         fun getInstance(): LocalRepository =
             INSTANCE ?: synchronized(this) {
