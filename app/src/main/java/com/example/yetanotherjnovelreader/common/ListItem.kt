@@ -8,4 +8,8 @@ interface ListItem {
         val mText: String? = null,
         val mImageUrl: String? = null
     )
+
+    interface InteractionListener<in T : ListItem> {
+        fun onClick(item: T)
+    }
 }

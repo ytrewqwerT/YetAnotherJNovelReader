@@ -10,8 +10,9 @@ import com.example.yetanotherjnovelreader.R
 import com.example.yetanotherjnovelreader.data.RemoteRepository
 import kotlinx.android.synthetic.main.recycler_item.view.*
 
-class CustomRecyclerViewAdapter<T : ListItem>
-    : RecyclerView.Adapter<CustomRecyclerViewAdapter<T>.ViewHolder>() {
+class CustomRecyclerViewAdapter<T : ListItem>(
+    private val listener: ListItem.InteractionListener<T>? = null
+) : RecyclerView.Adapter<CustomRecyclerViewAdapter<T>.ViewHolder>() {
 
     private var items: List<T> = emptyList()
 
@@ -32,10 +33,12 @@ class CustomRecyclerViewAdapter<T : ListItem>
         holder.subText.text = contents.mText
         val repository = RemoteRepository.getInstance(holder.imageView.context)
         holder.imageView.setImageUrl(contents.mImageUrl, repository.imageLoader)
+
+        holder.view.setOnClickListener { listener?.onClick(items[position]) }
     }
     override fun getItemCount(): Int = items.size
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
         val subText: TextView = view.subText
         val imageView: NetworkImageView = view.image
