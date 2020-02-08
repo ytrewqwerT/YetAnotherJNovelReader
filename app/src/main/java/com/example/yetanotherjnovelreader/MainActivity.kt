@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.yetanotherjnovelreader.data.RemoteRepository
+import com.example.yetanotherjnovelreader.data.Series
 
 class MainActivity : AppCompatActivity() {
 

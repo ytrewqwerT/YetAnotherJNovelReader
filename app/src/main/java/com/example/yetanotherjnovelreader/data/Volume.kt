@@ -1,16 +1,18 @@
-package com.example.yetanotherjnovelreader
+package com.example.yetanotherjnovelreader.data
 
+import com.example.yetanotherjnovelreader.ListItem
 import org.json.JSONObject
 
-class Series(source: JSONObject) : JSONObject(source.toString()), ListItem {
+class Volume(source: JSONObject) : JSONObject(source.toString()), ListItem {
     val id = getString("id")
+    val serieId = getString("serieId")
     val title = getString("title")
     val titleslug = getString("titleslug")
+    val volumeNum = getInt("volumeNumber")
     val description = getString("description")
     val descriptionShort = getString("descriptionShort")
     val tags = getString("tags")
     val created = getString("created")
-    val overrideExpiration = getBoolean("override_expiration")
     val coverFullURL: String
     val coverThumbURL: String
 
@@ -27,6 +29,9 @@ class Series(source: JSONObject) : JSONObject(source.toString()), ListItem {
         coverThumbURL = thumb ?: ""
     }
 
-    override fun getListItemContents(): ListItem.ListItemContents =
-        ListItem.ListItemContents(title, descriptionShort, "${RemoteRepository.IMG_ADDR}/$coverThumbURL")
+    override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
+        title,
+        descriptionShort,
+        "${RemoteRepository.IMG_ADDR}/$coverThumbURL"
+    )
 }

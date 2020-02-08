@@ -4,8 +4,8 @@ interface ListItem {
     fun getListItemContents(): ListItemContents
 
     data class ListItemContents(
-        val mTitle: String?,
-        val mText: String?,
-        val mImageUrl: String
+        val mTitle: String? = null,
+        val mText: String? = null,
+        val mImageUrl: String? = null
     )
 }
