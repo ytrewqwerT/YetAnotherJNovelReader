@@ -1,9 +1,10 @@
 package com.example.yetanotherjnovelreader.data
 
-import com.example.yetanotherjnovelreader.ListItem
+import com.example.yetanotherjnovelreader.common.ListItem
 import org.json.JSONObject
 
-class Part(source: JSONObject) : JSONObject(source.toString()), ListItem {
+class Part(source: JSONObject) : JSONObject(source.toString()),
+    ListItem {
     val id = getString("id")
     val volumeId = getString("volumeId")
     val serieId = getString("serieId")

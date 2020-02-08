@@ -1,10 +1,11 @@
-package com.example.yetanotherjnovelreader
+package com.example.yetanotherjnovelreader.data
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.android.volley.toolbox.ImageLoader
+import com.example.yetanotherjnovelreader.BuildConfig
 import com.jakewharton.disklrucache.DiskLruCache
 import java.io.File
 import java.util.*
@@ -26,7 +27,7 @@ class DiskImageLoader(appContext: Context) :
             1 shl 24
         )
     }
-    
+
     override fun getBitmap(url: String?): Bitmap? {
         if (url == null) return null
         val snapshot = cache.get(urlToName(url)) ?: return null

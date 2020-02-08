@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader
+package com.example.yetanotherjnovelreader.common
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.toolbox.NetworkImageView
+import com.example.yetanotherjnovelreader.R
 import com.example.yetanotherjnovelreader.data.RemoteRepository
 import kotlinx.android.synthetic.main.recycler_item.view.*
 

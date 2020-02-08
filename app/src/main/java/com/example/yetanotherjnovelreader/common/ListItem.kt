@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader
+package com.example.yetanotherjnovelreader.common
 
 interface ListItem {
     fun getListItemContents(): ListItemContents

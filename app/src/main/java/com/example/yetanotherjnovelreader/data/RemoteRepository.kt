@@ -9,7 +9,6 @@ import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.yetanotherjnovelreader.DiskImageLoader
 import org.json.JSONArray
 import org.json.JSONObject
 
