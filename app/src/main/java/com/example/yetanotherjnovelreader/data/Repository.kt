@@ -1,6 +1,8 @@
 package com.example.yetanotherjnovelreader.data
 
 import android.content.Context
+import android.text.Html
+import android.text.Spanned
 
 class Repository private constructor(appContext: Context) {
     companion object {
@@ -54,9 +56,14 @@ class Repository private constructor(appContext: Context) {
         }
     }
 
-    fun getPart(part: Part) {
+    fun getPart(part: Part, callback: (Spanned?) -> Unit) {
         remote.getPartJson(part.id) {
-
+            val partHtml = it?.getString("dataHTML")
+            if (partHtml != null) {
+                callback(Html.fromHtml(partHtml, 0))
+            } else {
+                callback(null)
+            }
         }
     }
 }

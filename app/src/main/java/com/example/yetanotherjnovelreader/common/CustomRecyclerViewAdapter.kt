@@ -31,8 +31,8 @@ class CustomRecyclerViewAdapter(
 
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
-        val repository = RemoteRepository.getInstance(holder.imageView.context)
-        holder.imageView.setImageUrl(contents.mImageUrl, repository.imageLoader)
+        val remoteRepository = RemoteRepository.getInstance(holder.imageView.context)
+        holder.imageView.setImageUrl(contents.mImageUrl, remoteRepository.imageLoader)
 
         holder.view.setOnClickListener { listener?.onClick(items[position]) }
     }
