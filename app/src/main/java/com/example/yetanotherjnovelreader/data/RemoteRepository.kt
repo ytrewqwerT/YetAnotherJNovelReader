@@ -53,7 +53,6 @@ class RemoteRepository private constructor(appContext: Context) {
                 callback(false)
             }
         )
-
         requestQueue.add(request)
     }
 
@@ -68,6 +67,23 @@ class RemoteRepository private constructor(appContext: Context) {
                 callback(it)
             },
             Response.ErrorListener { Log.d(TAG, "SeriesFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
+
+    fun getSerieJson(serieId: String, callback: (serieJson: JSONObject) -> Unit) {
+        val url = "${API_ADDR}/series/findOne?filter=" +
+                "{\"where\":{\"id\":\"${serieId}\"},\"include\":[\"volumes\",\"parts\"]}"
+        val request = JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            Response.Listener<JSONObject> {
+                Log.d(TAG, "SerieSuccess: Found series $serieId")
+                Log.d(TAG, it.toString(4))
+                callback(it)
+            },
+            Response.ErrorListener { Log.d(TAG, "SerieFailure: $it") }
         )
         requestQueue.add(request)
     }

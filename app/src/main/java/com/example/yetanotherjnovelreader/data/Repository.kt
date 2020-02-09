@@ -22,13 +22,24 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getSeries(callback: (List<Series>) -> Unit) {
-        if (local.series.isEmpty()) {
+        if (local.getSeries().isEmpty()) {
             remote.getSeriesJson {
                 local.addSeriesInfo(it)
-                callback(local.series)
+                callback(local.getSeries())
             }
         } else {
-            callback(local.series)
+            callback(local.getSeries())
+        }
+    }
+
+    fun getSerieVolumes(serie: Series, callback: (List<Volume>) -> Unit) {
+        if (local.getVolumes(serie.id).isEmpty()) {
+            remote.getSerieJson(serie.id) {
+                local.addSerieInfo(it)
+                callback(local.getVolumes(serie.id))
+            }
+        } else {
+            callback(local.getVolumes(serie.id))
         }
     }
 }

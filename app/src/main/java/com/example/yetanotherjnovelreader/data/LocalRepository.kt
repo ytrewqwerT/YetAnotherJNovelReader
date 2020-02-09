@@ -18,9 +18,22 @@ class LocalRepository private constructor() {
     private val _series = ArrayList<Series>()
     private val _volumes = ArrayList<Volume>()
     private val _parts = ArrayList<Part>()
-    val series: List<Series> get() = _series
-    val volumes: List<Volume> get() = _volumes
-    val parts: List<Part> get() = _parts
+
+    fun getSeries(): List<Series> = _series
+    fun getVolumes(serieId: String): List<Volume> {
+        val result = ArrayList<Volume>()
+        for (volume in _volumes) {
+            if (volume.serieId == serieId) result.add(volume)
+        }
+        return result
+    }
+    fun getParts(volumeId: String): List<Part> {
+        val result = ArrayList<Part>()
+        for (part in _parts) {
+            if (part.volumeId == volumeId) result.add(part)
+        }
+        return result
+    }
 
     fun addSeriesInfo(seriesData: JSONArray) {
         for (i in 0 until seriesData.length()) addSerieInfo(seriesData.getJSONObject(i))
@@ -45,15 +58,15 @@ class LocalRepository private constructor() {
     }
 
     private fun containsSerie(id: String): Boolean {
-        for (serie in series) if (serie.id == id) return true
+        for (serie in _series) if (serie.id == id) return true
         return false
     }
     private fun containsVolume(id: String): Boolean {
-        for (volume in volumes) if (volume.id == id) return true
+        for (volume in _volumes) if (volume.id == id) return true
         return false
     }
     private fun containsPart(id: String): Boolean {
-        for (part in parts) if (part.id == id) return true
+        for (part in _parts) if (part.id == id) return true
         return false
     }
 

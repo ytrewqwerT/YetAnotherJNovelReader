@@ -10,6 +10,7 @@ import com.example.yetanotherjnovelreader.common.ListItemFragment
 import com.example.yetanotherjnovelreader.common.ListItemViewModel
 import com.example.yetanotherjnovelreader.data.Repository
 import com.example.yetanotherjnovelreader.data.Series
+import com.example.yetanotherjnovelreader.data.Volume
 
 private const val TAG = "MainActivity"
 
@@ -21,6 +22,7 @@ private const val SERIES_FRAGMENT_TAG = "SERIES_FRAGMENT"
 class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<ListItemViewModel>()
+    private val repository by lazy { Repository.getInstance(applicationContext)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +32,6 @@ class MainActivity : AppCompatActivity() {
             onListItemInteraction(it.item)
         }
 
-        val repository = Repository.getInstance(applicationContext)
         repository.getSeries {
             viewModel.setItemList(SERIES_LIST_FRAGMENT_ID, it)
         }
@@ -52,12 +53,18 @@ class MainActivity : AppCompatActivity() {
         val curFragment = supportFragmentManager.findFragmentById(R.id.main_fragment_container)
         when (curFragment?.tag) {
             SERIES_LIST_FRAGMENT_TAG -> onSeriesListItemInteraction(item as? Series)
+            SERIES_FRAGMENT_TAG -> onVolumesListItemInteraction(item as? Volume)
         }
     }
 
-    private fun onSeriesListItemInteraction(item: Series?) {
-        Log.i(TAG, "Series clicked: ${item?.title}")
-        if (item != null) {
+    private fun onSeriesListItemInteraction(serie: Series?) {
+        Log.i(TAG, "Series clicked: ${serie?.title}")
+        if (serie != null) {
+            viewModel.setItemList(SERIES_FRAGMENT_ID, emptyList())
+            repository.getSerieVolumes(serie) {
+                viewModel.setItemList(SERIES_FRAGMENT_ID, it)
+            }
+
             with (supportFragmentManager.beginTransaction()) {
                 val args = Bundle()
                 args.putInt(ListItemFragment.ARG_ID, SERIES_FRAGMENT_ID)
@@ -71,5 +78,9 @@ class MainActivity : AppCompatActivity() {
                 commit()
             }
         }
+    }
+
+    private fun onVolumesListItemInteraction(volume: Volume?) {
+        Log.i(TAG, "Volume clicked: ${volume?.title}")
     }
 }
