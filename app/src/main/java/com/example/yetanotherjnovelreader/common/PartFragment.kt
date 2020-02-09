@@ -11,10 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.example.yetanotherjnovelreader.R
+import com.example.yetanotherjnovelreader.data.RemoteRepository
 
 class PartFragment : Fragment() {
 
-    private val viewModel by activityViewModels<PartViewModel>()
+    private val viewModel by activityViewModels<PartViewModel> {
+        PartViewModel.PartViewModelFactory(RemoteRepository.getInstance(requireActivity().applicationContext), resources)
+    }
 
     private var contentView: TextView? = null
     private val contentObserver by lazy {
@@ -29,12 +32,12 @@ class PartFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_part, container, false)
         contentView = view.findViewById(R.id.content_view)
-        viewModel.contents.observe(this, contentObserver)
+        viewModel.getContents().observe(this, contentObserver)
         return view
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.contents.removeObserver(contentObserver)
+        viewModel.getContents().removeObserver(contentObserver)
     }
 }

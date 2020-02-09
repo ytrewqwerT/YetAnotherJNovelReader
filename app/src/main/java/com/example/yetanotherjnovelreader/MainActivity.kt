@@ -6,10 +6,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
 import com.example.yetanotherjnovelreader.common.*
-import com.example.yetanotherjnovelreader.data.Part
-import com.example.yetanotherjnovelreader.data.Repository
-import com.example.yetanotherjnovelreader.data.Series
-import com.example.yetanotherjnovelreader.data.Volume
+import com.example.yetanotherjnovelreader.data.*
 
 private const val TAG = "MainActivity"
 
@@ -24,7 +21,9 @@ private const val PART_FRAGMENT_TAG = "PART_FRAGMENT"
 class MainActivity : AppCompatActivity() {
 
     private val listItemViewModel by viewModels<ListItemViewModel>()
-    private val partViewModel by viewModels<PartViewModel>()
+    private val partViewModel by viewModels<PartViewModel> {
+        PartViewModel.PartViewModelFactory(RemoteRepository.getInstance(applicationContext), resources)
+    }
     private val repository by lazy { Repository.getInstance(applicationContext)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         if (part != null) {
             repository.getPart(part) {
                 if (it != null) {
-                    partViewModel.contents.value = it
+                    partViewModel.setContents(it)
 
                     with (supportFragmentManager.beginTransaction()) {
                         replace(
