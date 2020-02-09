@@ -37,21 +37,27 @@ class RemoteRepository private constructor(appContext: Context) {
         DiskImageLoader(appContext)
     )
 
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, callback: (Boolean) -> Unit) {
         val args = JSONObject().put("email", email).put("password", password)
 
         val request = JsonObjectRequest(
             Request.Method.POST,
             "$API_ADDR/users/login?include=user",
             args,
-            Response.Listener { Log.d(TAG, "LoginSuccess: ${it.toString(4)}") },
-            Response.ErrorListener { Log.d(TAG, "LoginFailure: $it") }
+            Response.Listener {
+                Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
+                callback(true)
+            },
+            Response.ErrorListener {
+                Log.d(TAG, "LoginFailure: $it")
+                callback(false)
+            }
         )
 
         requestQueue.add(request)
     }
 
-    fun getSeries(listener: (seriesList: List<Series>) -> Unit) {
+    fun getSeriesJson(callback: (seriesJson: JSONArray) -> Unit) {
         val request = JsonArrayRequest(
             Request.Method.GET,
             "$API_ADDR/series",
@@ -59,14 +65,7 @@ class RemoteRepository private constructor(appContext: Context) {
             Response.Listener<JSONArray> {
                 Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
                 Log.d(TAG, it.toString(4))
-
-                val resultList = ArrayList<Series>(it.length())
-                for (i in 0 until it.length()) resultList.add(
-                    Series(
-                        it.getJSONObject(i)
-                    )
-                )
-                listener(resultList)
+                callback(it)
             },
             Response.ErrorListener { Log.d(TAG, "SeriesFailure: $it") }
         )
