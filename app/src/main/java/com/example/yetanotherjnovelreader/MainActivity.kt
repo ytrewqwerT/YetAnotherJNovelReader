@@ -1,16 +1,18 @@
-package com.example.yetanotherjnovelreader.activitymain
+package com.example.yetanotherjnovelreader
 
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
-import com.example.yetanotherjnovelreader.R
+import com.example.yetanotherjnovelreader.common.ListItemFragment
+import com.example.yetanotherjnovelreader.common.ListItemViewModel
 import com.example.yetanotherjnovelreader.data.RemoteRepository
 import com.example.yetanotherjnovelreader.data.Series
 
 private const val TAG = "MainActivity"
 private const val SERIES_LIST_FRAGMENT_ID = 1
+private const val SERIES_FRAGMENT_ID = 2
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,7 +32,9 @@ class MainActivity : AppCompatActivity() {
 
         with (supportFragmentManager.beginTransaction()) {
             val args = Bundle()
-            args.putInt(ListItemFragment.ARG_ID, SERIES_LIST_FRAGMENT_ID)
+            args.putInt(ListItemFragment.ARG_ID,
+                SERIES_LIST_FRAGMENT_ID
+            )
             add(R.id.main_fragment_container, ListItemFragment::class.java, args)
             commit()
         }

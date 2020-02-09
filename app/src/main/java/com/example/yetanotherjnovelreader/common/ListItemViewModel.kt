@@ -1,10 +1,9 @@
-package com.example.yetanotherjnovelreader.activitymain
+package com.example.yetanotherjnovelreader.common
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.yetanotherjnovelreader.SingleLiveEvent
-import com.example.yetanotherjnovelreader.common.ListItem
 
 class ListItemViewModel : ViewModel() {
 
@@ -23,7 +22,11 @@ class ListItemViewModel : ViewModel() {
     }
 
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
-        itemClickedEvent.value = EventData(fragmentId, item)
+        itemClickedEvent.value =
+            EventData(
+                fragmentId,
+                item
+            )
     }
 
     data class EventData(

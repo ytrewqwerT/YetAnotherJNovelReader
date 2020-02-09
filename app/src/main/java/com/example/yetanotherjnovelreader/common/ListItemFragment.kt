@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader.activitymain
+package com.example.yetanotherjnovelreader.common
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yetanotherjnovelreader.R
-import com.example.yetanotherjnovelreader.common.CustomRecyclerViewAdapter
-import com.example.yetanotherjnovelreader.common.ListItem
 
 class ListItemFragment : Fragment(), ListItem.InteractionListener {
     companion object {
