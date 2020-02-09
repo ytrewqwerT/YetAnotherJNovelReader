@@ -10,13 +10,13 @@ import com.example.yetanotherjnovelreader.R
 import com.example.yetanotherjnovelreader.data.RemoteRepository
 import kotlinx.android.synthetic.main.recycler_item.view.*
 
-class CustomRecyclerViewAdapter<T : ListItem>(
-    private val listener: ListItem.InteractionListener<T>? = null
-) : RecyclerView.Adapter<CustomRecyclerViewAdapter<T>.ViewHolder>() {
+class CustomRecyclerViewAdapter(
+    private val listener: ListItem.InteractionListener? = null
+) : RecyclerView.Adapter<CustomRecyclerViewAdapter.ViewHolder>() {
 
-    private var items: List<T> = emptyList()
+    private var items: List<ListItem> = emptyList()
 
-    fun setItems(newItems: List<T>) {
+    fun setItems(newItems: List<ListItem>) {
         items = newItems
         notifyDataSetChanged()
     }

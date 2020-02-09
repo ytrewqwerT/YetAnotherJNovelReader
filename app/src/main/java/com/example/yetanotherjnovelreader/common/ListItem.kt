@@ -9,7 +9,7 @@ interface ListItem {
         val mImageUrl: String? = null
     )
 
-    interface InteractionListener<in T : ListItem> {
-        fun onClick(item: T)
+    interface InteractionListener {
+        fun onClick(item: ListItem)
     }
 }
