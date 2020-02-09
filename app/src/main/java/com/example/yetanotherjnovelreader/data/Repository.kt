@@ -42,4 +42,15 @@ class Repository private constructor(appContext: Context) {
             callback(local.getVolumes(serie.id))
         }
     }
+
+    fun getVolumeParts(volume: Volume, callback: (List<Part>) -> Unit) {
+        if (local.getParts(volume.id).isEmpty()) {
+            remote.getSerieJson(volume.serieId) {
+                local.addSerieInfo(it)
+                callback(local.getParts(volume.id))
+            }
+        } else {
+            callback(local.getParts(volume.id))
+        }
+    }
 }
