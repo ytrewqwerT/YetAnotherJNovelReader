@@ -53,4 +53,10 @@ class Repository private constructor(appContext: Context) {
             callback(local.getParts(volume.id))
         }
     }
+
+    fun getPart(part: Part) {
+        remote.getPartJson(part.id) {
+
+        }
+    }
 }

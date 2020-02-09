@@ -12,9 +12,10 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
 
+private const val TAG = "RemoteRepository"
+
 class RemoteRepository private constructor(appContext: Context) {
     companion object {
-        private const val TAG = "RemoteRepository"
         const val API_ADDR = "https://api.j-novel.club/api"
         const val IMG_ADDR = "https://d2dq7ifhe7bu0f.cloudfront.net"
 
@@ -37,6 +38,8 @@ class RemoteRepository private constructor(appContext: Context) {
         DiskImageLoader(appContext)
     )
 
+    private var authToken: String? = null
+
     fun login(email: String, password: String, callback: (Boolean) -> Unit) {
         val args = JSONObject().put("email", email).put("password", password)
 
@@ -46,6 +49,7 @@ class RemoteRepository private constructor(appContext: Context) {
             args,
             Response.Listener {
                 Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
+                authToken = it.getString("id")
                 callback(true)
             },
             Response.ErrorListener {
@@ -84,6 +88,22 @@ class RemoteRepository private constructor(appContext: Context) {
                 callback(it)
             },
             Response.ErrorListener { Log.d(TAG, "SerieFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
+
+    fun getPartJson(partId: String, callback: (partJson: JSONObject?) -> Unit) {
+        val request = AuthorizedJsonObjectRequest(
+            authToken,
+            Request.Method.GET,
+            "${API_ADDR}/parts/${partId}/partData",
+            null,
+            Response.Listener {
+                Log.d(TAG, "PartSuccess: Found part $partId")
+                Log.d(TAG, it.toString(4))
+                callback(it)
+            },
+            Response.ErrorListener { Log.d(TAG, "PartFailure: $it") }
         )
         requestQueue.add(request)
     }

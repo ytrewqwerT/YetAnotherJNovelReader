@@ -75,6 +75,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun onPartsListItemInteraction(part: Part?) {
         Log.i(TAG, "Part clicked: ${part?.title}")
+        if (part != null) {
+            repository.getPart(part)
+        }
     }
 
     private fun setListItemFragment(fragmentId: Int, fragmentTag: String?) {
