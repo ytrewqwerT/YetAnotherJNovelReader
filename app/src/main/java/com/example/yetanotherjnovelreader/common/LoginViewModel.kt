@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.yetanotherjnovelreader.data.Repository
 
+private const val TAG = "LoginViewModel"
+
 class LoginViewModel(private val repository: Repository) : ViewModel() {
     val email = MutableLiveData<String>()
     val password = MutableLiveData<String>()
