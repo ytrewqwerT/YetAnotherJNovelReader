@@ -62,7 +62,7 @@ class RemoteRepository private constructor(
     }
 
     fun logout(callback: (Boolean) -> Unit) {
-        val request = AuthorizedNullRequest(
+        val request = AuthorizedStringRequest(
             authToken, Request.Method.POST, "${API_ADDR}/users/logout",
             Response.Listener {
                 Log.i(TAG, "LogoutSuccess")

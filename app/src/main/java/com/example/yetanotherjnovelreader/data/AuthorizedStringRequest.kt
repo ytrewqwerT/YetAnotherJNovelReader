@@ -3,7 +3,7 @@ package com.example.yetanotherjnovelreader.data
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 
-class AuthorizedNullRequest(
+class AuthorizedStringRequest(
     private val authToken: String?,
     method: Int,
     url: String,
