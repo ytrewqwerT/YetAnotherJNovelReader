@@ -5,14 +5,17 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.yetanotherjnovelreader.R
 import com.example.yetanotherjnovelreader.data.Repository
+import com.example.yetanotherjnovelreader.databinding.DialogLoginBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class LoginDialog() : DialogFragment() {
 
+    private lateinit var binding: DialogLoginBinding
     private val viewModel by viewModels<LoginViewModel> {
         LoginViewModel.LoginViewModelFactory(Repository.getInstance(requireContext()))
     }
@@ -20,10 +23,16 @@ class LoginDialog() : DialogFragment() {
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            val inflater = it.layoutInflater
-            val view = inflater.inflate(R.layout.dialog_login, null)
-            val errorTextView = view.findViewById<TextView>(R.id.login_error_text)
+            binding = DataBindingUtil.inflate(
+                it.layoutInflater,
+                R.layout.dialog_login,
+                null,
+                false
+            )
+            binding.viewModel = viewModel
 
+            val view = binding.root
+            val errorTextView = view.findViewById<TextView>(R.id.login_error_text)
             MaterialAlertDialogBuilder(it)
                 .setTitle("Login")
                 .setView(view)
