@@ -3,6 +3,8 @@ package com.example.yetanotherjnovelreader
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
@@ -10,6 +12,7 @@ import com.example.yetanotherjnovelreader.activitypart.PartActivity
 import com.example.yetanotherjnovelreader.common.ListItem
 import com.example.yetanotherjnovelreader.common.ListItemFragment
 import com.example.yetanotherjnovelreader.common.ListItemViewModel
+import com.example.yetanotherjnovelreader.common.LoginDialog
 import com.example.yetanotherjnovelreader.data.Part
 import com.example.yetanotherjnovelreader.data.Repository
 import com.example.yetanotherjnovelreader.data.Series
@@ -35,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(findViewById(R.id.toolbar))
+
         listItemViewModel.itemClickedEvent.observe(this) {
             onListItemInteraction(it.item)
         }
@@ -44,6 +49,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         setListItemFragment(SERIES_LIST_FRAGMENT_ID, SERIES_LIST_FRAGMENT_TAG)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
+        R.id.account_login -> {
+            LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     private fun onListItemInteraction(item: ListItem) {

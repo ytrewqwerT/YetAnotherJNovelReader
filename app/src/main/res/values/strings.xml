@@ -3,4 +3,8 @@
     <string name="password">Password</string>
     <string name="email">Email</string>
     <string name="login_failed">Login Failed</string>
+    <string name="account">Account</string>
+    <string name="not_logged_in">Not Logged In</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
 </resources>
