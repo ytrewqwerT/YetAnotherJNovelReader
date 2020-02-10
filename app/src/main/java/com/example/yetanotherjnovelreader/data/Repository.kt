@@ -36,12 +36,17 @@ class Repository private constructor(appContext: Context) {
             callback(it != null)
         }
     }
-    fun logout() {
-        remote.logout()
-        local.userId = null
-        local.authToken = null
-        local.authDate = null
-        local.username = null
+    fun logout(callback: (Boolean) -> Unit) {
+        remote.logout { logoutSuccessful ->
+            if (logoutSuccessful) {
+                local.userId = null
+                local.authToken = null
+                local.authDate = null
+                local.username = null
+            }
+            callback(logoutSuccessful)
+        }
+
     }
     fun loggedIn() = (local.authToken != null)
     fun getUsername() = local.username

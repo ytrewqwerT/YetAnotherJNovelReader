@@ -16,7 +16,7 @@ private const val TAG = "RemoteRepository"
 
 class RemoteRepository private constructor(
     appContext: Context,
-    private var authToken: String?
+    var authToken: String?
 ) {
     companion object {
         const val API_ADDR = "https://api.j-novel.club/api"
@@ -50,6 +50,7 @@ class RemoteRepository private constructor(
             args,
             Response.Listener {
                 Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
+                authToken = it?.getString("id")
                 callback(it)
             },
             Response.ErrorListener {
@@ -60,13 +61,21 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
-    fun logout() {
-        val request = AuthorizedJsonObjectRequest(
-            authToken, Request.Method.GET, "${API_ADDR}/users/logout", null,
-            Response.Listener { Log.i(TAG, "LogoutSuccess") },
-            Response.ErrorListener { Log.e(TAG, "LogoutFailure?") }
+    fun logout(callback: (Boolean) -> Unit) {
+        val request = AuthorizedNullRequest(
+            authToken, Request.Method.POST, "${API_ADDR}/users/logout",
+            Response.Listener {
+                Log.i(TAG, "LogoutSuccess")
+                authToken = null
+                callback(true)
+            },
+            Response.ErrorListener {
+                Log.e(TAG, "LogoutFailure? $it")
+                callback(false)
+            }
         )
         requestQueue.add(request)
+
     }
 
     fun getSeriesJson(callback: (seriesJson: JSONArray) -> Unit) {

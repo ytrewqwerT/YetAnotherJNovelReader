@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
@@ -57,8 +58,14 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
             if (repository.loggedIn()) {
-                repository.logout()
-                updateMenu()
+                repository.logout { logoutSuccessful ->
+                    if (logoutSuccessful) {
+                        Toast.makeText(this, "Logout Successful", Toast.LENGTH_LONG).show()
+                        updateMenu()
+                    } else {
+                        Toast.makeText(this, "Logout Failed", Toast.LENGTH_LONG).show()
+                    }
+                }
             } else {
                 LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
             }
@@ -142,6 +149,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
 
     override fun onLoginResult(loggedIn: Boolean) {
         Log.d(TAG, "Updating account menu")
+        if (loggedIn) Toast.makeText(this, "Logged in", Toast.LENGTH_LONG).show()
         updateMenu()
     }
 }
