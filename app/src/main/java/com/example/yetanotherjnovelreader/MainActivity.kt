@@ -9,10 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
 import com.example.yetanotherjnovelreader.activitypart.PartActivity
-import com.example.yetanotherjnovelreader.common.ListItem
-import com.example.yetanotherjnovelreader.common.ListItemFragment
-import com.example.yetanotherjnovelreader.common.ListItemViewModel
-import com.example.yetanotherjnovelreader.common.LoginDialog
+import com.example.yetanotherjnovelreader.common.*
 import com.example.yetanotherjnovelreader.data.Part
 import com.example.yetanotherjnovelreader.data.Repository
 import com.example.yetanotherjnovelreader.data.Series
@@ -26,13 +23,12 @@ private const val PARTS_LIST_FRAGMENT_ID = 3
 private const val SERIES_LIST_FRAGMENT_TAG = "SERIES_LIST_FRAGMENT"
 private const val VOLUMES_LIST_FRAGMENT_TAG = "VOLUMES_LIST_FRAGMENT"
 private const val PARTS_LIST_FRAGMENT_TAG = "PARTS_LIST_FRAGMENT"
-private const val PART_FRAGMENT_TAG = "PART_FRAGMENT"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), LoginResultListener {
 
     private val listItemViewModel by viewModels<ListItemViewModel>()
-
     private val repository by lazy { Repository.getInstance(applicationContext)}
+    private var appBarMenu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        appBarMenu = menu
+        updateMenu()
         return true
     }
 
@@ -123,5 +121,16 @@ class MainActivity : AppCompatActivity() {
             }
             commit()
         }
+    }
+
+    private fun updateMenu() {
+        if (repository.getUsername() != null) {
+            val nameHolder = appBarMenu?.findItem(R.id.account_name)
+            nameHolder?.title = repository.getUsername()
+        }
+    }
+
+    override fun onLoginResult(loggedIn: Boolean) {
+        updateMenu()
     }
 }

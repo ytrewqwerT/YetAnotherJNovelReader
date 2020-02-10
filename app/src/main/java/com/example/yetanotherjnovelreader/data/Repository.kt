@@ -29,10 +29,14 @@ class Repository private constructor(appContext: Context) {
 
     fun login(email: String, password: String, callback: (Boolean) -> Unit) {
         remote.login(email, password) {
-            local.authToken = it
+            local.userId = it?.getString("userId")
+            local.authToken = it?.getString("id")
+            local.authDate = it?.getString("created")
+            local.username = it?.getJSONObject("user")?.getString("username")
             callback(it != null)
         }
     }
+    fun getUsername() = local.username
 
     fun getSeries(callback: (List<Series>) -> Unit) {
         if (local.getSeries().isEmpty()) {

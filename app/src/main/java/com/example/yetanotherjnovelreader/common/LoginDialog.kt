@@ -3,6 +3,7 @@ package com.example.yetanotherjnovelreader.common
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -15,6 +16,8 @@ import com.example.yetanotherjnovelreader.databinding.DialogLoginBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class LoginDialog : DialogFragment() {
+
+    private var listener: LoginResultListener? = null
 
     private lateinit var binding: DialogLoginBinding
     private val viewModel by viewModels<LoginViewModel> {
@@ -53,5 +56,10 @@ class LoginDialog : DialogFragment() {
             }
             dialog
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? LoginResultListener
     }
 }

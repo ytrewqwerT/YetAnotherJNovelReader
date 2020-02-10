@@ -41,7 +41,7 @@ class RemoteRepository private constructor(
         DiskImageLoader(appContext)
     )
 
-    fun login(email: String, password: String, callback: (String?) -> Unit) {
+    fun login(email: String, password: String, callback: (JSONObject?) -> Unit) {
         val args = JSONObject().put("email", email).put("password", password)
 
         val request = JsonObjectRequest(
@@ -50,8 +50,7 @@ class RemoteRepository private constructor(
             args,
             Response.Listener {
                 Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
-                authToken = it.getString("id")
-                callback(authToken)
+                callback(it)
             },
             Response.ErrorListener {
                 Log.d(TAG, "LoginFailure: $it")

@@ -6,7 +6,10 @@ import org.json.JSONObject
 
 class LocalRepository private constructor(private val sharedPreferences: SharedPreferences) {
     companion object {
+        private const val USER_ID_KEY = "USER_ID"
         private const val AUTH_TOKEN_KEY = "AUTHENTICATION_TOKEN"
+        private const val AUTH_DATE_KEY = "AUTHENTICATION_DATE"
+        private const val USERNAME_KEY = "USERNAME"
         @Volatile
         private var INSTANCE: LocalRepository? = null
         fun getInstance(sharedPreferences: SharedPreferences): LocalRepository =
@@ -17,12 +20,18 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
             }
     }
 
+    var userId: String?
+        get() = sharedPreferences.getString(USER_ID_KEY, null)
+        set(value) { setSharedPrefString(USER_ID_KEY, value) }
     var authToken: String?
         get() = sharedPreferences.getString(AUTH_TOKEN_KEY, null)
-        set(value) { with (sharedPreferences.edit()) {
-            putString(AUTH_TOKEN_KEY, value)
-            commit()
-        }}
+        set(value) { setSharedPrefString(AUTH_TOKEN_KEY, value) }
+    var authDate: String?
+        get() = sharedPreferences.getString(AUTH_DATE_KEY, null)
+        set(value) { setSharedPrefString(AUTH_DATE_KEY, value) }
+    var username: String?
+        get() = sharedPreferences.getString(USERNAME_KEY, null)
+        set(value) { setSharedPrefString(USERNAME_KEY, value) }
 
     private val _series = ArrayList<Series>()
     private val _volumes = ArrayList<Volume>()
@@ -79,4 +88,10 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
         return false
     }
 
+    private fun setSharedPrefString(key: String, value: String?) {
+        with (sharedPreferences.edit()) {
+            putString(key, value)
+            commit()
+        }
+    }
 }
