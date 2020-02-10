@@ -83,7 +83,6 @@ class PartViewModel(
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
-
     }
 }
 
