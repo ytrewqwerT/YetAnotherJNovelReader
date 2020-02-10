@@ -8,7 +8,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="16dp">
+        android:layout_margin="@dimen/text_margin">
         <TextView
             android:id="@+id/content_view"
             android:justificationMode="inter_word"

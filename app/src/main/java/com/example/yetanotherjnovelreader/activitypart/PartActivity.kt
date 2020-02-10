@@ -1,6 +1,7 @@
 package com.example.yetanotherjnovelreader.activitypart
 
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,9 +14,13 @@ class PartActivity : AppCompatActivity() {
         const val EXTRA_PART_ID = "PART_ID"
     }
 
-    var partId: String = ""
+    private var partId: String = ""
+    private var mainTextViewWidth = 0
+
     private val viewModel by viewModels<PartViewModel> {
-        PartViewModel.PartViewModelFactory(Repository.getInstance(applicationContext), resources, partId)
+        PartViewModel.PartViewModelFactory(
+            Repository.getInstance(applicationContext), resources, partId, mainTextViewWidth
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +30,10 @@ class PartActivity : AppCompatActivity() {
         partId = intent.getStringExtra(EXTRA_PART_ID)
 
         val mainTextView = findViewById<TextView>(R.id.content_view)
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        mainTextViewWidth =
+            displayMetrics.widthPixels - 2 * resources.getDimensionPixelSize(R.dimen.text_margin)
         viewModel.contents.observe(this) { mainTextView.text = it }
     }
 }
