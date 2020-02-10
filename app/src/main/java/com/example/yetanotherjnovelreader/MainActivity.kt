@@ -1,12 +1,19 @@
 package com.example.yetanotherjnovelreader
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
-import com.example.yetanotherjnovelreader.common.*
-import com.example.yetanotherjnovelreader.data.*
+import com.example.yetanotherjnovelreader.activitypart.PartActivity
+import com.example.yetanotherjnovelreader.common.ListItem
+import com.example.yetanotherjnovelreader.common.ListItemFragment
+import com.example.yetanotherjnovelreader.common.ListItemViewModel
+import com.example.yetanotherjnovelreader.data.Part
+import com.example.yetanotherjnovelreader.data.Repository
+import com.example.yetanotherjnovelreader.data.Series
+import com.example.yetanotherjnovelreader.data.Volume
 
 private const val TAG = "MainActivity"
 
@@ -21,9 +28,7 @@ private const val PART_FRAGMENT_TAG = "PART_FRAGMENT"
 class MainActivity : AppCompatActivity() {
 
     private val listItemViewModel by viewModels<ListItemViewModel>()
-    private val partViewModel by viewModels<PartViewModel> {
-        PartViewModel.PartViewModelFactory(RemoteRepository.getInstance(applicationContext), resources)
-    }
+
     private val repository by lazy { Repository.getInstance(applicationContext)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,18 +82,9 @@ class MainActivity : AppCompatActivity() {
         if (part != null) {
             repository.getPart(part) {
                 if (it != null) {
-                    partViewModel.setContents(it)
-
-                    with (supportFragmentManager.beginTransaction()) {
-                        replace(
-                            R.id.main_fragment_container,
-                            PartFragment::class.java,
-                            null,
-                            PART_FRAGMENT_TAG
-                        )
-                        addToBackStack(null)
-                        commit()
-                    }
+                    val intent = Intent(this, PartActivity::class.java)
+                    intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+                    startActivity(intent)
                 }
             }
         }

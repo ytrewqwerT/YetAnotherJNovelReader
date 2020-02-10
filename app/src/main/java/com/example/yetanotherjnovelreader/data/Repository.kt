@@ -3,6 +3,7 @@ package com.example.yetanotherjnovelreader.data
 import android.content.Context
 import android.text.Html
 import android.text.Spanned
+import com.android.volley.toolbox.ImageLoader
 
 class Repository private constructor(appContext: Context) {
     companion object {
@@ -18,6 +19,8 @@ class Repository private constructor(appContext: Context) {
 
     private val local = LocalRepository.getInstance()
     private val remote = RemoteRepository.getInstance(appContext)
+
+    val imageLoader: ImageLoader get() = remote.imageLoader
 
     fun login(email: String, password: String, callback: (Boolean) -> Unit) {
         remote.login(email, password, callback)
@@ -56,8 +59,9 @@ class Repository private constructor(appContext: Context) {
         }
     }
 
-    fun getPart(part: Part, callback: (Spanned?) -> Unit) {
-        remote.getPartJson(part.id) {
+    fun getPart(part: Part, callback: (Spanned?) -> Unit) { getPart(part.id, callback) }
+    fun getPart(partId: String, callback: (Spanned?) -> Unit) {
+        remote.getPartJson(partId) {
             val partHtml = it?.getString("dataHTML")
             if (partHtml != null) {
                 callback(Html.fromHtml(partHtml, 0))
