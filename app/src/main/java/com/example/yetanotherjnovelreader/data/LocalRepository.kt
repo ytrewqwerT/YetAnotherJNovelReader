@@ -1,19 +1,28 @@
 package com.example.yetanotherjnovelreader.data
 
+import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
 
-class LocalRepository private constructor() {
+class LocalRepository private constructor(private val sharedPreferences: SharedPreferences) {
     companion object {
+        private const val AUTH_TOKEN_KEY = "AUTHENTICATION_TOKEN"
         @Volatile
         private var INSTANCE: LocalRepository? = null
-        fun getInstance(): LocalRepository =
+        fun getInstance(sharedPreferences: SharedPreferences): LocalRepository =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: LocalRepository().also {
+                INSTANCE ?: LocalRepository(sharedPreferences).also {
                     INSTANCE = it
                 }
             }
     }
+
+    var authToken: String?
+        get() = sharedPreferences.getString(AUTH_TOKEN_KEY, null)
+        set(value) { with (sharedPreferences.edit()) {
+            putString(AUTH_TOKEN_KEY, value)
+            commit()
+        }}
 
     private val _series = ArrayList<Series>()
     private val _volumes = ArrayList<Volume>()

@@ -17,13 +17,21 @@ class Repository private constructor(appContext: Context) {
             }
     }
 
-    private val local = LocalRepository.getInstance()
-    private val remote = RemoteRepository.getInstance(appContext)
-
+    private val local = LocalRepository.getInstance(appContext.getSharedPreferences(
+        "com.example.yetanotherjnovelreader.GLOBAL_PREFERENCES", Context.MODE_PRIVATE
+    ))
+    private val remote: RemoteRepository
     val imageLoader: ImageLoader get() = remote.imageLoader
 
+    init {
+        remote = RemoteRepository.getInstance(appContext, local.authToken)
+    }
+
     fun login(email: String, password: String, callback: (Boolean) -> Unit) {
-        remote.login(email, password, callback)
+        remote.login(email, password) {
+            local.authToken = it
+            callback(it != null)
+        }
     }
 
     fun getSeries(callback: (List<Series>) -> Unit) {

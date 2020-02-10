@@ -14,19 +14,22 @@ import org.json.JSONObject
 
 private const val TAG = "RemoteRepository"
 
-class RemoteRepository private constructor(appContext: Context) {
+class RemoteRepository private constructor(
+    appContext: Context,
+    private var authToken: String?
+) {
     companion object {
         const val API_ADDR = "https://api.j-novel.club/api"
         const val IMG_ADDR = "https://d2dq7ifhe7bu0f.cloudfront.net"
 
         @Volatile
         private var INSTANCE: RemoteRepository? = null
-        fun getInstance(context: Context) =
+        fun getInstance(context: Context, authToken: String? = null) =
             INSTANCE
                 ?: synchronized(this) {
                 INSTANCE
                     ?: RemoteRepository(
-                        context.applicationContext
+                        context.applicationContext, authToken
                     ).also {
                     INSTANCE = it
                 }
@@ -38,9 +41,7 @@ class RemoteRepository private constructor(appContext: Context) {
         DiskImageLoader(appContext)
     )
 
-    private var authToken: String? = null
-
-    fun login(email: String, password: String, callback: (Boolean) -> Unit) {
+    fun login(email: String, password: String, callback: (String?) -> Unit) {
         val args = JSONObject().put("email", email).put("password", password)
 
         val request = JsonObjectRequest(
@@ -50,11 +51,11 @@ class RemoteRepository private constructor(appContext: Context) {
             Response.Listener {
                 Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
                 authToken = it.getString("id")
-                callback(true)
+                callback(authToken)
             },
             Response.ErrorListener {
                 Log.d(TAG, "LoginFailure: $it")
-                callback(false)
+                callback(null)
             }
         )
         requestQueue.add(request)
