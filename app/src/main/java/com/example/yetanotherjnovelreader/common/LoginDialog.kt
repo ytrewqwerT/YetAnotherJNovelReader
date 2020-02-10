@@ -47,6 +47,7 @@ class LoginDialog : DialogFragment() {
                 button.setOnClickListener {
                     viewModel.login { loginSuccessful ->
                         if (loginSuccessful) {
+                            listener?.onLoginResult(true)
                             dialog.dismiss()
                         } else {
                             errorTextView?.visibility = View.VISIBLE

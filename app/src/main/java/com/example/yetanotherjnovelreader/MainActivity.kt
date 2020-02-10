@@ -56,7 +56,12 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
-            LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
+            if (repository.loggedIn()) {
+                repository.logout()
+                updateMenu()
+            } else {
+                LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
+            }
             true
         }
         else -> super.onOptionsItemSelected(item)
@@ -124,13 +129,19 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
     }
 
     private fun updateMenu() {
-        if (repository.getUsername() != null) {
-            val nameHolder = appBarMenu?.findItem(R.id.account_name)
+        val nameHolder = appBarMenu?.findItem(R.id.account_name)
+        val loginItem = appBarMenu?.findItem(R.id.account_login)
+        if (repository.loggedIn()) {
             nameHolder?.title = repository.getUsername()
+            loginItem?.title = getString(R.string.logout)
+        } else {
+            nameHolder?.title = getString(R.string.not_logged_in)
+            loginItem?.title = getString(R.string.login)
         }
     }
 
     override fun onLoginResult(loggedIn: Boolean) {
+        Log.d(TAG, "Updating account menu")
         updateMenu()
     }
 }

@@ -60,6 +60,15 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
+    fun logout() {
+        val request = AuthorizedJsonObjectRequest(
+            authToken, Request.Method.GET, "${API_ADDR}/users/logout", null,
+            Response.Listener { Log.i(TAG, "LogoutSuccess") },
+            Response.ErrorListener { Log.e(TAG, "LogoutFailure?") }
+        )
+        requestQueue.add(request)
+    }
+
     fun getSeriesJson(callback: (seriesJson: JSONArray) -> Unit) {
         val request = JsonArrayRequest(
             Request.Method.GET,

@@ -36,7 +36,16 @@ class Repository private constructor(appContext: Context) {
             callback(it != null)
         }
     }
+    fun logout() {
+        remote.logout()
+        local.userId = null
+        local.authToken = null
+        local.authDate = null
+        local.username = null
+    }
+    fun loggedIn() = (local.authToken != null)
     fun getUsername() = local.username
+
 
     fun getSeries(callback: (List<Series>) -> Unit) {
         if (local.getSeries().isEmpty()) {
