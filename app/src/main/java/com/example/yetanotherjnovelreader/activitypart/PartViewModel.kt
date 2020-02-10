@@ -20,7 +20,8 @@ private const val TAG = "PartViewModel"
 class PartViewModel(
     private val repository: Repository,
     private val resources: Resources,
-    partId: String
+    partId: String,
+    private val imgWidth: Int
 ) : ViewModel() {
 
     private val _contents = MutableLiveData<Spanned>()
@@ -49,7 +50,8 @@ class PartViewModel(
                     if (response?.bitmap != null) {
                         Log.d(TAG, "Got image from ${img.source}")
                         val drawable = BitmapDrawable(resources, response.bitmap)
-                        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+
+                        drawable.scaleToWidth(imgWidth)
                         val newImg = ImageSpan(drawable)
 
                         val start = spanBuilder.getSpanStart(img)
@@ -71,15 +73,22 @@ class PartViewModel(
     class PartViewModelFactory(
         private val repository: Repository,
         private val resources: Resources,
-        private val partId: String
+        private val partId: String,
+        private val imgWidth: Int
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(PartViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return PartViewModel(repository, resources, partId) as T
+                return PartViewModel(repository, resources, partId, imgWidth) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
 
     }
+}
+
+fun BitmapDrawable.scaleToWidth(width: Int) {
+    Log.d(TAG, "Scaling image to width $width")
+    val height = width * intrinsicHeight / intrinsicWidth
+    setBounds(0, 0, width, height)
 }
