@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
+import com.example.yetanotherjnovelreader.SingleLiveEvent
 import com.example.yetanotherjnovelreader.data.Repository
 
 private const val TAG = "PartViewModel"
@@ -24,8 +25,20 @@ class PartViewModel(
     private val imgWidth: Int
 ) : ViewModel() {
 
+    val initialPartProgress = SingleLiveEvent<Double>()
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
+
+    private var tempImages = -1
+        set(value) {
+            field = value
+            if (value == 0 && partProgress != -1.0) initialPartProgress.value = partProgress
+        }
+    private var partProgress = -1.0
+        set(value) {
+            field = value
+            if (tempImages == 0) initialPartProgress.value = value
+        }
 
     init {
         repository.getPart(partId) {
@@ -34,11 +47,14 @@ class PartViewModel(
                 insertImages(it)
             }
         }
+        repository.getPartProgress(partId) { partProgress = it ?: 0.0 }
     }
 
     private fun insertImages(spanned: Spanned) {
         val spanBuilder =
             (spanned as? SpannableStringBuilder) ?: SpannableStringBuilder(spanned)
+
+        tempImages = spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java).size
 
         for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {
             repository.imageLoader.get(img.source, object : ImageLoader.ImageListener {
@@ -59,6 +75,8 @@ class PartViewModel(
                         spanBuilder.removeSpan(img)
                         spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                         _contents.value = spanBuilder
+
+                        tempImages--
                     }
                 }
 
