@@ -37,6 +37,8 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
     private val _volumes = ArrayList<Volume>()
     private val _parts = ArrayList<Part>()
 
+    var partsProgress: PartsProgress? = null
+
     fun getSeries(): List<Series> = _series
     fun getVolumes(serieId: String): List<Volume> {
         val result = ArrayList<Volume>()

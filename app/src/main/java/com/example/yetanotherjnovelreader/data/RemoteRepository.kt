@@ -125,4 +125,19 @@ class RemoteRepository private constructor(
         )
         requestQueue.add(request)
     }
+
+    fun getUserPartProgressJson(userId: String, callback: (partProgress: JSONArray?) -> Unit) {
+        val url = "${API_ADDR}/users/${userId}?filter={\"include\":\"readParts\"}"
+        val request = AuthorizedJsonObjectRequest(
+            authToken, Request.Method.GET, url, null,
+            Response.Listener {
+                val partProgress = it.getJSONArray("readParts")
+                Log.d(TAG, "PartProgressSuccess: Found progress ${partProgress.length()} parts")
+                Log.d(TAG, partProgress.toString(4))
+                callback(partProgress)
+            },
+            Response.ErrorListener { Log.d(TAG, "PartProgressFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
 }

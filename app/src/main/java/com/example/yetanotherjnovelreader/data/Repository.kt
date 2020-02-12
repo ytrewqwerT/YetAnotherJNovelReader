@@ -96,4 +96,16 @@ class Repository private constructor(appContext: Context) {
             }
         }
     }
+
+    fun getPartProgress(partId: String, callback: (progress: Double?) -> Unit) {
+        val userId = local.userId
+        if (userId != null && local.partsProgress == null) {
+            remote.getUserPartProgressJson(userId) {
+                if (it != null) local.partsProgress = PartsProgress(it)
+                callback(local.partsProgress?.getProgress(partId))
+            }
+        } else {
+            callback(local.partsProgress?.getProgress(partId))
+        }
+    }
 }
