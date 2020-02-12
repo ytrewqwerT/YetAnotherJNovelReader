@@ -2,16 +2,18 @@ package com.example.yetanotherjnovelreader.data
 
 import org.json.JSONArray
 
-class PartsProgress(partsProgressJson: JSONArray) {
+class PartsProgress(partsProgressJson: JSONArray? = null) {
 
     private val progressList = HashMap<String, Double>()
 
     init {
-        for (i in 0 until partsProgressJson.length()) {
-            val part = partsProgressJson.getJSONObject(i)
-            val partId = part.getString("partId")
-            val completion = part.getDouble("completion")
-            progressList[partId] = completion
+        if (partsProgressJson != null) {
+            for (i in 0 until partsProgressJson.length()) {
+                val part = partsProgressJson.getJSONObject(i)
+                val partId = part.getString("partId")
+                val completion = part.getDouble("completion")
+                progressList[partId] = completion
+            }
         }
     }
 

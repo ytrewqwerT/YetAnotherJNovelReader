@@ -7,21 +7,20 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
 import com.example.yetanotherjnovelreader.SingleLiveEvent
 import com.example.yetanotherjnovelreader.data.Repository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val TAG = "PartViewModel"
 
 class PartViewModel(
     private val repository: Repository,
     private val resources: Resources,
-    partId: String,
+    private val partId: String,
     private val imgWidth: Int
 ) : ViewModel() {
 
@@ -29,15 +28,30 @@ class PartViewModel(
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
 
+    private var uploadingProgress = false
+    var currentPartProgress = 0.0
+        set(value) {
+            field = value
+            // Wait before sending to remote to prevent spam
+            if (!uploadingProgress) {
+                uploadingProgress = true
+                viewModelScope.launch {
+                    delay(3000)
+                    repository.setPartProgress(partId, currentPartProgress)
+                    uploadingProgress = false
+                }
+            }
+        }
+
     private var tempImages = -1
         set(value) {
             field = value
-            if (value == 0 && partProgress != -1.0) initialPartProgress.value = partProgress
+            if (value == 0 && partProgress != -1.0) setInitialPartsProgress(partProgress)
         }
     private var partProgress = -1.0
         set(value) {
             field = value
-            if (tempImages == 0) initialPartProgress.value = value
+            if (tempImages == 0) setInitialPartsProgress(value)
         }
 
     init {
@@ -48,6 +62,16 @@ class PartViewModel(
             }
         }
         repository.getPartProgress(partId) { partProgress = it ?: 0.0 }
+    }
+
+    private fun setInitialPartsProgress(value: Double) {
+        viewModelScope.launch {
+            // Responding too quickly upon activity creation results in
+            // the scrollview's position not being updated, so wait.
+            delay(100)
+            initialPartProgress.value = value
+            currentPartProgress = value
+        }
     }
 
     private fun insertImages(spanned: Spanned) {

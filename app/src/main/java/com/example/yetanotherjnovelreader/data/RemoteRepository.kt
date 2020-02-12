@@ -140,4 +140,15 @@ class RemoteRepository private constructor(
         )
         requestQueue.add(request)
     }
+    fun setUserPartProgress(userId: String, partId: String, progress: Double) {
+        val args = JSONObject().put("partId", partId).put("completion", progress)
+        val request = AuthorizedJsonObjectRequest(
+            authToken, Request.Method.POST,
+            "${API_ADDR}/users/${userId}/updateReadCompletion",
+            args,
+            Response.Listener { Log.d(TAG, "SaveProgressSuccess: $partId at $progress") },
+            Response.ErrorListener { Log.d(TAG, "SaveProgressFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
 }

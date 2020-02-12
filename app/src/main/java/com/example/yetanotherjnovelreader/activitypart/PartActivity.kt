@@ -45,5 +45,16 @@ class PartActivity : AppCompatActivity() {
             val position = textView.height * percentage
             scrollView.smoothScrollTo(0, position.toInt())
         }
+
+        scrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            val tvHeight = textView.height
+            val svHeight = scrollView.height
+            viewModel.currentPartProgress = if (svHeight < tvHeight) {
+                // tvHeight - svHeight == scrollY when scrolled to bottom of scrollView
+                scrollY.toDouble() / (tvHeight - svHeight)
+            } else {
+                1.0
+            }
+        }
     }
 }
