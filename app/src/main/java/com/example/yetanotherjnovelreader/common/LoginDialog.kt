@@ -21,7 +21,9 @@ class LoginDialog : DialogFragment() {
 
     private lateinit var binding: DialogLoginBinding
     private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModel.LoginViewModelFactory(Repository.getInstance(requireContext()))
+        LoginViewModelFactory(
+            Repository.getInstance(requireContext())
+        )
     }
 
     @SuppressLint("InflateParams")
