@@ -4,6 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.Html
 import android.text.Spanned
+import com.example.yetanotherjnovelreader.data.local.LocalRepository
+import com.example.yetanotherjnovelreader.data.local.PartsProgress
+import com.example.yetanotherjnovelreader.data.remote.RemoteRepository
 
 private const val TAG = "Repository"
 class Repository private constructor(appContext: Context) {
@@ -101,7 +104,10 @@ class Repository private constructor(appContext: Context) {
         val userId = local.userId
         if (userId != null && local.partsProgress == null) {
             remote.getUserPartProgressJson(userId) {
-                if (it != null) local.partsProgress = PartsProgress(it)
+                if (it != null) local.partsProgress =
+                    PartsProgress(
+                        it
+                    )
                 callback(local.partsProgress?.getProgress(partId))
             }
         } else {
@@ -109,7 +115,8 @@ class Repository private constructor(appContext: Context) {
         }
     }
     fun setPartProgress(partId: String, progress: Double) {
-        if (local.partsProgress == null) local.partsProgress = PartsProgress()
+        if (local.partsProgress == null) local.partsProgress =
+            PartsProgress()
         local.partsProgress?.setProgress(partId, progress)
         val userId = local.userId
         if (userId != null) remote.setUserPartProgress(userId, partId, progress)

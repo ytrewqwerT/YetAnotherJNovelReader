@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader.data
+package com.example.yetanotherjnovelreader.data.remote
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -64,18 +64,27 @@ class RemoteRepository private constructor(
     }
 
     fun logout(callback: (Boolean) -> Unit) {
-        val request = AuthorizedStringRequest(
-            authToken, Request.Method.POST, "${API_ADDR}/users/logout",
-            Response.Listener {
-                Log.i(TAG, "LogoutSuccess")
-                authToken = null
-                callback(true)
-            },
-            Response.ErrorListener {
-                Log.e(TAG, "LogoutFailure? $it")
-                callback(false)
-            }
-        )
+        val request =
+            AuthorizedStringRequest(
+                authToken,
+                Request.Method.POST,
+                "$API_ADDR/users/logout",
+                Response.Listener {
+                    Log.i(
+                        TAG,
+                        "LogoutSuccess"
+                    )
+                    authToken = null
+                    callback(true)
+                },
+                Response.ErrorListener {
+                    Log.e(
+                        TAG,
+                        "LogoutFailure? $it"
+                    )
+                    callback(false)
+                }
+            )
         requestQueue.add(request)
 
     }
@@ -96,7 +105,7 @@ class RemoteRepository private constructor(
     }
 
     fun getSerieJson(serieId: String, callback: (serieJson: JSONObject) -> Unit) {
-        val url = "${API_ADDR}/series/findOne?filter=" +
+        val url = "$API_ADDR/series/findOne?filter=" +
                 "{\"where\":{\"id\":\"${serieId}\"},\"include\":[\"volumes\",\"parts\"]}"
         val request = JsonObjectRequest(
             Request.Method.GET,
@@ -113,44 +122,79 @@ class RemoteRepository private constructor(
     }
 
     fun getPartJson(partId: String, callback: (partJson: JSONObject?) -> Unit) {
-        val request = AuthorizedJsonObjectRequest(
-            authToken,
-            Request.Method.GET,
-            "${API_ADDR}/parts/${partId}/partData",
-            null,
-            Response.Listener {
-                Log.d(TAG, "PartSuccess: Found part $partId")
-                Log.d(TAG, it.toString(4))
-                callback(it)
-            },
-            Response.ErrorListener { Log.d(TAG, "PartFailure: $it") }
-        )
+        val request =
+            AuthorizedJsonObjectRequest(
+                authToken,
+                Request.Method.GET,
+                "$API_ADDR/parts/${partId}/partData",
+                null,
+                Response.Listener {
+                    Log.d(
+                        TAG,
+                        "PartSuccess: Found part $partId"
+                    )
+                    Log.d(
+                        TAG,
+                        it.toString(4)
+                    )
+                    callback(it)
+                },
+                Response.ErrorListener {
+                    Log.d(
+                        TAG,
+                        "PartFailure: $it"
+                    )
+                }
+            )
         requestQueue.add(request)
     }
 
     fun getUserPartProgressJson(userId: String, callback: (partProgress: JSONArray?) -> Unit) {
-        val url = "${API_ADDR}/users/${userId}?filter={\"include\":\"readParts\"}"
-        val request = AuthorizedJsonObjectRequest(
-            authToken, Request.Method.GET, url, null,
-            Response.Listener {
-                val partProgress = it.getJSONArray("readParts")
-                Log.d(TAG, "PartProgressSuccess: Found progress ${partProgress.length()} parts")
-                Log.d(TAG, partProgress.toString(4))
-                callback(partProgress)
-            },
-            Response.ErrorListener { Log.d(TAG, "PartProgressFailure: $it") }
-        )
+        val url = "$API_ADDR/users/${userId}?filter={\"include\":\"readParts\"}"
+        val request =
+            AuthorizedJsonObjectRequest(
+                authToken, Request.Method.GET, url, null,
+                Response.Listener {
+                    val partProgress = it.getJSONArray("readParts")
+                    Log.d(
+                        TAG,
+                        "PartProgressSuccess: Found progress ${partProgress.length()} parts"
+                    )
+                    Log.d(
+                        TAG,
+                        partProgress.toString(4)
+                    )
+                    callback(partProgress)
+                },
+                Response.ErrorListener {
+                    Log.d(
+                        TAG,
+                        "PartProgressFailure: $it"
+                    )
+                }
+            )
         requestQueue.add(request)
     }
     fun setUserPartProgress(userId: String, partId: String, progress: Double) {
         val args = JSONObject().put("partId", partId).put("completion", progress)
-        val request = AuthorizedJsonObjectRequest(
-            authToken, Request.Method.POST,
-            "${API_ADDR}/users/${userId}/updateReadCompletion",
-            args,
-            Response.Listener { Log.d(TAG, "SaveProgressSuccess: $partId at $progress") },
-            Response.ErrorListener { Log.d(TAG, "SaveProgressFailure: $it") }
-        )
+        val request =
+            AuthorizedJsonObjectRequest(
+                authToken, Request.Method.POST,
+                "$API_ADDR/users/${userId}/updateReadCompletion",
+                args,
+                Response.Listener {
+                    Log.d(
+                        TAG,
+                        "SaveProgressSuccess: $partId at $progress"
+                    )
+                },
+                Response.ErrorListener {
+                    Log.d(
+                        TAG,
+                        "SaveProgressFailure: $it"
+                    )
+                }
+            )
         requestQueue.add(request)
     }
 

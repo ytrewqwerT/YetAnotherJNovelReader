@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader.activitypart
+package com.example.yetanotherjnovelreader.partreader
 
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader.common
+package com.example.yetanotherjnovelreader.login
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

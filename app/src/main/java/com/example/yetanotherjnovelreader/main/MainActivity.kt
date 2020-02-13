@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader
+package com.example.yetanotherjnovelreader.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,12 +9,17 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
-import com.example.yetanotherjnovelreader.activitypart.PartActivity
-import com.example.yetanotherjnovelreader.common.*
+import com.example.yetanotherjnovelreader.R
+import com.example.yetanotherjnovelreader.common.ListItem
+import com.example.yetanotherjnovelreader.common.ListItemFragment
+import com.example.yetanotherjnovelreader.common.ListItemViewModel
 import com.example.yetanotherjnovelreader.data.Part
 import com.example.yetanotherjnovelreader.data.Repository
 import com.example.yetanotherjnovelreader.data.Series
 import com.example.yetanotherjnovelreader.data.Volume
+import com.example.yetanotherjnovelreader.login.LoginDialog
+import com.example.yetanotherjnovelreader.login.LoginResultListener
+import com.example.yetanotherjnovelreader.partreader.PartActivity
 
 private const val TAG = "MainActivity"
 
@@ -25,7 +30,8 @@ private const val SERIES_LIST_FRAGMENT_TAG = "SERIES_LIST_FRAGMENT"
 private const val VOLUMES_LIST_FRAGMENT_TAG = "VOLUMES_LIST_FRAGMENT"
 private const val PARTS_LIST_FRAGMENT_TAG = "PARTS_LIST_FRAGMENT"
 
-class MainActivity : AppCompatActivity(), LoginResultListener {
+class MainActivity : AppCompatActivity(),
+    LoginResultListener {
 
     private val listItemViewModel by viewModels<ListItemViewModel>()
     private val repository by lazy { Repository.getInstance(applicationContext)}
@@ -45,7 +51,10 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             listItemViewModel.setItemList(SERIES_LIST_FRAGMENT_ID, it)
         }
 
-        setListItemFragment(SERIES_LIST_FRAGMENT_ID, SERIES_LIST_FRAGMENT_TAG)
+        setListItemFragment(
+            SERIES_LIST_FRAGMENT_ID,
+            SERIES_LIST_FRAGMENT_TAG
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -67,7 +76,8 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
                     }
                 }
             } else {
-                LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
+                LoginDialog()
+                    .show(supportFragmentManager, "LOGIN_DIALOG")
             }
             true
         }
@@ -90,7 +100,10 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             repository.getSerieVolumes(serie) {
                 listItemViewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, it)
             }
-            setListItemFragment(VOLUMES_LIST_FRAGMENT_ID, VOLUMES_LIST_FRAGMENT_TAG)
+            setListItemFragment(
+                VOLUMES_LIST_FRAGMENT_ID,
+                VOLUMES_LIST_FRAGMENT_TAG
+            )
         }
     }
 
@@ -101,7 +114,10 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             repository.getVolumeParts(volume) {
                 listItemViewModel.setItemList(PARTS_LIST_FRAGMENT_ID, it)
             }
-            setListItemFragment(PARTS_LIST_FRAGMENT_ID, PARTS_LIST_FRAGMENT_TAG)
+            setListItemFragment(
+                PARTS_LIST_FRAGMENT_ID,
+                PARTS_LIST_FRAGMENT_TAG
+            )
         }
     }
 

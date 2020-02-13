@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader.data
+package com.example.yetanotherjnovelreader.data.local
 
 import org.json.JSONArray
 

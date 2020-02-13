@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.yetanotherjnovelreader.common.LoginViewModel" />
+            type="com.example.yetanotherjnovelreader.login.LoginViewModel" />
     </data>
 
     <LinearLayout

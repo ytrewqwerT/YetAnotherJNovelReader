@@ -1,6 +1,7 @@
 package com.example.yetanotherjnovelreader.data
 
 import com.example.yetanotherjnovelreader.common.ListItem
+import com.example.yetanotherjnovelreader.data.remote.RemoteRepository
 import org.json.JSONObject
 
 class Volume(source: JSONObject) : JSONObject(source.toString()),

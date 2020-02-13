@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader.common
+package com.example.yetanotherjnovelreader.login
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog

@@ -1,6 +1,9 @@
-package com.example.yetanotherjnovelreader.data
+package com.example.yetanotherjnovelreader.data.local
 
 import android.content.SharedPreferences
+import com.example.yetanotherjnovelreader.data.Part
+import com.example.yetanotherjnovelreader.data.Series
+import com.example.yetanotherjnovelreader.data.Volume
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -13,8 +16,12 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
         @Volatile
         private var INSTANCE: LocalRepository? = null
         fun getInstance(sharedPreferences: SharedPreferences): LocalRepository =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: LocalRepository(sharedPreferences).also {
+            INSTANCE
+                ?: synchronized(this) {
+                INSTANCE
+                    ?: LocalRepository(
+                        sharedPreferences
+                    ).also {
                     INSTANCE = it
                 }
             }
@@ -66,15 +73,27 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
     }
 
     fun addSerieInfo(serieData: JSONObject) {
-        if (!containsSerie(serieData.getString("id"))) _series.add(Series(serieData))
+        if (!containsSerie(serieData.getString("id"))) _series.add(
+            Series(
+                serieData
+            )
+        )
         if (serieData.has("volumes")) addVolumesInfo(serieData.getJSONArray("volumes"))
         if (serieData.has("parts")) addPartsInfo(serieData.getJSONArray("parts"))
     }
     fun addVolumeInfo(volumeData: JSONObject) {
-        if (!containsVolume(volumeData.getString("id"))) _volumes.add(Volume(volumeData))
+        if (!containsVolume(volumeData.getString("id"))) _volumes.add(
+            Volume(
+                volumeData
+            )
+        )
     }
     fun addPartInfo(partData: JSONObject) {
-        if (!containsPart(partData.getString("id"))) _parts.add(Part(partData))
+        if (!containsPart(partData.getString("id"))) _parts.add(
+            Part(
+                partData
+            )
+        )
     }
 
     private fun containsSerie(id: String): Boolean {

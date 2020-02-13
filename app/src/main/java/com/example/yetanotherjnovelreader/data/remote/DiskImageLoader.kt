@@ -1,4 +1,4 @@
-package com.example.yetanotherjnovelreader.data
+package com.example.yetanotherjnovelreader.data.remote
 
 import android.content.Context
 import android.graphics.Bitmap
