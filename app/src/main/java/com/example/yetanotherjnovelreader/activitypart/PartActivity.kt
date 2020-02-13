@@ -19,7 +19,7 @@ class PartActivity : AppCompatActivity() {
     private var mainTextViewWidth = 0
 
     private val viewModel by viewModels<PartViewModel> {
-        PartViewModel.PartViewModelFactory(
+        PartViewModelFactory(
             Repository.getInstance(applicationContext), resources, partId, mainTextViewWidth
         )
     }

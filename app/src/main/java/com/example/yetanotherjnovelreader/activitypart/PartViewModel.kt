@@ -6,14 +6,15 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.yetanotherjnovelreader.SingleLiveEvent
 import com.example.yetanotherjnovelreader.data.Repository
+import com.example.yetanotherjnovelreader.scaleToWidth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-private const val TAG = "PartViewModel"
 
 class PartViewModel(
     private val repository: Repository,
@@ -30,15 +31,7 @@ class PartViewModel(
     var currentPartProgress = 0.0
         set(value) {
             field = value
-            // Wait before sending to remote to prevent spam
-            if (!uploadingProgress) {
-                uploadingProgress = true
-                viewModelScope.launch {
-                    delay(3000)
-                    repository.setPartProgress(partId, currentPartProgress)
-                    uploadingProgress = false
-                }
-            }
+            uploadProgress()
         }
 
     private var tempImages = -1
@@ -75,7 +68,6 @@ class PartViewModel(
     private fun insertImages(spanned: Spanned) {
         val spanBuilder =
             (spanned as? SpannableStringBuilder) ?: SpannableStringBuilder(spanned)
-
         tempImages = spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java).size
 
         for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {
@@ -97,24 +89,15 @@ class PartViewModel(
         }
     }
 
-    class PartViewModelFactory(
-        private val repository: Repository,
-        private val resources: Resources,
-        private val partId: String,
-        private val imgWidth: Int
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(PartViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return PartViewModel(repository, resources, partId, imgWidth) as T
+    private fun uploadProgress() {
+        // Wait before sending to remote to prevent spam
+        if (!uploadingProgress) {
+            uploadingProgress = true
+            viewModelScope.launch {
+                delay(3000)
+                repository.setPartProgress(partId, currentPartProgress)
+                uploadingProgress = false
             }
-            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
-}
-
-fun BitmapDrawable.scaleToWidth(width: Int) {
-    Log.d(TAG, "Scaling image to width $width")
-    val height = width * intrinsicHeight / intrinsicWidth
-    setBounds(0, 0, width, height)
 }
