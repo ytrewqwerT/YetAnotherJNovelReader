@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.text.Html
 import android.text.Spanned
 import com.example.yetanotherjnovelreader.data.local.LocalRepository
-import com.example.yetanotherjnovelreader.data.local.PartsProgress
+import com.example.yetanotherjnovelreader.data.local.UnknownPartsProgress
 import com.example.yetanotherjnovelreader.data.remote.RemoteRepository
 
 private const val TAG = "Repository"
@@ -28,15 +28,30 @@ class Repository private constructor(appContext: Context) {
 
     init {
         remote = RemoteRepository.getInstance(appContext, local.authToken)
+
+        val userId = local.userId
+        if (userId != null) {
+            remote.getUserPartProgressJson(userId) {
+                if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
+            }
+        }
     }
 
     fun login(email: String, password: String, callback: (Boolean) -> Unit) {
-        remote.login(email, password) {
-            local.userId = it?.getString("userId")
-            local.authToken = it?.getString("id")
-            local.authDate = it?.getString("created")
-            local.username = it?.getJSONObject("user")?.getString("username")
-            callback(it != null)
+        remote.login(email, password) { loginJson ->
+            local.userId = loginJson?.getString("userId")
+            local.authToken = loginJson?.getString("id")
+            local.authDate = loginJson?.getString("created")
+            local.username = loginJson?.getJSONObject("user")?.getString("username")
+
+            val userId = local.userId
+            if (userId != null) {
+                remote.getUserPartProgressJson(userId) {
+                    if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
+                }
+            }
+
+            callback(loginJson != null)
         }
     }
     fun logout(callback: (Boolean) -> Unit) {
@@ -100,24 +115,10 @@ class Repository private constructor(appContext: Context) {
         }
     }
 
-    fun getPartProgress(partId: String, callback: (progress: Double?) -> Unit) {
-        val userId = local.userId
-        if (userId != null && local.partsProgress == null) {
-            remote.getUserPartProgressJson(userId) {
-                if (it != null) local.partsProgress =
-                    PartsProgress(
-                        it
-                    )
-                callback(local.partsProgress?.getProgress(partId))
-            }
-        } else {
-            callback(local.partsProgress?.getProgress(partId))
-        }
-    }
+    fun getPartProgress(partId: String) = local.getPart(partId)?.progress ?: 0.0
+
     fun setPartProgress(partId: String, progress: Double) {
-        if (local.partsProgress == null) local.partsProgress =
-            PartsProgress()
-        local.partsProgress?.setProgress(partId, progress)
+        local.getPart(partId)?.progress = progress
         val userId = local.userId
         if (userId != null) remote.setUserPartProgress(userId, partId, progress)
     }
