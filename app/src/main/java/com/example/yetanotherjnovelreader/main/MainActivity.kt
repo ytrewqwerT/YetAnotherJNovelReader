@@ -85,51 +85,45 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun onListItemInteraction(item: ListItem) {
-        val curFragment = supportFragmentManager.findFragmentById(R.id.main_fragment_container)
-        when (curFragment?.tag) {
-            SERIES_LIST_FRAGMENT_TAG -> onSeriesListItemInteraction(item as? Series)
-            VOLUMES_LIST_FRAGMENT_TAG -> onVolumesListItemInteraction(item as? Volume)
-            PARTS_LIST_FRAGMENT_TAG -> onPartsListItemInteraction(item as? Part)
+        when (item) {
+            is Series -> onSeriesListItemInteraction(item)
+            is Volume -> onVolumesListItemInteraction(item)
+            is Part -> onPartsListItemInteraction(item)
+            else -> Log.e(TAG, "ListItemInteraction for $item's type not handled")
         }
     }
 
-    private fun onSeriesListItemInteraction(serie: Series?) {
-        Log.i(TAG, "Series clicked: ${serie?.title}")
-        if (serie != null) {
-            listItemViewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, emptyList())
-            repository.getSerieVolumes(serie) {
-                listItemViewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, it)
-            }
-            setListItemFragment(
-                VOLUMES_LIST_FRAGMENT_ID,
-                VOLUMES_LIST_FRAGMENT_TAG
-            )
+    private fun onSeriesListItemInteraction(serie: Series) {
+        Log.i(TAG, "Series clicked: ${serie.title}")
+        listItemViewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, emptyList())
+        repository.getSerieVolumes(serie) {
+            listItemViewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, it)
         }
+        setListItemFragment(
+            VOLUMES_LIST_FRAGMENT_ID,
+            VOLUMES_LIST_FRAGMENT_TAG
+        )
     }
 
-    private fun onVolumesListItemInteraction(volume: Volume?) {
-        Log.i(TAG, "Volume clicked: ${volume?.title}")
-        if (volume != null) {
-            listItemViewModel.setItemList(PARTS_LIST_FRAGMENT_ID, emptyList())
-            repository.getVolumeParts(volume) {
-                listItemViewModel.setItemList(PARTS_LIST_FRAGMENT_ID, it)
-            }
-            setListItemFragment(
-                PARTS_LIST_FRAGMENT_ID,
-                PARTS_LIST_FRAGMENT_TAG
-            )
+    private fun onVolumesListItemInteraction(volume: Volume) {
+        Log.i(TAG, "Volume clicked: ${volume.title}")
+        listItemViewModel.setItemList(PARTS_LIST_FRAGMENT_ID, emptyList())
+        repository.getVolumeParts(volume) {
+            listItemViewModel.setItemList(PARTS_LIST_FRAGMENT_ID, it)
         }
+        setListItemFragment(
+            PARTS_LIST_FRAGMENT_ID,
+            PARTS_LIST_FRAGMENT_TAG
+        )
     }
 
-    private fun onPartsListItemInteraction(part: Part?) {
-        Log.i(TAG, "Part clicked: ${part?.title}")
-        if (part != null) {
-            repository.getPart(part) {
-                if (it != null) {
-                    val intent = Intent(this, PartActivity::class.java)
-                    intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
-                    startActivity(intent)
-                }
+    private fun onPartsListItemInteraction(part: Part) {
+        Log.i(TAG, "Part clicked: ${part.title}")
+        repository.getPart(part) {
+            if (it != null) {
+                val intent = Intent(this, PartActivity::class.java)
+                intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+                startActivity(intent)
             }
         }
     }
