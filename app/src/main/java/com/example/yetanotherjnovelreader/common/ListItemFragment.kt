@@ -31,6 +31,12 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Force redraw for potentially updated recycler_item progress values
+        recyclerViewAdapter.notifyDataSetChanged()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

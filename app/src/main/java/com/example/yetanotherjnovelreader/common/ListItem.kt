@@ -6,7 +6,8 @@ interface ListItem {
     data class ListItemContents(
         val mTitle: String? = null,
         val mText: String? = null,
-        val mImageUrl: String? = null
+        val mImageUrl: String? = null,
+        val progress: Double? = null
     )
 
     interface InteractionListener {

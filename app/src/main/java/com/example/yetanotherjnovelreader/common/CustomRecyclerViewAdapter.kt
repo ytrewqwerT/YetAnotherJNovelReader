@@ -1,9 +1,11 @@
 package com.example.yetanotherjnovelreader.common
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yetanotherjnovelreader.R
@@ -31,8 +33,19 @@ class CustomRecyclerViewAdapter(
 
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
+
         val repository = Repository.getInstance(holder.imageView.context)
         repository.getImage(contents.mImageUrl) { holder.imageView.setImageBitmap(it) }
+
+        if (contents.progress != null) {
+            val percentage = (100 * contents.progress).toInt()
+            Log.d("CustomRecyclerViewAdapter", "Set ${contents.mTitle} progress to ${percentage}%")
+            holder.progressBar.progress = percentage
+            holder.progressBar.visibility = View.VISIBLE
+        } else {
+            holder.progressBar.visibility = View.INVISIBLE
+        }
+
         holder.view.setOnClickListener { listener?.onClick(items[position]) }
     }
     override fun getItemCount(): Int = items.size
@@ -41,5 +54,6 @@ class CustomRecyclerViewAdapter(
         val titleText: TextView = view.title
         val subText: TextView = view.subText
         val imageView: ImageView = view.image
+        val progressBar: ProgressBar = view.progress
     }
 }
