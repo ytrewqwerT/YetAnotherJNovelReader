@@ -90,6 +90,7 @@ class PartViewModel(
     }
 
     private fun uploadProgress() {
+        // TODO (?): Reduce delay, but only upload after a significant amount of progress is made
         // Wait before sending to remote to prevent spam
         if (!uploadingProgress) {
             uploadingProgress = true
