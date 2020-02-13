@@ -3,11 +3,11 @@ package com.example.yetanotherjnovelreader.common
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.toolbox.NetworkImageView
 import com.example.yetanotherjnovelreader.R
-import com.example.yetanotherjnovelreader.data.remote.RemoteRepository
+import com.example.yetanotherjnovelreader.data.Repository
 import kotlinx.android.synthetic.main.recycler_item.view.*
 
 class CustomRecyclerViewAdapter(
@@ -31,9 +31,8 @@ class CustomRecyclerViewAdapter(
 
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
-        val remoteRepository = RemoteRepository.getInstance(holder.imageView.context)
-        holder.imageView.setImageUrl(contents.mImageUrl, remoteRepository.imageLoader)
-
+        val repository = Repository.getInstance(holder.imageView.context)
+        repository.getImage(contents.mImageUrl) { holder.imageView.setImageBitmap(it) }
         holder.view.setOnClickListener { listener?.onClick(items[position]) }
     }
     override fun getItemCount(): Int = items.size
@@ -41,6 +40,6 @@ class CustomRecyclerViewAdapter(
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
         val subText: TextView = view.subText
-        val imageView: NetworkImageView = view.image
+        val imageView: ImageView = view.image
     }
 }

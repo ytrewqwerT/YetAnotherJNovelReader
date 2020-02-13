@@ -123,6 +123,10 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getImage(source: String?, callback: (Bitmap?) -> Unit) {
-        remote.getImage(source, callback)
+        if (source != null) {
+            remote.getImage(source, callback)
+        } else {
+            callback(null)
+        }
     }
 }

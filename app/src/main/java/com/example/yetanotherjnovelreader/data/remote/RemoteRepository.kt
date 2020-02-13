@@ -198,7 +198,7 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
-    fun getImage(source: String?, callback: (Bitmap?) -> Unit) {
+    fun getImage(source: String, callback: (Bitmap?) -> Unit) {
         imageLoader.get(source, object : ImageLoader.ImageListener {
             override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
                 Log.i(TAG, "Got response for image ${source}: ${response?.bitmap}")
