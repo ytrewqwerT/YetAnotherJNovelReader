@@ -1,10 +1,11 @@
 package com.example.yetanotherjnovelreader.data
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.text.Html
 import android.text.Spanned
-import com.android.volley.toolbox.ImageLoader
 
+private const val TAG = "Repository"
 class Repository private constructor(appContext: Context) {
     companion object {
         @Volatile
@@ -21,7 +22,6 @@ class Repository private constructor(appContext: Context) {
         "com.example.yetanotherjnovelreader.GLOBAL_PREFERENCES", Context.MODE_PRIVATE
     ))
     private val remote: RemoteRepository
-    val imageLoader: ImageLoader get() = remote.imageLoader
 
     init {
         remote = RemoteRepository.getInstance(appContext, local.authToken)
@@ -113,5 +113,9 @@ class Repository private constructor(appContext: Context) {
         local.partsProgress?.setProgress(partId, progress)
         val userId = local.userId
         if (userId != null) remote.setUserPartProgress(userId, partId, progress)
+    }
+
+    fun getImage(source: String?, callback: (Bitmap?) -> Unit) {
+        remote.getImage(source, callback)
     }
 }

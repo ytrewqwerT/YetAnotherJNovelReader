@@ -8,8 +8,6 @@ import android.text.Spanned
 import android.text.style.ImageSpan
 import android.util.Log
 import androidx.lifecycle.*
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.ImageLoader
 import com.example.yetanotherjnovelreader.SingleLiveEvent
 import com.example.yetanotherjnovelreader.data.Repository
 import kotlinx.coroutines.delay
@@ -81,34 +79,21 @@ class PartViewModel(
         tempImages = spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java).size
 
         for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {
-            repository.imageLoader.get(img.source, object : ImageLoader.ImageListener {
-                override fun onResponse(
-                    response: ImageLoader.ImageContainer?,
-                    isImmediate: Boolean
-                ) {
-                    Log.d(TAG, "Got response for image ${img.source}")
-                    if (response?.bitmap != null) {
-                        Log.d(TAG, "Got image from ${img.source}")
-                        val drawable = BitmapDrawable(resources, response.bitmap)
+            repository.getImage(img.source) { bitmap ->
+                if (bitmap != null) {
+                    val drawable = BitmapDrawable(resources, bitmap)
+                    drawable.scaleToWidth(imgWidth)
+                    val newImg = ImageSpan(drawable)
 
-                        drawable.scaleToWidth(imgWidth)
-                        val newImg = ImageSpan(drawable)
+                    val start = spanBuilder.getSpanStart(img)
+                    val end = spanBuilder.getSpanEnd(img)
+                    spanBuilder.removeSpan(img)
+                    spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    _contents.value = spanBuilder
 
-                        val start = spanBuilder.getSpanStart(img)
-                        val end = spanBuilder.getSpanEnd(img)
-                        spanBuilder.removeSpan(img)
-                        spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        _contents.value = spanBuilder
-
-                        tempImages--
-                    }
+                    tempImages--
                 }
-
-                override fun onErrorResponse(error: VolleyError?) {
-                    Log.e(TAG, "Failed to get image: $error")
-                }
-
-            })
+            }
         }
     }
 

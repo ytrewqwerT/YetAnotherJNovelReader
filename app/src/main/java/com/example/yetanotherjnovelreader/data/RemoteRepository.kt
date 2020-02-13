@@ -1,10 +1,12 @@
 package com.example.yetanotherjnovelreader.data
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
@@ -150,5 +152,18 @@ class RemoteRepository private constructor(
             Response.ErrorListener { Log.d(TAG, "SaveProgressFailure: $it") }
         )
         requestQueue.add(request)
+    }
+
+    fun getImage(source: String?, callback: (Bitmap?) -> Unit) {
+        imageLoader.get(source, object : ImageLoader.ImageListener {
+            override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
+                Log.i(TAG, "Got response for image ${source}: ${response?.bitmap}")
+                callback(response?.bitmap)
+            }
+            override fun onErrorResponse(error: VolleyError?) {
+                Log.e(TAG, "Failed to get image: $error")
+                callback(null)
+            }
+        })
     }
 }
