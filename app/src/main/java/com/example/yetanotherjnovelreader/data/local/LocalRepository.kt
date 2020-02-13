@@ -69,6 +69,15 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
         return null
     }
 
+    fun getParts(partIds: List<String>): List<Part> {
+        val resultParts = ArrayList<Part>()
+        for (partId in partIds) {
+            val part = getPart(partId)
+            if (part != null) resultParts.add(part)
+        }
+        return resultParts
+    }
+
     fun addSeriesInfo(seriesData: JSONArray) {
         for (i in 0 until seriesData.length()) addSerieInfo(seriesData.getJSONObject(i))
     }

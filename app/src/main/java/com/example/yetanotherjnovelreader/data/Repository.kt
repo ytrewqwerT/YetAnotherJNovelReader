@@ -7,6 +7,8 @@ import android.text.Spanned
 import com.example.yetanotherjnovelreader.data.local.LocalRepository
 import com.example.yetanotherjnovelreader.data.local.UnknownPartsProgress
 import com.example.yetanotherjnovelreader.data.remote.RemoteRepository
+import java.time.Instant
+import java.time.Period
 
 private const val TAG = "Repository"
 class Repository private constructor(appContext: Context) {
@@ -128,6 +130,19 @@ class Repository private constructor(appContext: Context) {
             remote.getImage(source, callback)
         } else {
             callback(null)
+        }
+    }
+
+    fun getRecentParts(callback: (List<Part>) -> Unit) {
+        val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
+        remote.getPartsJsonAfter(oneMonthAgo) {
+            // Funnel through LocalRepository and back so that part progress is attached to parts
+            local.addPartsInfo(it)
+            val partIds = ArrayList<String>()
+            for (i in 0 until it.length()) {
+                partIds.add(it.getJSONObject(i).getString("id"))
+            }
+            callback(local.getParts(partIds))
         }
     }
 }

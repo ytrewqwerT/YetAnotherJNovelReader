@@ -13,6 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.Instant
 
 private const val TAG = "RemoteRepository"
 
@@ -117,6 +118,20 @@ class RemoteRepository private constructor(
                 callback(it)
             },
             Response.ErrorListener { Log.d(TAG, "SerieFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
+
+    fun getPartsJsonAfter(time: Instant, callback: (partsJson: JSONArray) -> Unit) {
+        val url = "${API_ADDR}/parts?filter=" +
+                "{\"where\":{\"launchDate\":{\"gt\":\"${time}\"}},\"order\":\"launchDate+DESC\"}"
+        val request = JsonArrayRequest(
+            Request.Method.GET, url, null,
+            Response.Listener {
+                Log.i(TAG, "RecentPartSuccess: Found ${it.length()} parts")
+                callback(it)
+            },
+            Response.ErrorListener { Log.e(TAG, "RecentPartFailure: $it") }
         )
         requestQueue.add(request)
     }
