@@ -44,7 +44,7 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
     private val _volumes = ArrayList<Volume>()
     private val _parts = ArrayList<Part>()
 
-    var partsProgress: PartsProgress? = null
+    private var unknownPartsProgress: UnknownPartsProgress? = null
 
     fun getSeries(): List<Series> = _series
     fun getVolumes(serieId: String): List<Volume> {
@@ -62,6 +62,13 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
         return result
     }
 
+    fun getPart(partId: String): Part? {
+        for (part in _parts) {
+            if (part.id == partId) return part
+        }
+        return null
+    }
+
     fun addSeriesInfo(seriesData: JSONArray) {
         for (i in 0 until seriesData.length()) addSerieInfo(seriesData.getJSONObject(i))
     }
@@ -73,27 +80,28 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
     }
 
     fun addSerieInfo(serieData: JSONObject) {
-        if (!containsSerie(serieData.getString("id"))) _series.add(
-            Series(
-                serieData
-            )
-        )
+        if (!containsSerie(serieData.getString("id"))) _series.add(Series(serieData))
         if (serieData.has("volumes")) addVolumesInfo(serieData.getJSONArray("volumes"))
         if (serieData.has("parts")) addPartsInfo(serieData.getJSONArray("parts"))
     }
     fun addVolumeInfo(volumeData: JSONObject) {
-        if (!containsVolume(volumeData.getString("id"))) _volumes.add(
-            Volume(
-                volumeData
-            )
-        )
+        if (!containsVolume(volumeData.getString("id"))) _volumes.add(Volume(volumeData))
     }
     fun addPartInfo(partData: JSONObject) {
-        if (!containsPart(partData.getString("id"))) _parts.add(
-            Part(
-                partData
-            )
-        )
+        if (!containsPart(partData.getString("id"))) {
+            val part = Part(partData)
+            val partProgress = unknownPartsProgress?.getProgress(part.id)
+            if (partProgress != null) part.progress = partProgress
+            _parts.add(part)
+        }
+    }
+
+    fun setPartsProgress(progress: UnknownPartsProgress) {
+        unknownPartsProgress = progress
+        for (part in _parts) {
+            val partProgress = progress.getProgress(part.id)
+            if (partProgress != null) part.progress = partProgress
+        }
     }
 
     private fun containsSerie(id: String): Boolean {

@@ -52,7 +52,7 @@ class PartViewModel(
                 insertImages(it)
             }
         }
-        repository.getPartProgress(partId) { partProgress = it ?: 0.0 }
+        partProgress = repository.getPartProgress(partId)
     }
 
     private fun setInitialPartsProgress(value: Double) {

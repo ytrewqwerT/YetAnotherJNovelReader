@@ -2,7 +2,7 @@ package com.example.yetanotherjnovelreader.data.local
 
 import org.json.JSONArray
 
-class PartsProgress(partsProgressJson: JSONArray? = null) {
+class UnknownPartsProgress(partsProgressJson: JSONArray? = null) {
 
     private val progressList = HashMap<String, Double>()
 
