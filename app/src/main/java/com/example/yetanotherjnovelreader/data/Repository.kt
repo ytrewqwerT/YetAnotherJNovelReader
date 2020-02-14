@@ -10,7 +10,6 @@ import com.example.yetanotherjnovelreader.data.remote.RemoteRepository
 import java.time.Instant
 import java.time.Period
 
-private const val TAG = "Repository"
 class Repository private constructor(appContext: Context) {
     companion object {
         @Volatile

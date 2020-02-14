@@ -15,13 +15,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 
-private const val TAG = "RemoteRepository"
-
 class RemoteRepository private constructor(
     appContext: Context,
     var authToken: String?
 ) {
+
     companion object {
+        private const val TAG = "RemoteRepository"
         const val API_ADDR = "https://api.j-novel.club/api"
         const val IMG_ADDR = "https://d2dq7ifhe7bu0f.cloudfront.net"
 
@@ -57,7 +57,7 @@ class RemoteRepository private constructor(
                 callback(it)
             },
             Response.ErrorListener {
-                Log.d(TAG, "LoginFailure: $it")
+                Log.w(TAG, "LoginFailure: $it")
                 callback(null)
             }
         )
@@ -71,18 +71,12 @@ class RemoteRepository private constructor(
                 Request.Method.POST,
                 "$API_ADDR/users/logout",
                 Response.Listener {
-                    Log.i(
-                        TAG,
-                        "LogoutSuccess"
-                    )
+                    Log.d(TAG, "LogoutSuccess")
                     authToken = null
                     callback(true)
                 },
                 Response.ErrorListener {
-                    Log.e(
-                        TAG,
-                        "LogoutFailure? $it"
-                    )
+                    Log.w(TAG, "LogoutFailure? $it")
                     callback(false)
                 }
             )
@@ -97,10 +91,10 @@ class RemoteRepository private constructor(
             null,
             Response.Listener<JSONArray> {
                 Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
-                Log.d(TAG, it.toString(4))
+                Log.v(TAG, it.toString(4))
                 callback(it)
             },
-            Response.ErrorListener { Log.d(TAG, "SeriesFailure: $it") }
+            Response.ErrorListener { Log.w(TAG, "SeriesFailure: $it") }
         )
         requestQueue.add(request)
     }
@@ -114,10 +108,10 @@ class RemoteRepository private constructor(
             null,
             Response.Listener<JSONObject> {
                 Log.d(TAG, "SerieSuccess: Found series $serieId")
-                Log.d(TAG, it.toString(4))
+                Log.v(TAG, it.toString(4))
                 callback(it)
             },
-            Response.ErrorListener { Log.d(TAG, "SerieFailure: $it") }
+            Response.ErrorListener { Log.w(TAG, "SerieFailure: $it") }
         )
         requestQueue.add(request)
     }
@@ -128,10 +122,10 @@ class RemoteRepository private constructor(
         val request = JsonArrayRequest(
             Request.Method.GET, url, null,
             Response.Listener {
-                Log.i(TAG, "RecentPartSuccess: Found ${it.length()} parts")
+                Log.d(TAG, "RecentPartSuccess: Found ${it.length()} parts")
                 callback(it)
             },
-            Response.ErrorListener { Log.e(TAG, "RecentPartFailure: $it") }
+            Response.ErrorListener { Log.w(TAG, "RecentPartFailure: $it") }
         )
         requestQueue.add(request)
     }
@@ -144,21 +138,12 @@ class RemoteRepository private constructor(
                 "$API_ADDR/parts/${partId}/partData",
                 null,
                 Response.Listener {
-                    Log.d(
-                        TAG,
-                        "PartSuccess: Found part $partId"
-                    )
-                    Log.d(
-                        TAG,
-                        it.toString(4)
-                    )
+                    Log.d(TAG, "PartSuccess: Found part $partId")
+                    Log.v(TAG, it.toString(4))
                     callback(it)
                 },
                 Response.ErrorListener {
-                    Log.d(
-                        TAG,
-                        "PartFailure: $it"
-                    )
+                    Log.w(TAG, "PartFailure: $it")
                 }
             )
         requestQueue.add(request)
@@ -171,21 +156,12 @@ class RemoteRepository private constructor(
                 authToken, Request.Method.GET, url, null,
                 Response.Listener {
                     val partProgress = it.getJSONArray("readParts")
-                    Log.d(
-                        TAG,
-                        "PartProgressSuccess: Found progress ${partProgress.length()} parts"
-                    )
-                    Log.d(
-                        TAG,
-                        partProgress.toString(4)
-                    )
+                    Log.d(TAG, "PartProgressSuccess: Found progress ${partProgress.length()} parts")
+                    Log.v(TAG, partProgress.toString(4))
                     callback(partProgress)
                 },
                 Response.ErrorListener {
-                    Log.d(
-                        TAG,
-                        "PartProgressFailure: $it"
-                    )
+                    Log.w(TAG, "PartProgressFailure: $it")
                 }
             )
         requestQueue.add(request)
@@ -198,16 +174,10 @@ class RemoteRepository private constructor(
                 "$API_ADDR/users/${userId}/updateReadCompletion",
                 args,
                 Response.Listener {
-                    Log.d(
-                        TAG,
-                        "SaveProgressSuccess: $partId at $progress"
-                    )
+                    Log.d(TAG, "SaveProgressSuccess: $partId at $progress")
                 },
                 Response.ErrorListener {
-                    Log.d(
-                        TAG,
-                        "SaveProgressFailure: $it"
-                    )
+                    Log.w(TAG, "SaveProgressFailure: $it")
                 }
             )
         requestQueue.add(request)
@@ -216,11 +186,11 @@ class RemoteRepository private constructor(
     fun getImage(source: String, callback: (Bitmap?) -> Unit) {
         imageLoader.get(source, object : ImageLoader.ImageListener {
             override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
-                Log.i(TAG, "Got response for image ${source}: ${response?.bitmap}")
+                Log.d(TAG, "Got response for image ${source}: ${response?.bitmap}")
                 callback(response?.bitmap)
             }
             override fun onErrorResponse(error: VolleyError?) {
-                Log.e(TAG, "Failed to get image: $error")
+                Log.w(TAG, "Failed to get image: $error")
                 callback(null)
             }
         })

@@ -45,16 +45,9 @@ class DiskImageLoader(appContext: Context) :
         cache.edit(urlToName(url))?.apply {
             val stream = newOutputStream(0)
             if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)) {
-                Log.i(
-                    TAG,
-                    "Encoded $bitmap for $url"
-                )
                 commit()
             } else {
-                Log.e(
-                    TAG,
-                    "Failed to encode $bitmap for $url"
-                )
+                Log.e(TAG, "Failed to encode $bitmap for $url")
                 abort()
             }
         }

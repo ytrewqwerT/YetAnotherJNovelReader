@@ -1,6 +1,5 @@
 package com.example.yetanotherjnovelreader.common
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +38,6 @@ class CustomRecyclerViewAdapter(
 
         if (contents.progress != null) {
             val percentage = (100 * contents.progress).toInt()
-            Log.d("CustomRecyclerViewAdapter", "Set ${contents.mTitle} progress to ${percentage}%")
             holder.progressBar.progress = percentage
             holder.progressBar.visibility = View.VISIBLE
         } else {
