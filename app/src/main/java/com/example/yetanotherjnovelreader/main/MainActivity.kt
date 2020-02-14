@@ -1,5 +1,6 @@
 package com.example.yetanotherjnovelreader.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -7,13 +8,16 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.observe
 import androidx.viewpager.widget.ViewPager
 import com.example.yetanotherjnovelreader.R
 import com.example.yetanotherjnovelreader.addOnPageSelectedListener
 import com.example.yetanotherjnovelreader.common.ListItemViewModel
+import com.example.yetanotherjnovelreader.data.Part
 import com.example.yetanotherjnovelreader.data.Repository
 import com.example.yetanotherjnovelreader.login.LoginDialog
 import com.example.yetanotherjnovelreader.login.LoginResultListener
+import com.example.yetanotherjnovelreader.partreader.PartActivity
 
 class MainActivity : AppCompatActivity(),
     LoginResultListener {
@@ -39,6 +43,9 @@ class MainActivity : AppCompatActivity(),
 
         val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
         repository.getRecentParts { viewModel.setItemList(recentPartsFragId, it) }
+        viewModel.itemClickedEvent.observe(this) {
+            onPartsListItemInteraction(it.item as? Part)
+        }
 
         viewPager.addOnPageSelectedListener { position: Int ->
             with (supportFragmentManager.beginTransaction()) {
@@ -92,5 +99,18 @@ class MainActivity : AppCompatActivity(),
         Log.d(TAG, "Updating account menu")
         if (loggedIn) Toast.makeText(this, "Logged in", Toast.LENGTH_LONG).show()
         updateMenu()
+    }
+
+    private fun onPartsListItemInteraction(part: Part?) {
+        Log.d(TAG, "Part clicked: ${part?.title}")
+        if (part != null) {
+            repository.getPart(part) {
+                if (it != null) {
+                    val intent = Intent(this, PartActivity::class.java)
+                    intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+                    startActivity(intent)
+                }
+            }
+        } else Log.e(TAG, "Clicked item handled by MainActivity was null")
     }
 }
