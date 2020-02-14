@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +18,10 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener {
         const val ARG_ID = "${TAG}_ID"
     }
 
-    private val viewModel by activityViewModels<ListItemViewModel>()
+    private val viewModel by lazy {
+        // If a parent fragment exists, let it manage this fragment's contents instead of activity.
+        ViewModelProvider(parentFragment ?: requireActivity())[ListItemViewModel::class.java]
+    }
     private var uid = 0
     private var recyclerViewAdapter = CustomRecyclerViewAdapter(this)
 
