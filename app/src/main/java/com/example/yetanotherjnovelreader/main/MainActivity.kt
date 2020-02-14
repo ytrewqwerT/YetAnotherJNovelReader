@@ -132,6 +132,11 @@ class MainActivity : AppCompatActivity(),
         with (supportFragmentManager.beginTransaction()) {
             val args = Bundle()
             args.putInt(ListItemFragment.ARG_ID, fragmentId)
+            android.R.animator.fade_in
+            setCustomAnimations(
+                R.animator.slide_from_right, R.animator.slide_to_left,
+                R.animator.slide_from_left, R.animator.slide_to_right
+            )
             replace(
                 R.id.main_fragment_container,
                 ListItemFragment::class.java,
