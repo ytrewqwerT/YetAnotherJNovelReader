@@ -5,12 +5,15 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager.widget.ViewPager
 import com.example.yetanotherjnovelreader.R
+import com.example.yetanotherjnovelreader.addOnPageSelectedListener
+import com.example.yetanotherjnovelreader.common.ListItemViewModel
 import com.example.yetanotherjnovelreader.data.Repository
 import com.example.yetanotherjnovelreader.login.LoginDialog
 import com.example.yetanotherjnovelreader.login.LoginResultListener
-import com.example.yetanotherjnovelreader.seriesnavigation.ExplorerFragment
 
 class MainActivity : AppCompatActivity(),
     LoginResultListener {
@@ -19,8 +22,10 @@ class MainActivity : AppCompatActivity(),
         private const val TAG = "MainActivity"
     }
 
+    private val viewModel by viewModels<ListItemViewModel>()
     private val repository by lazy { Repository.getInstance(applicationContext)}
     private var appBarMenu: Menu? = null
+    private lateinit var viewPager: ViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +33,19 @@ class MainActivity : AppCompatActivity(),
 
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        with (supportFragmentManager.beginTransaction()) {
-            val navFragment = ExplorerFragment()
-            add(R.id.main_fragment_container, navFragment)
-            setPrimaryNavigationFragment(navFragment)
-            commit()
+        viewPager = findViewById(R.id.pager)
+        val viewPagerAdapter = MainPagerAdapter(supportFragmentManager)
+        viewPager.adapter = viewPagerAdapter
+
+        val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
+        repository.getRecentParts { viewModel.setItemList(recentPartsFragId, it) }
+
+        viewPager.addOnPageSelectedListener { position: Int ->
+            with (supportFragmentManager.beginTransaction()) {
+                val fragment = viewPagerAdapter.getItem(position)
+                setPrimaryNavigationFragment(fragment)
+                commit()
+            }
         }
     }
 

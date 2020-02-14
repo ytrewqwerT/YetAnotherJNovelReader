@@ -28,7 +28,7 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        uid = arguments?.getInt(ARG_ID, 0) ?: 0
+        uid = requireArguments().getInt(ARG_ID, 0)
         viewModel.getItemList(uid).observe(this) {
             recyclerViewAdapter.setItems(it)
         }
