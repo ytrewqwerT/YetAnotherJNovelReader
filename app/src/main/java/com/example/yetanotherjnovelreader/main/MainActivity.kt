@@ -21,17 +21,19 @@ import com.example.yetanotherjnovelreader.login.LoginDialog
 import com.example.yetanotherjnovelreader.login.LoginResultListener
 import com.example.yetanotherjnovelreader.partreader.PartActivity
 
-private const val TAG = "MainActivity"
-
-private const val SERIES_LIST_FRAGMENT_ID = 1
-private const val VOLUMES_LIST_FRAGMENT_ID = 2
-private const val PARTS_LIST_FRAGMENT_ID = 3
-private const val SERIES_LIST_FRAGMENT_TAG = "SERIES_LIST_FRAGMENT"
-private const val VOLUMES_LIST_FRAGMENT_TAG = "VOLUMES_LIST_FRAGMENT"
-private const val PARTS_LIST_FRAGMENT_TAG = "PARTS_LIST_FRAGMENT"
-
 class MainActivity : AppCompatActivity(),
     LoginResultListener {
+
+    companion object {
+        private const val TAG = "MainActivity"
+
+        private const val SERIES_LIST_FRAGMENT_ID = 1
+        private const val VOLUMES_LIST_FRAGMENT_ID = 2
+        private const val PARTS_LIST_FRAGMENT_ID = 3
+        private const val SERIES_LIST_FRAGMENT_TAG = "SERIES_LIST_FRAGMENT"
+        private const val VOLUMES_LIST_FRAGMENT_TAG = "VOLUMES_LIST_FRAGMENT"
+        private const val PARTS_LIST_FRAGMENT_TAG = "PARTS_LIST_FRAGMENT"
+    }
 
     private val listItemViewModel by viewModels<ListItemViewModel>()
     private val repository by lazy { Repository.getInstance(applicationContext)}
@@ -94,7 +96,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun onSeriesListItemInteraction(serie: Series) {
-        Log.i(TAG, "Series clicked: ${serie.title}")
+        Log.d(TAG, "Series clicked: ${serie.title}")
         listItemViewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, emptyList())
         repository.getSerieVolumes(serie) {
             listItemViewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, it)
@@ -106,7 +108,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun onVolumesListItemInteraction(volume: Volume) {
-        Log.i(TAG, "Volume clicked: ${volume.title}")
+        Log.d(TAG, "Volume clicked: ${volume.title}")
         listItemViewModel.setItemList(PARTS_LIST_FRAGMENT_ID, emptyList())
         repository.getVolumeParts(volume) {
             listItemViewModel.setItemList(PARTS_LIST_FRAGMENT_ID, it)
@@ -118,7 +120,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun onPartsListItemInteraction(part: Part) {
-        Log.i(TAG, "Part clicked: ${part.title}")
+        Log.d(TAG, "Part clicked: ${part.title}")
         repository.getPart(part) {
             if (it != null) {
                 val intent = Intent(this, PartActivity::class.java)
