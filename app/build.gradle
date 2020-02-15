@@ -9,7 +9,7 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.yetanotherjnovelreader"
+        applicationId "com.ytrewqwert.yetanotherjnovelreader"
         minSdkVersion 27
         targetSdkVersion 28
         versionCode 1
