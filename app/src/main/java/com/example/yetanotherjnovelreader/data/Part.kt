@@ -33,7 +33,7 @@ class Part(source: JSONObject) : JSONObject(source.toString()), ListItem {
     }
 
     override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
-        title, descriptionShort,
+        title, null,
         "${RemoteRepository.IMG_ADDR}/$coverFullUrl",
         progress
     )
