@@ -1,5 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader
 
+import android.content.SharedPreferences
 import android.graphics.drawable.BitmapDrawable
 import androidx.viewpager.widget.ViewPager
 
@@ -19,4 +20,18 @@ fun ViewPager.addOnPageSelectedListener(listener: (position: Int) -> Unit) {
             listener(position)
         }
     })
+}
+
+fun SharedPreferences.setString(key: String, value: String?) {
+    with (this.edit()) {
+        putString(key, value)
+        commit()
+    }
+}
+
+fun SharedPreferences.setInt(key: String, value: Int) {
+    with (this.edit()) {
+        putInt(key, value)
+        commit()
+    }
 }

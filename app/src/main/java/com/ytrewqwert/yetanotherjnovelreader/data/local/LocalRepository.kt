@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.ytrewqwert.yetanotherjnovelreader.data.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.Series
 import com.ytrewqwert.yetanotherjnovelreader.data.Volume
+import com.ytrewqwert.yetanotherjnovelreader.setString
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -29,16 +30,16 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
 
     var userId: String?
         get() = sharedPreferences.getString(USER_ID_KEY, null)
-        set(value) { setSharedPrefString(USER_ID_KEY, value) }
+        set(value) = sharedPreferences.setString(USER_ID_KEY, value)
     var authToken: String?
         get() = sharedPreferences.getString(AUTH_TOKEN_KEY, null)
-        set(value) { setSharedPrefString(AUTH_TOKEN_KEY, value) }
+        set(value) = sharedPreferences.setString(AUTH_TOKEN_KEY, value)
     var authDate: String?
         get() = sharedPreferences.getString(AUTH_DATE_KEY, null)
-        set(value) { setSharedPrefString(AUTH_DATE_KEY, value) }
+        set(value) = sharedPreferences.setString(AUTH_DATE_KEY, value)
     var username: String?
         get() = sharedPreferences.getString(USERNAME_KEY, null)
-        set(value) { setSharedPrefString(USERNAME_KEY, value) }
+        set(value) = sharedPreferences.setString(USERNAME_KEY, value)
 
     private val _series = ArrayList<Series>()
     private val _volumes = ArrayList<Volume>()
@@ -132,12 +133,5 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
     private fun containsPart(id: String): Boolean {
         for (part in _parts) if (part.id == id) return true
         return false
-    }
-
-    private fun setSharedPrefString(key: String, value: String?) {
-        with (sharedPreferences.edit()) {
-            putString(key, value)
-            commit()
-        }
     }
 }
