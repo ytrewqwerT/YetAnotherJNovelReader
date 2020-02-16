@@ -14,6 +14,10 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
         private const val AUTH_TOKEN_KEY = "AUTHENTICATION_TOKEN"
         private const val AUTH_DATE_KEY = "AUTHENTICATION_DATE"
         private const val USERNAME_KEY = "USERNAME"
+
+        private const val FONT_SIZE_KEY = "FONT_SIZE" // TODO: Coordinate key with R.xml.preferences
+        private const val FONT_SIZE_DEFAULT = 15 // TODO: Maybe move value to resource file?
+
         @Volatile
         private var INSTANCE: LocalRepository? = null
         fun getInstance(sharedPreferences: SharedPreferences): LocalRepository =
@@ -40,6 +44,8 @@ class LocalRepository private constructor(private val sharedPreferences: SharedP
     var username: String?
         get() = sharedPreferences.getString(USERNAME_KEY, null)
         set(value) = sharedPreferences.setString(USERNAME_KEY, value)
+    val fontSize: Int
+        get() = sharedPreferences.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT)
 
     private val _series = ArrayList<Series>()
     private val _volumes = ArrayList<Volume>()

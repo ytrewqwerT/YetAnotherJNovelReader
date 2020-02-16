@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.Html
 import android.text.Spanned
+import androidx.preference.PreferenceManager
 import com.ytrewqwert.yetanotherjnovelreader.data.local.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.UnknownPartsProgress
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
@@ -26,12 +27,14 @@ class Repository private constructor(appContext: Context) {
             }
     }
 
-    private val local = LocalRepository.getInstance(appContext.getSharedPreferences(
-        "com.ytrewqwert.yetanotherjnovelreader.GLOBAL_PREFERENCES", Context.MODE_PRIVATE
-    ))
+    private val local: LocalRepository
     private val remote: RemoteRepository
 
+    val fontSize: Int get() = local.fontSize
+
     init {
+        val prefManager = PreferenceManager.getDefaultSharedPreferences(appContext)
+        local = LocalRepository.getInstance(prefManager)
         remote = RemoteRepository.getInstance(appContext, local.authToken)
 
         val userId = local.userId

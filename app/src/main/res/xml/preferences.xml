@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen>
-
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <SeekBarPreference
+        app:key="FONT_SIZE"
+        app:title="@string/font_size"
+        app:icon="@drawable/ic_format_size_on_background_24dp"
+        app:defaultValue="15"
+        app:min="8"
+        android:max="32"
+        app:showSeekBarValue="true" />
 </PreferenceScreen>

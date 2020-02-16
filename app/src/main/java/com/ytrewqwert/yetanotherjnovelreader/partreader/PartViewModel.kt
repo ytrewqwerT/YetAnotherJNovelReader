@@ -26,6 +26,7 @@ class PartViewModel(
     val initialPartProgress = SingleLiveEvent<Double>()
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
+    val fontSize: Int get() = repository.fontSize
 
     private var uploadingProgress = false
     var currentPartProgress = 0.0

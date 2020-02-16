@@ -4,6 +4,7 @@ import android.animation.AnimatorInflater
 import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -82,6 +83,12 @@ class PartActivity : AppCompatActivity() {
                 else -> View.VISIBLE
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val textSize = viewModel.fontSize.toFloat()
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
