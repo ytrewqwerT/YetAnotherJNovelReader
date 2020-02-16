@@ -1,18 +1,23 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader
 
 import android.animation.AnimatorInflater
+import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.addListener
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 
 class PartActivity : AppCompatActivity() {
     companion object {
@@ -30,23 +35,27 @@ class PartActivity : AppCompatActivity() {
 
     private lateinit var loadBar: ProgressBar
     private lateinit var scrollView: ScrollView
+    private lateinit var textView: TextView
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_part)
 
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
         partId = intent.getStringExtra(EXTRA_PART_ID)
 
         loadBar = findViewById(R.id.load_bar)
         scrollView = findViewById(R.id.content_scroll_container)
-        val textView = findViewById<TextView>(R.id.content_view)
+        textView = findViewById<TextView>(R.id.content_view)
 
-        val mainTextView = findViewById<TextView>(R.id.content_view)
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         mainTextViewWidth =
             displayMetrics.widthPixels - 2 * resources.getDimensionPixelSize(R.dimen.text_margin)
-        viewModel.contents.observe(this) { mainTextView.text = it }
+        viewModel.contents.observe(this) { textView.text = it }
 
         // TODO: Add indicator that part is still loading until below observer is fired
         viewModel.initialPartProgress.observe(this) { percentage ->
@@ -65,6 +74,28 @@ class PartActivity : AppCompatActivity() {
                 1.0
             }
         }
+
+        // Attaching to scrollView would have been preferred, but it doesn't seem to want to work...
+        textView.setOnClickListener {
+            toolbar.visibility = when (toolbar.visibility) {
+                View.VISIBLE -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_reader, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean  = when (item?.itemId) {
+        R.id.settings_button -> {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     private fun transitionToContent() {
