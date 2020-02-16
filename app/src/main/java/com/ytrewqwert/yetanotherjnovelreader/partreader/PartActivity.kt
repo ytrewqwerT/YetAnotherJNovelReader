@@ -89,6 +89,7 @@ class PartActivity : AppCompatActivity() {
         super.onResume()
         val textSize = viewModel.fontSize.toFloat()
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+        textView.typeface = viewModel.fontStyle
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

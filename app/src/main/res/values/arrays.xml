@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="font_names">
+        <item>Default</item>
+        <item>Alegreya</item>
+        <item>Alegreya Sans</item>
+        <item>Crimson Text</item>
+        <item>Lora</item>
+        <item>Open Sans</item>
+    </string-array>
+    <string-array name="font_files">
+        <item>default</item>
+        <item>alegreya.ttf</item>
+        <item>alegreya_sans.ttf</item>
+        <item>crimson_text.ttf</item>
+        <item>lora.ttf</item>
+        <item>open_sans.ttf</item>
+    </string-array>
+</resources>

@@ -1,6 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader
 
 import android.content.res.Resources
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -27,6 +28,7 @@ class PartViewModel(
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
     val fontSize: Int get() = repository.fontSize
+    val fontStyle: Typeface get() = repository.fontStyle
 
     private var uploadingProgress = false
     var currentPartProgress = 0.0

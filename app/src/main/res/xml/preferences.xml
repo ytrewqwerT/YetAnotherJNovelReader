@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <SeekBarPreference
-        app:key="FONT_SIZE"
-        app:title="@string/font_size"
-        app:icon="@drawable/ic_format_size_on_background_24dp"
-        app:defaultValue="15"
-        app:min="8"
-        android:max="32"
-        app:showSeekBarValue="true" />
+
+    <PreferenceCategory
+        app:title="@string/reader">
+        <SeekBarPreference
+            app:key="FONT_SIZE"
+            app:title="@string/font_size"
+            app:icon="@drawable/ic_format_size_on_background_24dp"
+            app:defaultValue="15"
+            app:min="8"
+            android:max="32"
+            app:showSeekBarValue="true" />
+        <ListPreference
+            android:key="FONT_STYLE"
+            android:title="Font"
+            android:summary="%s"
+            android:defaultValue="1"
+            android:entries="@array/font_names"
+            android:entryValues="@array/font_files" />
+    </PreferenceCategory>
+
+
 </PreferenceScreen>

@@ -2,10 +2,11 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Typeface
 import android.text.Html
 import android.text.Spanned
-import androidx.preference.PreferenceManager
 import com.ytrewqwert.yetanotherjnovelreader.data.local.LocalRepository
+import com.ytrewqwert.yetanotherjnovelreader.data.local.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.local.UnknownPartsProgress
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import java.time.Instant
@@ -27,17 +28,17 @@ class Repository private constructor(appContext: Context) {
             }
     }
 
-    private val local: LocalRepository
+    private val prefStore: PreferenceStore = PreferenceStore.getInstance(appContext)
+    private val local: LocalRepository = LocalRepository.getInstance()
     private val remote: RemoteRepository
 
-    val fontSize: Int get() = local.fontSize
+    val fontSize: Int get() = prefStore.fontSize
+    val fontStyle: Typeface get() = prefStore.fontStyle
 
     init {
-        val prefManager = PreferenceManager.getDefaultSharedPreferences(appContext)
-        local = LocalRepository.getInstance(prefManager)
-        remote = RemoteRepository.getInstance(appContext, local.authToken)
+        remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
-        val userId = local.userId
+        val userId = prefStore.userId
         if (userId != null) {
             remote.getUserPartProgressJson(userId) {
                 if (it != null) local.setPartsProgress(
@@ -51,12 +52,12 @@ class Repository private constructor(appContext: Context) {
 
     fun login(email: String, password: String, callback: (Boolean) -> Unit) {
         remote.login(email, password) { loginJson ->
-            local.userId = loginJson?.getString("userId")
-            local.authToken = loginJson?.getString("id")
-            local.authDate = loginJson?.getString("created")
-            local.username = loginJson?.getJSONObject("user")?.getString("username")
+            prefStore.userId = loginJson?.getString("userId")
+            prefStore.authToken = loginJson?.getString("id")
+            prefStore.authDate = loginJson?.getString("created")
+            prefStore.username = loginJson?.getJSONObject("user")?.getString("username")
 
-            val userId = local.userId
+            val userId = prefStore.userId
             if (userId != null) {
                 remote.getUserPartProgressJson(userId) {
                     if (it != null) local.setPartsProgress(
@@ -73,17 +74,17 @@ class Repository private constructor(appContext: Context) {
     fun logout(callback: (Boolean) -> Unit) {
         remote.logout { logoutSuccessful ->
             if (logoutSuccessful) {
-                local.userId = null
-                local.authToken = null
-                local.authDate = null
-                local.username = null
+                prefStore.userId = null
+                prefStore.authToken = null
+                prefStore.authDate = null
+                prefStore.username = null
             }
             callback(logoutSuccessful)
         }
 
     }
-    fun loggedIn() = (local.authToken != null)
-    fun getUsername() = local.username
+    fun loggedIn() = (prefStore.authToken != null)
+    fun getUsername() = prefStore.username
 
 
     fun getSeries(callback: (List<Series>) -> Unit) {
@@ -135,7 +136,7 @@ class Repository private constructor(appContext: Context) {
 
     fun setPartProgress(partId: String, progress: Double) {
         local.getPart(partId)?.progress = progress
-        val userId = local.userId
+        val userId = prefStore.userId
         if (userId != null) remote.setUserPartProgress(userId, partId, progress)
     }
 

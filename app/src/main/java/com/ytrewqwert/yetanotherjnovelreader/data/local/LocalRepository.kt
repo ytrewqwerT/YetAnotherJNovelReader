@@ -1,51 +1,24 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.local
 
-import android.content.SharedPreferences
 import com.ytrewqwert.yetanotherjnovelreader.data.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.Series
 import com.ytrewqwert.yetanotherjnovelreader.data.Volume
-import com.ytrewqwert.yetanotherjnovelreader.setString
 import org.json.JSONArray
 import org.json.JSONObject
 
-class LocalRepository private constructor(private val sharedPreferences: SharedPreferences) {
+class LocalRepository private constructor() {
     companion object {
-        private const val USER_ID_KEY = "USER_ID"
-        private const val AUTH_TOKEN_KEY = "AUTHENTICATION_TOKEN"
-        private const val AUTH_DATE_KEY = "AUTHENTICATION_DATE"
-        private const val USERNAME_KEY = "USERNAME"
-
-        private const val FONT_SIZE_KEY = "FONT_SIZE" // TODO: Coordinate key with R.xml.preferences
-        private const val FONT_SIZE_DEFAULT = 15 // TODO: Maybe move value to resource file?
-
         @Volatile
         private var INSTANCE: LocalRepository? = null
-        fun getInstance(sharedPreferences: SharedPreferences): LocalRepository =
+        fun getInstance(): LocalRepository =
             INSTANCE
                 ?: synchronized(this) {
                 INSTANCE
-                    ?: LocalRepository(
-                        sharedPreferences
-                    ).also {
+                    ?: LocalRepository().also {
                     INSTANCE = it
                 }
             }
     }
-
-    var userId: String?
-        get() = sharedPreferences.getString(USER_ID_KEY, null)
-        set(value) = sharedPreferences.setString(USER_ID_KEY, value)
-    var authToken: String?
-        get() = sharedPreferences.getString(AUTH_TOKEN_KEY, null)
-        set(value) = sharedPreferences.setString(AUTH_TOKEN_KEY, value)
-    var authDate: String?
-        get() = sharedPreferences.getString(AUTH_DATE_KEY, null)
-        set(value) = sharedPreferences.setString(AUTH_DATE_KEY, value)
-    var username: String?
-        get() = sharedPreferences.getString(USERNAME_KEY, null)
-        set(value) = sharedPreferences.setString(USERNAME_KEY, value)
-    val fontSize: Int
-        get() = sharedPreferences.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT)
 
     private val _series = ArrayList<Series>()
     private val _volumes = ArrayList<Volume>()
