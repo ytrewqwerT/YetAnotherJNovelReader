@@ -14,6 +14,8 @@ class Part(source: JSONObject) : JSONObject(source.toString()),
     val partNum = getInt("partNumber")
     val description = getString("description")
     val descriptionShort = getString("descriptionShort")
+    val expired = getBoolean("expired")
+    val preview = getBoolean("preview")
     val tags = getString("tags")
     val created = getString("created")
     val coverFullUrl: String
@@ -44,6 +46,6 @@ class Part(source: JSONObject) : JSONObject(source.toString()),
     override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
         title, null,
         "${RemoteRepository.IMG_ADDR}/$coverFullUrl",
-        progress
+        progress, !expired
     )
 }

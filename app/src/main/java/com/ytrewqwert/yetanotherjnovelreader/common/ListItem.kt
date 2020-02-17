@@ -7,7 +7,8 @@ interface ListItem {
         val mTitle: String? = null,
         val mText: String? = null,
         val mImageUrl: String? = null,
-        val progress: Double? = null
+        val progress: Double? = null,
+        val clickable: Boolean = true
     )
 
     interface InteractionListener {

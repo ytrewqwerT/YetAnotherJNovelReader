@@ -42,6 +42,7 @@ class Volume(source: JSONObject) : JSONObject(source.toString()),
     override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
         title,
         descriptionShort,
-        "${RemoteRepository.IMG_ADDR}/$coverFullUrl"
+        "${RemoteRepository.IMG_ADDR}/$coverFullUrl",
+        null, true
     )
 }

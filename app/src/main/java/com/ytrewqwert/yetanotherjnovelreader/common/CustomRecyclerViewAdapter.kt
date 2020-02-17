@@ -1,5 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,7 +45,15 @@ class CustomRecyclerViewAdapter(
             holder.progressBar.visibility = View.INVISIBLE
         }
 
-        holder.view.setOnClickListener { listener?.onClick(items[position]) }
+        if (contents.clickable) {
+            holder.view.foreground = null
+            holder.view.setOnClickListener { listener?.onClick(items[position]) }
+        } else {
+            val disabledColor = holder.view.resources.getColor(R.color.disabled, null)
+            holder.view.foreground = ColorDrawable(disabledColor)
+            holder.view.isClickable = false
+        }
+
     }
     override fun getItemCount(): Int = items.size
 
