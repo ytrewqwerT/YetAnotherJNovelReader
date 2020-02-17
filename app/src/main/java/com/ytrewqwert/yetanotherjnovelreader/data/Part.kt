@@ -33,6 +33,14 @@ class Part(source: JSONObject) : JSONObject(source.toString()),
         coverThumbUrl = thumb ?: ""
     }
 
+    override fun equals(other: Any?): Boolean = when (other) {
+        !is Part -> false
+        else -> id == other.id
+    }
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
     override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
         title, null,
         "${RemoteRepository.IMG_ADDR}/$coverFullUrl",

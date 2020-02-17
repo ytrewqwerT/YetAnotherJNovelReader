@@ -30,6 +30,14 @@ class Series(source: JSONObject) : JSONObject(source.toString()),
         coverThumbUrl = thumb ?: ""
     }
 
+    override fun equals(other: Any?): Boolean = when (other) {
+        !is Series -> false
+        else -> id == other.id
+    }
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
     override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
         title,
         descriptionShort,

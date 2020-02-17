@@ -77,7 +77,7 @@ class Repository private constructor(appContext: Context) {
     fun getSeries(callback: (List<Series>) -> Unit) {
         if (local.getSeries().isEmpty()) {
             remote.getSeriesJson {
-                local.addSeriesInfo(it)
+                local.addData(it)
                 callback(local.getSeries())
             }
         } else {
@@ -92,7 +92,7 @@ class Repository private constructor(appContext: Context) {
             callback(local.getVolumes(seriesId))
         } else {
             remote.getSerieJson(seriesId) {
-                local.addSerieInfo(it)
+                local.addData(it)
                 callback(local.getVolumes(seriesId))
             }
         }
@@ -103,7 +103,7 @@ class Repository private constructor(appContext: Context) {
             callback(local.getParts(volume.id))
         } else {
             remote.getSerieJson(volume.serieId) {
-                local.addSerieInfo(it)
+                local.addData(it)
                 callback(local.getParts(volume.id))
             }
         }
@@ -140,7 +140,7 @@ class Repository private constructor(appContext: Context) {
         val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
         remote.getPartsJsonAfter(oneMonthAgo) {
             // Funnel through LocalRepository and back so that part progress is attached to parts
-            local.addPartsInfo(it)
+            local.addData(it)
             val partIds = ArrayList<String>()
             for (i in 0 until it.length())
                 partIds.add(it.getJSONObject(i).getString("id"))
