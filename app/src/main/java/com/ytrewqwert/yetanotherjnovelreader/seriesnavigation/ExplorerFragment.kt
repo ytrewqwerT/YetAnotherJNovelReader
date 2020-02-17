@@ -23,13 +23,9 @@ class ExplorerFragment : Fragment() {
 
     companion object {
         private const val TAG = "NavigationFragment"
-        private const val SERIES_LIST_FRAGMENT_ID = 1
-        private const val VOLUMES_LIST_FRAGMENT_ID = 2
-        private const val PARTS_LIST_FRAGMENT_ID = 3
-        private const val SERIES_LIST_FRAGMENT_TAG = "SERIES_LIST_FRAGMENT"
-        private const val VOLUMES_LIST_FRAGMENT_TAG = "VOLUMES_LIST_FRAGMENT"
-        private const val PARTS_LIST_FRAGMENT_TAG = "PARTS_LIST_FRAGMENT"
     }
+
+    private enum class ListTypes { SERIES, VOLUMES, PARTS }
 
     private val viewModel by viewModels<ListItemViewModel>()
     private val repository by lazy { Repository.getInstance(requireContext()) }
@@ -38,8 +34,9 @@ class ExplorerFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         viewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
-        repository.getSeries { viewModel.setItemList(SERIES_LIST_FRAGMENT_ID, it) }
-        setListItemFragment(SERIES_LIST_FRAGMENT_ID, SERIES_LIST_FRAGMENT_TAG)
+
+        repository.getSeries { viewModel.setItemList(ListTypes.SERIES.ordinal, it) }
+        setListItemFragment(ListTypes.SERIES.ordinal, ListTypes.SERIES.name)
     }
 
     override fun onCreateView(
@@ -82,25 +79,25 @@ class ExplorerFragment : Fragment() {
 
     private fun onSeriesListItemInteraction(serie: Series) {
         Log.d(TAG, "Series clicked: ${serie.title}")
-        viewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, emptyList())
+        viewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
         repository.getSerieVolumes(serie) {
-            viewModel.setItemList(VOLUMES_LIST_FRAGMENT_ID, it)
+            viewModel.setItemList(ListTypes.VOLUMES.ordinal, it)
         }
         setListItemFragment(
-            VOLUMES_LIST_FRAGMENT_ID,
-            VOLUMES_LIST_FRAGMENT_TAG
+            ListTypes.VOLUMES.ordinal,
+            ListTypes.VOLUMES.name
         )
     }
 
     private fun onVolumesListItemInteraction(volume: Volume) {
         Log.d(TAG, "Volume clicked: ${volume.title}")
-        viewModel.setItemList(PARTS_LIST_FRAGMENT_ID, emptyList())
+        viewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
         repository.getVolumeParts(volume) {
-            viewModel.setItemList(PARTS_LIST_FRAGMENT_ID, it)
+            viewModel.setItemList(ListTypes.PARTS.ordinal, it)
         }
         setListItemFragment(
-            PARTS_LIST_FRAGMENT_ID,
-            PARTS_LIST_FRAGMENT_TAG
+            ListTypes.PARTS.ordinal,
+            ListTypes.PARTS.name
         )
     }
 

@@ -52,19 +52,12 @@ class Repository private constructor(appContext: Context) {
 
     fun login(email: String, password: String, callback: (Boolean) -> Unit) {
         remote.login(email, password) { loginJson ->
-            prefStore.userId = loginJson?.getString("userId")
-            prefStore.authToken = loginJson?.getString("id")
-            prefStore.authDate = loginJson?.getString("created")
-            prefStore.username = loginJson?.getJSONObject("user")?.getString("username")
+            prefStore.setUserData(loginJson)
 
             val userId = prefStore.userId
             if (userId != null) {
                 remote.getUserPartProgressJson(userId) {
-                    if (it != null) local.setPartsProgress(
-                        UnknownPartsProgress(
-                            it
-                        )
-                    )
+                    if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
                 }
             }
 
@@ -73,19 +66,13 @@ class Repository private constructor(appContext: Context) {
     }
     fun logout(callback: (Boolean) -> Unit) {
         remote.logout { logoutSuccessful ->
-            if (logoutSuccessful) {
-                prefStore.userId = null
-                prefStore.authToken = null
-                prefStore.authDate = null
-                prefStore.username = null
-            }
+            if (logoutSuccessful) prefStore.clearUserData()
             callback(logoutSuccessful)
         }
 
     }
     fun loggedIn() = (prefStore.authToken != null)
     fun getUsername() = prefStore.username
-
 
     fun getSeries(callback: (List<Series>) -> Unit) {
         if (local.getSeries().isEmpty()) {
@@ -98,25 +85,27 @@ class Repository private constructor(appContext: Context) {
         }
     }
 
-    fun getSerieVolumes(serie: Series, callback: (List<Volume>) -> Unit) {
-        if (local.getVolumes(serie.id).isEmpty()) {
-            remote.getSerieJson(serie.id) {
-                local.addSerieInfo(it)
-                callback(local.getVolumes(serie.id))
-            }
+    fun getSerieVolumes(series: Series, callback: (List<Volume>) -> Unit) =
+        getSerieVolumes(series.id, callback)
+    fun getSerieVolumes(seriesId: String, callback: (List<Volume>) -> Unit) {
+        if (local.getVolumes(seriesId).isNotEmpty()) {
+            callback(local.getVolumes(seriesId))
         } else {
-            callback(local.getVolumes(serie.id))
+            remote.getSerieJson(seriesId) {
+                local.addSerieInfo(it)
+                callback(local.getVolumes(seriesId))
+            }
         }
     }
 
     fun getVolumeParts(volume: Volume, callback: (List<Part>) -> Unit) {
-        if (local.getParts(volume.id).isEmpty()) {
+        if (local.getParts(volume.id).isNotEmpty()) {
+            callback(local.getParts(volume.id))
+        } else {
             remote.getSerieJson(volume.serieId) {
                 local.addSerieInfo(it)
                 callback(local.getParts(volume.id))
             }
-        } else {
-            callback(local.getParts(volume.id))
         }
     }
 
@@ -133,7 +122,6 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getPartProgress(partId: String) = local.getPart(partId)?.progress ?: 0.0
-
     fun setPartProgress(partId: String, progress: Double) {
         local.getPart(partId)?.progress = progress
         val userId = prefStore.userId
@@ -154,9 +142,8 @@ class Repository private constructor(appContext: Context) {
             // Funnel through LocalRepository and back so that part progress is attached to parts
             local.addPartsInfo(it)
             val partIds = ArrayList<String>()
-            for (i in 0 until it.length()) {
+            for (i in 0 until it.length())
                 partIds.add(it.getJSONObject(i).getString("id"))
-            }
             callback(local.getParts(partIds))
         }
     }

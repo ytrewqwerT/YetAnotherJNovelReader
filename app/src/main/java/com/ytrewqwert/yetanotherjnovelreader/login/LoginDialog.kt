@@ -21,9 +21,7 @@ class LoginDialog : DialogFragment() {
 
     private lateinit var binding: DialogLoginBinding
     private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModelFactory(
-            Repository.getInstance(requireContext())
-        )
+        LoginViewModelFactory(Repository.getInstance(requireContext()))
     }
 
     @SuppressLint("InflateParams")
@@ -36,6 +34,7 @@ class LoginDialog : DialogFragment() {
 
             val view = binding.root
             val errorTextView = view.findViewById<TextView>(R.id.login_error_text)
+
             val dialog = MaterialAlertDialogBuilder(it)
                 .setTitle("Login")
                 .setView(view)

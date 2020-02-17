@@ -71,6 +71,7 @@ class PartViewModel(
     private fun insertImages(spanned: Spanned) {
         val spanBuilder =
             (spanned as? SpannableStringBuilder) ?: SpannableStringBuilder(spanned)
+
         tempImages = spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java).size
 
         for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {

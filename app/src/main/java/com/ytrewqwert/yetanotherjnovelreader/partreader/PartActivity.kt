@@ -52,37 +52,8 @@ class PartActivity : AppCompatActivity() {
         scrollView = findViewById(R.id.content_scroll_container)
         textView = findViewById<TextView>(R.id.content_view)
 
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        mainTextViewWidth =
-            displayMetrics.widthPixels - 2 * resources.getDimensionPixelSize(R.dimen.text_margin)
-        viewModel.contents.observe(this) { textView.text = it }
-
-        // TODO: Add indicator that part is still loading until below observer is fired
-        viewModel.initialPartProgress.observe(this) { percentage ->
-            val position = textView.height * percentage
-            scrollView.scrollTo(0, position.toInt())
-            transitionToContent()
-        }
-
-        scrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-            val tvHeight = textView.height
-            val svHeight = scrollView.height
-            viewModel.currentPartProgress = if (svHeight < tvHeight) {
-                // tvHeight - svHeight == scrollY when scrolled to bottom of scrollView
-                scrollY.toDouble() / (tvHeight - svHeight)
-            } else {
-                1.0
-            }
-        }
-
-        // Attaching to scrollView would have been preferred, but it doesn't seem to want to work...
-        textView.setOnClickListener {
-            toolbar.visibility = when (toolbar.visibility) {
-                View.VISIBLE -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
+        determineMainTextViewWidth()
+        initialiseObserversListeners()
     }
 
     override fun onResume() {
@@ -104,6 +75,41 @@ class PartActivity : AppCompatActivity() {
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+
+    private fun initialiseObserversListeners() {
+        viewModel.contents.observe(this) { textView.text = it }
+        viewModel.initialPartProgress.observe(this) { percentage ->
+            val position = textView.height * percentage
+            scrollView.scrollTo(0, position.toInt())
+            transitionToContent()
+        }
+
+        scrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            val tvHeight = textView.height
+            val svHeight = scrollView.height
+            viewModel.currentPartProgress = if (svHeight < tvHeight) {
+                // tvHeight - svHeight == scrollY when scrolled to bottom of scrollView
+                scrollY.toDouble() / (tvHeight - svHeight)
+            } else {
+                1.0
+            }
+        }
+        // Attaching to scrollView would have been preferred, but it doesn't seem to want to work...
+        textView.setOnClickListener {
+            toolbar.visibility = when (toolbar.visibility) {
+                View.VISIBLE -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+    }
+
+    private fun determineMainTextViewWidth() {
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        mainTextViewWidth =
+            displayMetrics.widthPixels - 2 * resources.getDimensionPixelSize(R.dimen.text_margin)
     }
 
     private fun transitionToContent() {

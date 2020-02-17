@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Typeface
 import androidx.preference.PreferenceManager
 import com.ytrewqwert.yetanotherjnovelreader.setString
+import org.json.JSONObject
 
 class PreferenceStore private constructor(private val appContext: Context) {
 
@@ -56,4 +57,17 @@ class PreferenceStore private constructor(private val appContext: Context) {
                 else -> Typeface.createFromAsset(appContext.assets, "fonts/$styleString")
             }
         }
+
+    fun setUserData(data: JSONObject?) {
+        userId = data?.getString("userId")
+        authToken = data?.getString("id")
+        authDate = data?.getString("created")
+        username = data?.getJSONObject("user")?.getString("username")
+    }
+    fun clearUserData() {
+        userId = null
+        authToken = null
+        authDate = null
+        username = null
+    }
 }

@@ -28,10 +28,3 @@ fun SharedPreferences.setString(key: String, value: String?) {
         commit()
     }
 }
-
-fun SharedPreferences.setInt(key: String, value: Int) {
-    with (this.edit()) {
-        putInt(key, value)
-        commit()
-    }
-}

@@ -8,9 +8,7 @@ import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 class ListItemViewModel : ViewModel() {
 
     private val itemLists = ArrayList<MutableLiveData< List<ListItem> >>()
-
-    val itemClickedEvent =
-        SingleLiveEvent<EventData>()
+    val itemClickedEvent = SingleLiveEvent<EventData>()
 
     fun setItemList(fragmentId: Int, list: List<ListItem>) {
         while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
@@ -23,11 +21,7 @@ class ListItemViewModel : ViewModel() {
     }
 
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
-        itemClickedEvent.value =
-            EventData(
-                fragmentId,
-                item
-            )
+        itemClickedEvent.value = EventData(fragmentId, item)
     }
 
     data class EventData(

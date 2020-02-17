@@ -34,25 +34,25 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         setSupportActionBar(findViewById(R.id.toolbar))
 
         viewPager = findViewById(R.id.pager)
         val viewPagerAdapter = MainPagerAdapter(supportFragmentManager)
         viewPager.adapter = viewPagerAdapter
-
-        val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
-        repository.getRecentParts { viewModel.setItemList(recentPartsFragId, it) }
-        viewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? Part)
-        }
-
+        // Set primary navigation fragment to the focused viewpager page to allow interception
         viewPager.addOnPageSelectedListener { position: Int ->
             with (supportFragmentManager.beginTransaction()) {
                 val fragment = viewPagerAdapter.getItem(position)
                 setPrimaryNavigationFragment(fragment)
                 commit()
             }
+        }
+
+        // Catch Part clicks from the recent parts page in the viewpager
+        val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
+        repository.getRecentParts { viewModel.setItemList(recentPartsFragId, it) }
+        viewModel.itemClickedEvent.observe(this) {
+            onPartsListItemInteraction(it.item as? Part)
         }
     }
 
@@ -66,21 +66,24 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
             if (repository.loggedIn()) {
-                repository.logout { logoutSuccessful ->
-                    if (logoutSuccessful) {
-                        Toast.makeText(this, "Logout Successful", Toast.LENGTH_LONG).show()
-                        updateMenu()
-                    } else {
-                        Toast.makeText(this, "Logout Failed", Toast.LENGTH_LONG).show()
-                    }
-                }
+                logout()
             } else {
-                LoginDialog()
-                    .show(supportFragmentManager, "LOGIN_DIALOG")
+                LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
             }
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun logout() {
+        repository.logout { logoutSuccessful ->
+            if (logoutSuccessful) {
+                Toast.makeText(this, "Logout Successful", Toast.LENGTH_LONG).show()
+                updateMenu()
+            } else {
+                Toast.makeText(this, "Logout Failed", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun updateMenu() {

@@ -27,10 +27,7 @@ class ListItemFragment : Fragment(),
         ViewModelProvider(parentFragment ?: requireActivity())[ListItemViewModel::class.java]
     }
     private var uid = 0
-    private var recyclerViewAdapter =
-        CustomRecyclerViewAdapter(
-            this
-        )
+    private var recyclerViewAdapter = CustomRecyclerViewAdapter(this)
 
     private lateinit var loadBar: ProgressBar
     private lateinit var recyclerView: RecyclerView
@@ -49,7 +46,7 @@ class ListItemFragment : Fragment(),
         super.onResume()
         // Force redraw for potentially updated recycler_item progress values
         recyclerViewAdapter.notifyDataSetChanged()
-
+        // Pausing switches back to the initial loading view for some reason, so switch it back
         if (viewModel.getItemList(uid).value?.isNotEmpty() == true) {
             loadBar.visibility = View.GONE
             recyclerView.visibility = View.VISIBLE
