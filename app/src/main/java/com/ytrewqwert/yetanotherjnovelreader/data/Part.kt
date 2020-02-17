@@ -46,6 +46,12 @@ class Part(source: JSONObject) : JSONObject(source.toString()),
     override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
         title, null,
         "${RemoteRepository.IMG_ADDR}/$coverFullUrl",
-        progress, !expired
+        progress, readable()
     )
+
+    private fun readable(): Boolean {
+        if (expired) return false
+        if (preview) return true
+        return Repository.getInstance()?.isMember() ?: false
+    }
 }

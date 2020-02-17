@@ -99,7 +99,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onLoginResult(loggedIn: Boolean) {
-        Log.d(TAG, "Updating account menu")
         if (loggedIn) Toast.makeText(this, "Logged in", Toast.LENGTH_LONG).show()
         updateMenu()
     }

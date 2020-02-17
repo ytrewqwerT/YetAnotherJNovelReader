@@ -28,3 +28,10 @@ fun SharedPreferences.setString(key: String, value: String?) {
         commit()
     }
 }
+
+fun SharedPreferences.setBoolean(key: String, value: Boolean) {
+    with (this.edit()) {
+        putBoolean(key, value)
+        commit()
+    }
+}

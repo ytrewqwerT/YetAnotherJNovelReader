@@ -16,6 +16,7 @@ class Repository private constructor(appContext: Context) {
     companion object {
         @Volatile
         private var INSTANCE: Repository? = null
+        fun getInstance() = INSTANCE
         fun getInstance(context: Context) =
             INSTANCE
                 ?: synchronized(this) {
@@ -73,6 +74,7 @@ class Repository private constructor(appContext: Context) {
     }
     fun loggedIn() = (prefStore.authToken != null)
     fun getUsername() = prefStore.username
+    fun isMember() = prefStore.isMember
 
     fun getSeries(callback: (List<Series>) -> Unit) {
         if (local.getSeries().isEmpty()) {
