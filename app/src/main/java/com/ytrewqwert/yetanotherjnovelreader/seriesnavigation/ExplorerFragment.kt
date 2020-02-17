@@ -103,12 +103,8 @@ class ExplorerFragment : Fragment() {
 
     private fun onPartsListItemInteraction(part: Part) {
         Log.d(TAG, "Part clicked: ${part.title}")
-        repository.getPart(part) {
-            if (it != null) {
-                val intent = Intent(context, PartActivity::class.java)
-                intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
-                startActivity(intent)
-            }
-        }
+        val intent = Intent(context, PartActivity::class.java)
+        intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+        startActivity(intent)
     }
 }

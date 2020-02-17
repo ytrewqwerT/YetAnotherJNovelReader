@@ -107,13 +107,9 @@ class MainActivity : AppCompatActivity(),
     private fun onPartsListItemInteraction(part: Part?) {
         Log.d(TAG, "Part clicked: ${part?.title}")
         if (part != null) {
-            repository.getPart(part) {
-                if (it != null) {
-                    val intent = Intent(this, PartActivity::class.java)
-                    intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
-                    startActivity(intent)
-                }
-            }
+            val intent = Intent(this, PartActivity::class.java)
+            intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+            startActivity(intent)
         } else Log.e(TAG, "Clicked item handled by MainActivity was null")
     }
 }

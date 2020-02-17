@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -79,11 +80,17 @@ class PartActivity : AppCompatActivity() {
 
 
     private fun initialiseObserversListeners() {
-        viewModel.contents.observe(this) { textView.text = it }
+        viewModel.contents.observe(this) {
+            textView.text = it
+        }
         viewModel.initialPartProgress.observe(this) { percentage ->
             val position = textView.height * percentage
             scrollView.scrollTo(0, position.toInt())
             transitionToContent()
+        }
+        viewModel.errorEvent.observe(this) { error ->
+            Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+            finish()
         }
 
         scrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->

@@ -161,6 +161,7 @@ class RemoteRepository private constructor(
                         TAG,
                         "PartFailure: $it"
                     )
+                    callback(null)
                 }
             )
         requestQueue.add(request)

@@ -24,9 +24,12 @@ class PartViewModel(
     private val imgWidth: Int
 ) : ViewModel() {
 
+    val errorEvent = SingleLiveEvent<String>()
+
     val initialPartProgress = SingleLiveEvent<Double>()
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
+
     val fontSize: Int get() = repository.fontSize
     val fontStyle: Typeface get() = repository.fontStyle
 
@@ -53,6 +56,8 @@ class PartViewModel(
             if (it != null) {
                 _contents.value = it
                 insertImages(it)
+            } else {
+                errorEvent.value = "Failed to get part data"
             }
         }
         partProgress = repository.getPartProgress(partId)
