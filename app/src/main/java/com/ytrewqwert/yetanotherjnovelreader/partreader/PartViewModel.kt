@@ -99,15 +99,24 @@ class PartViewModel(
     }
 
     private fun uploadProgress() {
-        // TODO (?): Reduce delay, but only upload after a significant amount of progress is made
         // Wait before sending to remote to prevent spam
         if (!uploadingProgress) {
             uploadingProgress = true
             viewModelScope.launch {
-                delay(3000)
-                repository.setPartProgress(partId, currentPartProgress)
-                uploadingProgress = false
+                delay(60 * 1000)
+                if (uploadingProgress) {
+                    repository.setPartProgress(partId, currentPartProgress)
+                    uploadingProgress = false
+                }
             }
+        }
+    }
+
+    fun uploadProgressNow() {
+        // Only upload if the value has changed since last upload
+        if (uploadingProgress) {
+            repository.setPartProgress(partId, currentPartProgress)
+            uploadingProgress = false
         }
     }
 }

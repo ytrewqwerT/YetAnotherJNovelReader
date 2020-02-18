@@ -73,4 +73,6 @@ class LocalRepository private constructor() {
             if (partProgress != null) part.progress = partProgress
         }
     }
+
+    fun setPartProgress(partId: String, progress: Double) { getPart(partId)?.progress = progress }
 }

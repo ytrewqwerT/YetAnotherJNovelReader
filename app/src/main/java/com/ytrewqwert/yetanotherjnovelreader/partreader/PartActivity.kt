@@ -57,6 +57,10 @@ class PartActivity : AppCompatActivity() {
         initialiseObserversListeners()
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.uploadProgressNow()
+    }
     override fun onResume() {
         super.onResume()
         val textSize = viewModel.fontSize.toFloat()
