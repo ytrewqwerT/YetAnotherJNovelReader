@@ -25,10 +25,18 @@ class MainPagerAdapter(fm: FragmentManager)
     private val explorerFragment by lazy { ExplorerFragment() }
 
     override fun getCount(): Int = ChildFragments.values().size
+
     override fun getItem(position: Int): Fragment {
         return when (ChildFragments.values()[position]) {
             ChildFragments.RECENT_PARTS -> recentPartsFragment
             ChildFragments.EXPLORER -> explorerFragment
+        }
+    }
+
+    override fun getPageTitle(position: Int): CharSequence? {
+        return when (ChildFragments.values()[position]) {
+            ChildFragments.RECENT_PARTS -> "Recent"
+            ChildFragments.EXPLORER -> "Explore"
         }
     }
 }
