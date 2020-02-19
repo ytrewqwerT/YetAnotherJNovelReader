@@ -34,18 +34,18 @@ class DataStore {
     }
 
     companion object {
+        fun fromJson(json: JSONArray): DataStore {
+            val store = DataStore()
+            for (i in 0 until json.length()) store.mergeData(fromJson(json.getJSONObject(i)))
+            return store
+        }
+
         fun fromJson(json: JSONObject): DataStore {
             val store = DataStore()
             // Identify as series, volume, or part, and act accordingly
             when {
-                json.has("volumeId") -> {
-                    store.parts.add(Part(json))
-                }
-
-                json.has("serieId") -> {
-                    store.volumes.add(Volume(json))
-                }
-
+                json.has("volumeId") -> store.parts.add(Part(json))
+                json.has("serieId") -> store.volumes.add(Volume(json))
                 else -> {
                     store.series.add(Series(json))
                     // Series may also contain volumes and parts
@@ -58,14 +58,6 @@ class DataStore {
                         store.mergeData(fromJson(volumesJson))
                     }
                 }
-            }
-            return store
-        }
-
-        fun fromJson(json: JSONArray): DataStore {
-            val store = DataStore()
-            for (i in 0 until json.length()) {
-                store.mergeData(fromJson(json.getJSONObject(i)))
             }
             return store
         }

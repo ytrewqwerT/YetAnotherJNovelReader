@@ -11,10 +11,8 @@ class LocalRepository private constructor() {
         @Volatile
         private var INSTANCE: LocalRepository? = null
         fun getInstance(): LocalRepository =
-            INSTANCE
-                ?: synchronized(this) {
-                INSTANCE
-                    ?: LocalRepository().also {
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: LocalRepository().also {
                     INSTANCE = it
                 }
             }
@@ -23,6 +21,16 @@ class LocalRepository private constructor() {
     private val dataStore = DataStore()
 
     private var unknownPartsProgress: UnknownPartsProgress? = null
+
+    fun addData(dataJson: JSONObject) { addData(DataStore.fromJson(dataJson)) }
+    fun addData(dataJson: JSONArray) { addData(DataStore.fromJson(dataJson)) }
+    fun addData(newData: DataStore) {
+        for (part in newData.parts) {
+            val partProgress = unknownPartsProgress?.getProgress(part.id)
+            if (partProgress != null) part.progress = partProgress
+        }
+        dataStore.mergeData(newData)
+    }
 
     fun getSeries(): List<Series> = dataStore.series
     fun getVolumes(serieId: String): List<Volume> {
@@ -40,13 +48,6 @@ class LocalRepository private constructor() {
         return result
     }
 
-    fun getPart(partId: String): Part? {
-        for (part in dataStore.parts) {
-            if (part.id == partId) return part
-        }
-        return null
-    }
-
     fun getParts(partIds: List<String>): List<Part> {
         val resultParts = ArrayList<Part>()
         for (partId in partIds) {
@@ -55,15 +56,11 @@ class LocalRepository private constructor() {
         }
         return resultParts
     }
-
-    fun addData(dataJson: JSONObject) { addData(DataStore.fromJson(dataJson)) }
-    fun addData(dataJson: JSONArray) { addData(DataStore.fromJson(dataJson)) }
-    fun addData(newData: DataStore) {
-        for (part in newData.parts) {
-            val partProgress = unknownPartsProgress?.getProgress(part.id)
-            if (partProgress != null) part.progress = partProgress
+    fun getPart(partId: String): Part? {
+        for (part in dataStore.parts) {
+            if (part.id == partId) return part
         }
-        dataStore.mergeData(newData)
+        return null
     }
 
     fun setPartsProgress(progress: UnknownPartsProgress) {

@@ -17,7 +17,9 @@ class DiskImageLoader(appContext: Context) :
         private const val TAG = "DiskImageLoader"
         private const val MAX_KEY_LEN = 64
     }
+
     private val cache: DiskLruCache
+
     init {
         val cacheDir = File(appContext.cacheDir, "disklrucache")
         cache = DiskLruCache.open(
@@ -30,14 +32,11 @@ class DiskImageLoader(appContext: Context) :
 
     override fun getBitmap(url: String?): Bitmap? {
         if (url == null) return null
+
         val snapshot = cache.get(urlToName(url)) ?: return null
         val bytes = snapshot.getInputStream(0).readBytes()
-        val result =
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-        Log.d(
-            TAG,
-            "Got $result from $url"
-        )
+        val result = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        Log.d(TAG, "Got $result from $url")
         return result
     }
     override fun putBitmap(url: String?, bitmap: Bitmap?) {

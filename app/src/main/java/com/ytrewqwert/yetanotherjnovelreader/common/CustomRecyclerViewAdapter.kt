@@ -18,16 +18,8 @@ class CustomRecyclerViewAdapter(
 
     private var items: List<ListItem> = emptyList()
 
-    fun setItems(newItems: List<ListItem>) {
-        items = newItems
-        notifyDataSetChanged()
-    }
+    override fun getItemCount(): Int = items.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.recycler_item, parent, false)
-        return ViewHolder(view)
-    }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val contents = items[position].getListItemContents()
 
@@ -55,7 +47,17 @@ class CustomRecyclerViewAdapter(
         }
 
     }
-    override fun getItemCount(): Int = items.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view =LayoutInflater.from(parent.context)
+            .inflate(R.layout.recycler_item, parent, false)
+        return ViewHolder(view)
+    }
+
+    fun setItems(newItems: List<ListItem>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title

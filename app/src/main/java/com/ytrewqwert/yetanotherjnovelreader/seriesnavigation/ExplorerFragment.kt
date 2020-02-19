@@ -46,28 +46,6 @@ class ExplorerFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_explorer, container, false)
     }
 
-    private fun setListItemFragment(fragmentId: Int, fragmentTag: String?) {
-        with (childFragmentManager.beginTransaction()) {
-            val args = Bundle()
-            args.putInt(ListItemFragment.ARG_ID, fragmentId)
-            setCustomAnimations(
-                R.animator.slide_from_right, R.animator.slide_to_left,
-                R.animator.slide_from_left, R.animator.slide_to_right
-            )
-            replace(
-                R.id.fragment_container,
-                ListItemFragment::class.java,
-                args,
-                fragmentTag
-            )
-            if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
-                Log.d(TAG, "adding to back stack")
-                addToBackStack(null)
-            }
-            commit()
-        }
-    }
-
     private fun onListItemInteraction(item: ListItem) {
         when (item) {
             is Series -> onSeriesListItemInteraction(item)
@@ -80,31 +58,40 @@ class ExplorerFragment : Fragment() {
     private fun onSeriesListItemInteraction(serie: Series) {
         Log.d(TAG, "Series clicked: ${serie.title}")
         viewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
-        repository.getSerieVolumes(serie) {
-            viewModel.setItemList(ListTypes.VOLUMES.ordinal, it)
-        }
-        setListItemFragment(
-            ListTypes.VOLUMES.ordinal,
-            ListTypes.VOLUMES.name
-        )
+        repository.getSerieVolumes(serie) { viewModel.setItemList(ListTypes.VOLUMES.ordinal, it) }
+        setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
-
     private fun onVolumesListItemInteraction(volume: Volume) {
         Log.d(TAG, "Volume clicked: ${volume.title}")
         viewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
-        repository.getVolumeParts(volume) {
-            viewModel.setItemList(ListTypes.PARTS.ordinal, it)
-        }
-        setListItemFragment(
-            ListTypes.PARTS.ordinal,
-            ListTypes.PARTS.name
-        )
+        repository.getVolumeParts(volume) { viewModel.setItemList(ListTypes.PARTS.ordinal, it) }
+        setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
-
     private fun onPartsListItemInteraction(part: Part) {
         Log.d(TAG, "Part clicked: ${part.title}")
         val intent = Intent(context, PartActivity::class.java)
         intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
         startActivity(intent)
+    }
+
+    private fun setListItemFragment(fragmentId: Int, fragmentTag: String?) {
+        with (childFragmentManager.beginTransaction()) {
+            val args = Bundle()
+            args.putInt(ListItemFragment.ARG_ID, fragmentId)
+            setCustomAnimations(
+                R.animator.slide_from_right, R.animator.slide_to_left,
+                R.animator.slide_from_left, R.animator.slide_to_right
+            )
+            replace(
+                R.id.fragment_container,
+                ListItemFragment::class.java,
+                args, fragmentTag
+            )
+            if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
+                Log.d(TAG, "adding to back stack")
+                addToBackStack(null)
+            }
+            commit()
+        }
     }
 }

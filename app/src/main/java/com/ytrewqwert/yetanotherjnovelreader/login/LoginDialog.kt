@@ -24,6 +24,11 @@ class LoginDialog : DialogFragment() {
         LoginViewModelFactory(Repository.getInstance(requireContext()))
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? LoginResultListener
+    }
+
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -58,10 +63,5 @@ class LoginDialog : DialogFragment() {
             }
             dialog
         } ?: throw IllegalStateException("Activity cannot be null")
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        listener = context as? LoginResultListener
     }
 }

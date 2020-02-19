@@ -19,12 +19,4 @@ class UnknownPartsProgress(partsProgressJson: JSONArray? = null) {
 
     fun getProgress(partId: String): Double? =
         if (progressList.containsKey(partId)) progressList[partId] else null
-    fun setProgress(partId: String, progress: Double) {
-        val boundedProgress = when {
-            progress < 0 -> 0.0
-            progress > 1 -> 1.0
-            else -> progress
-        }
-        progressList[partId] = boundedProgress
-    }
 }

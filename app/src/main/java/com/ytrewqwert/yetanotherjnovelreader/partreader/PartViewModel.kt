@@ -63,16 +63,6 @@ class PartViewModel(
         partProgress = repository.getPartProgress(partId)
     }
 
-    private fun setInitialPartsProgress(value: Double) {
-        viewModelScope.launch {
-            // Responding too quickly upon activity creation results in
-            // the scrollview's position not being updated, so wait.
-            delay(100)
-            initialPartProgress.value = value
-            currentPartProgress = value
-        }
-    }
-
     private fun insertImages(spanned: Spanned) {
         val spanBuilder =
             (spanned as? SpannableStringBuilder) ?: SpannableStringBuilder(spanned)
@@ -95,6 +85,16 @@ class PartViewModel(
                     tempImages--
                 }
             }
+        }
+    }
+
+    private fun setInitialPartsProgress(value: Double) {
+        viewModelScope.launch {
+            // Responding too quickly upon activity creation results in
+            // the scrollview's position not being updated, so wait.
+            delay(100)
+            initialPartProgress.value = value
+            currentPartProgress = value
         }
     }
 

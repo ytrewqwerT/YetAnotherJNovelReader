@@ -57,17 +57,6 @@ class PartActivity : AppCompatActivity() {
         initialiseObserversListeners()
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.uploadProgressNow()
-    }
-    override fun onResume() {
-        super.onResume()
-        val textSize = viewModel.fontSize.toFloat()
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-        textView.typeface = viewModel.fontStyle
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_reader, menu)
         return true
@@ -82,11 +71,26 @@ class PartActivity : AppCompatActivity() {
         else -> super.onOptionsItemSelected(item)
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.uploadProgressNow()
+    }
+    override fun onResume() {
+        super.onResume()
+        val textSize = viewModel.fontSize.toFloat()
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+        textView.typeface = viewModel.fontStyle
+    }
+
+    private fun determineMainTextViewWidth() {
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        mainTextViewWidth =
+            displayMetrics.widthPixels - 2 * resources.getDimensionPixelSize(R.dimen.text_margin)
+    }
 
     private fun initialiseObserversListeners() {
-        viewModel.contents.observe(this) {
-            textView.text = it
-        }
+        viewModel.contents.observe(this) { textView.text = it }
         viewModel.initialPartProgress.observe(this) { percentage ->
             val position = textView.height * percentage
             scrollView.scrollTo(0, position.toInt())
@@ -114,13 +118,6 @@ class PartActivity : AppCompatActivity() {
                 else -> View.VISIBLE
             }
         }
-    }
-
-    private fun determineMainTextViewWidth() {
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        mainTextViewWidth =
-            displayMetrics.widthPixels - 2 * resources.getDimensionPixelSize(R.dimen.text_margin)
     }
 
     private fun transitionToContent() {

@@ -63,13 +63,15 @@ class MainActivity : AppCompatActivity(),
         return true
     }
 
+    override fun onLoginResult(loggedIn: Boolean) {
+        if (loggedIn) Toast.makeText(this, "Logged in", Toast.LENGTH_LONG).show()
+        updateMenu()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
-            if (repository.loggedIn()) {
-                logout()
-            } else {
-                LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
-            }
+            if (repository.loggedIn()) logout()
+            else LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
             true
         }
         else -> super.onOptionsItemSelected(item)
@@ -86,6 +88,15 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    private fun onPartsListItemInteraction(part: Part?) {
+        Log.d(TAG, "Part clicked: ${part?.title}")
+        if (part != null) {
+            val intent = Intent(this, PartActivity::class.java)
+            intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+            startActivity(intent)
+        } else Log.e(TAG, "Clicked item handled by MainActivity was null")
+    }
+
     private fun updateMenu() {
         val nameHolder = appBarMenu?.findItem(R.id.account_name)
         val loginItem = appBarMenu?.findItem(R.id.account_login)
@@ -96,19 +107,5 @@ class MainActivity : AppCompatActivity(),
             nameHolder?.title = getString(R.string.not_logged_in)
             loginItem?.title = getString(R.string.login)
         }
-    }
-
-    override fun onLoginResult(loggedIn: Boolean) {
-        if (loggedIn) Toast.makeText(this, "Logged in", Toast.LENGTH_LONG).show()
-        updateMenu()
-    }
-
-    private fun onPartsListItemInteraction(part: Part?) {
-        Log.d(TAG, "Part clicked: ${part?.title}")
-        if (part != null) {
-            val intent = Intent(this, PartActivity::class.java)
-            intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
-            startActivity(intent)
-        } else Log.e(TAG, "Clicked item handled by MainActivity was null")
     }
 }

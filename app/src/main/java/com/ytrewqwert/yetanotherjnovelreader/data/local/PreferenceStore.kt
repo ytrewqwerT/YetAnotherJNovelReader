@@ -62,6 +62,13 @@ class PreferenceStore private constructor(private val appContext: Context) {
             }
         }
 
+    fun clearUserData() {
+        userId = null
+        authToken = null
+        authDate = null
+        username = null
+        isMember = false
+    }
     fun setUserData(data: JSONObject?) {
         userId = data?.getString("userId")
         authToken = data?.getString("id")
@@ -70,12 +77,5 @@ class PreferenceStore private constructor(private val appContext: Context) {
         username = user?.getString("username")
         val curSub = user?.getJSONObject("currentSubscription")
         isMember = curSub?.getString("status") == "active"
-    }
-    fun clearUserData() {
-        userId = null
-        authToken = null
-        authDate = null
-        username = null
-        isMember = false
     }
 }
