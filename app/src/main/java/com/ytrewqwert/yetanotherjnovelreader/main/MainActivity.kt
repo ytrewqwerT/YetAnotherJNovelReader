@@ -26,7 +26,8 @@ class MainActivity : AppCompatActivity(),
         private const val TAG = "MainActivity"
     }
 
-    private val viewModel by viewModels<ListItemViewModel>()
+    private val mainViewModel by viewModels<MainViewModel>()
+    private val recentsListViewModel by viewModels<ListItemViewModel>()
     private val repository by lazy { Repository.getInstance(applicationContext)}
     private var appBarMenu: Menu? = null
     private lateinit var viewPager: ViewPager
@@ -50,8 +51,8 @@ class MainActivity : AppCompatActivity(),
 
         // Catch Part clicks from the recent parts page in the viewpager
         val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
-        repository.getRecentParts { viewModel.setItemList(recentPartsFragId, it) }
-        viewModel.itemClickedEvent.observe(this) {
+        mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
+        recentsListViewModel.itemClickedEvent.observe(this) {
             onPartsListItemInteraction(it.item as? Part)
         }
     }
@@ -70,22 +71,17 @@ class MainActivity : AppCompatActivity(),
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
-            if (repository.loggedIn()) logout()
-            else LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
+            if (mainViewModel.loggedIn()) {
+                mainViewModel.logout { logoutResult ->
+                    Toast.makeText(this, logoutResult, Toast.LENGTH_LONG).show()
+                    updateMenu()
+                }
+            } else {
+                LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
+            }
             true
         }
         else -> super.onOptionsItemSelected(item)
-    }
-
-    private fun logout() {
-        repository.logout { logoutSuccessful ->
-            if (logoutSuccessful) {
-                Toast.makeText(this, "Logout Successful", Toast.LENGTH_LONG).show()
-                updateMenu()
-            } else {
-                Toast.makeText(this, "Logout Failed", Toast.LENGTH_LONG).show()
-            }
-        }
     }
 
     private fun onPartsListItemInteraction(part: Part?) {
@@ -100,8 +96,8 @@ class MainActivity : AppCompatActivity(),
     private fun updateMenu() {
         val nameHolder = appBarMenu?.findItem(R.id.account_name)
         val loginItem = appBarMenu?.findItem(R.id.account_login)
-        if (repository.loggedIn()) {
-            nameHolder?.title = repository.getUsername()
+        if (mainViewModel.loggedIn()) {
+            nameHolder?.title = mainViewModel.getUsername()
             loginItem?.title = getString(R.string.logout)
         } else {
             nameHolder?.title = getString(R.string.not_logged_in)
