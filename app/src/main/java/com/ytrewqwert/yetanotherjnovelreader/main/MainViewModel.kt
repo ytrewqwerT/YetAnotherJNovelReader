@@ -1,8 +1,11 @@
 package com.ytrewqwert.yetanotherjnovelreader.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.data.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
     fun logout(callback: (String) -> Unit) {
@@ -11,7 +14,14 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
             callback(resultText)
         }
     }
-    fun getRecentParts(callback: (List<Part>) -> Unit) { repository.getRecentParts(callback) }
+    fun getRecentParts(callback: (List<Part>) -> Unit) {
+        repository.getRecentParts {
+            viewModelScope.launch {
+                while (!repository.progressReady) delay(100)
+                callback(it)
+            }
+        }
+    }
     fun loggedIn() = repository.loggedIn()
     fun getUsername() = repository.getUsername()
 }

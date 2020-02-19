@@ -29,6 +29,9 @@ class Repository private constructor(appContext: Context) {
     private val local: LocalRepository = LocalRepository.getInstance()
     private val remote: RemoteRepository
 
+    var progressReady = false
+        private set
+
     val fontSize: Int get() = prefStore.fontSize
     val fontStyle: Typeface get() = prefStore.fontStyle
 
@@ -39,6 +42,7 @@ class Repository private constructor(appContext: Context) {
         if (userId != null) {
             remote.getUserPartProgressJson(userId) {
                 if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
+                progressReady = true
             }
         }
     }
@@ -114,8 +118,10 @@ class Repository private constructor(appContext: Context) {
 
             val userId = prefStore.userId
             if (userId != null) {
+                progressReady = false
                 remote.getUserPartProgressJson(userId) {
                     if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
+                    progressReady = true
                 }
             }
 
