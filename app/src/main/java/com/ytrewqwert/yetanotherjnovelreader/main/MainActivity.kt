@@ -14,7 +14,6 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.data.Part
-import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
@@ -28,7 +27,6 @@ class MainActivity : AppCompatActivity(),
 
     private val mainViewModel by viewModels<MainViewModel>()
     private val recentsListViewModel by viewModels<ListItemViewModel>()
-    private val repository by lazy { Repository.getInstance(applicationContext)}
     private var appBarMenu: Menu? = null
     private lateinit var viewPager: ViewPager
 
