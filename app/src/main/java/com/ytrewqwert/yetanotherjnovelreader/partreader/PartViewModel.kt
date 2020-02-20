@@ -33,11 +33,11 @@ class PartViewModel(
     val fontSize: Int get() = repository.fontSize
     val fontStyle: Typeface get() = repository.fontStyle
 
-    private var uploadingProgress = false
+    private var progressChanged = false
     var currentPartProgress = 0.0
         set(value) {
             field = value
-            uploadProgress()
+            progressChanged = true
         }
 
     private var tempImages = -1
@@ -98,25 +98,11 @@ class PartViewModel(
         }
     }
 
-    private fun uploadProgress() {
-        // Wait before sending to remote to prevent spam
-        if (!uploadingProgress) {
-            uploadingProgress = true
-            viewModelScope.launch {
-                delay(60 * 1000)
-                if (uploadingProgress) {
-                    repository.setPartProgress(partId, currentPartProgress)
-                    uploadingProgress = false
-                }
-            }
-        }
-    }
-
     fun uploadProgressNow() {
         // Only upload if the value has changed since last upload
-        if (uploadingProgress) {
+        if (progressChanged) {
             repository.setPartProgress(partId, currentPartProgress)
-            uploadingProgress = false
+            progressChanged = false
         }
     }
 }
