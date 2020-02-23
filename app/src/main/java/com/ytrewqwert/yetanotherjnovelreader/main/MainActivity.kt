@@ -69,16 +69,26 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onLoginResult(loggedIn: Boolean) {
-        if (loggedIn) Toast.makeText(this, "Logged in", Toast.LENGTH_LONG).show()
+        val loginStatusText = if (loggedIn) "Logged in" else "Logged out"
+        Toast.makeText(this, loginStatusText, Toast.LENGTH_LONG).show()
         updateMenu()
+
+        val fragment = supportFragmentManager.findFragmentByTag(
+            "android:switcher:${R.id.pager}:${viewPager.currentItem}"
+        )
+
+        // Resuming ListItemFragments force-updates them into (un)greying out non-viewable parts
+        //  and ExplorerFragment propagates the onResume ot its children to do the same.
+        // Not a great solution, I know.
+        fragment?.onResume()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
             if (mainViewModel.loggedIn()) {
                 mainViewModel.logout { logoutResult ->
-                    Toast.makeText(this, logoutResult, Toast.LENGTH_LONG).show()
-                    updateMenu()
+                    if (logoutResult) onLoginResult(false)
+                    else Toast.makeText(this, "Logout failed", Toast.LENGTH_LONG).show()
                 }
             } else {
                 LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")

@@ -8,10 +8,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
-    fun logout(callback: (String) -> Unit) {
+    fun logout(callback: (Boolean) -> Unit) {
         repository.logout { loggedOut ->
-            val resultText = if (loggedOut) "Logout Successful" else "Logout Failed"
-            callback(resultText)
+            callback(loggedOut)
         }
     }
     fun getRecentParts(callback: (List<Part>) -> Unit) {

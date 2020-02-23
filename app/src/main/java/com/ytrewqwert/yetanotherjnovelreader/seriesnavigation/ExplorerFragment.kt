@@ -46,6 +46,13 @@ class ExplorerFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_explorer, container, false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Propagate to child fragment
+        val curFragment = childFragmentManager.findFragmentById(R.id.fragment_container)
+        curFragment?.onResume()
+    }
+
     private fun onListItemInteraction(item: ListItem) {
         when (item) {
             is Series -> onSeriesListItemInteraction(item)
