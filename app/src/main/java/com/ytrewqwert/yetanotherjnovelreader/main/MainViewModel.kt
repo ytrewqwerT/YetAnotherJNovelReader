@@ -17,7 +17,9 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     fun getRecentParts(callback: (List<Part>) -> Unit) {
         repository.getRecentParts {
             viewModelScope.launch {
-                while (!repository.progressReady) delay(100)
+                if (loggedIn()) {
+                    while (!repository.progressReady) delay(100)
+                }
                 callback(it)
             }
         }
