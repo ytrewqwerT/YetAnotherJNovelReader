@@ -19,6 +19,7 @@ import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
+
 class MainActivity : AppCompatActivity(),
     LoginResultListener {
 
@@ -42,9 +43,11 @@ class MainActivity : AppCompatActivity(),
         val viewPagerAdapter = MainPagerAdapter(supportFragmentManager)
         viewPager.adapter = viewPagerAdapter
         // Set primary navigation fragment to the focused viewpager page to allow interception
-        viewPager.addOnPageSelectedListener { position: Int ->
+        viewPager.addOnPageSelectedListener {
             with (supportFragmentManager.beginTransaction()) {
-                val fragment = viewPagerAdapter.getItem(position)
+                val fragment = supportFragmentManager.findFragmentByTag(
+                    "android:switcher:${R.id.pager}:${viewPager.currentItem}"
+                )
                 setPrimaryNavigationFragment(fragment)
                 commit()
             }
