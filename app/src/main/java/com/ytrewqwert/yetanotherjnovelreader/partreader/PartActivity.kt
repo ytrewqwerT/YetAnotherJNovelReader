@@ -55,6 +55,8 @@ class PartActivity : AppCompatActivity() {
 
         determineMainTextViewWidth()
         initialiseObserversListeners()
+
+        if (viewModel.initialPartProgress.value != null) transitionToContent()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -91,9 +93,7 @@ class PartActivity : AppCompatActivity() {
 
     private fun initialiseObserversListeners() {
         viewModel.contents.observe(this) { textView.text = it }
-        viewModel.initialPartProgress.observe(this) { percentage ->
-            val position = textView.height * percentage
-            scrollView.scrollTo(0, position.toInt())
+        viewModel.initialPartProgress.observe(this) {
             transitionToContent()
         }
         viewModel.errorEvent.observe(this) { error ->
@@ -121,6 +121,11 @@ class PartActivity : AppCompatActivity() {
     }
 
     private fun transitionToContent() {
+        // Set scrollview position before transitioning
+        val percentage = viewModel.initialPartProgress.value ?: 0.0
+        val position = textView.height * percentage
+        scrollView.scrollTo(0, position.toInt())
+
         val loadBarAnimator = AnimatorInflater.loadAnimator(this, android.R.animator.fade_out)
         loadBarAnimator.setTarget(loadBar)
         loadBarAnimator.addListener(onEnd = { loadBar.visibility = View.GONE })
