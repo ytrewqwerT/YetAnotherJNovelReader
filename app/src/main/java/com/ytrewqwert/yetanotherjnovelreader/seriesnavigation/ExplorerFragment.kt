@@ -27,16 +27,34 @@ class ExplorerFragment : Fragment() {
 
     private enum class ListTypes { SERIES, VOLUMES, PARTS }
 
-    private val viewModel by viewModels<ListItemViewModel>()
-    private val repository by lazy { Repository.getInstance(requireContext()) }
+    private val viewModel by viewModels<ExplorerViewModel> {
+        ExplorerViewModelFactory(Repository.getInstance(requireContext()))
+    }
+    private val listItemViewModel by viewModels<ListItemViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
+        listItemViewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
 
-        repository.getSeries { viewModel.setItemList(ListTypes.SERIES.ordinal, it) }
+        viewModel.getSeries { listItemViewModel.setItemList(ListTypes.SERIES.ordinal, it) }
         setListItemFragment(ListTypes.SERIES.ordinal, ListTypes.SERIES.name)
+
+        listItemViewModel.getRefreshLiveEvent(ListTypes.SERIES.ordinal).observe(this) {
+            viewModel.getSeries {
+                listItemViewModel.setItemList(ListTypes.SERIES.ordinal, it)
+            }
+        }
+        listItemViewModel.getRefreshLiveEvent(ListTypes.VOLUMES.ordinal).observe(this) {
+            viewModel.getSerieVolumes {
+                listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, it)
+            }
+        }
+        listItemViewModel.getRefreshLiveEvent(ListTypes.PARTS.ordinal).observe(this) {
+            viewModel.getVolumeParts {
+                listItemViewModel.setItemList(ListTypes.PARTS.ordinal, it)
+            }
+        }
     }
 
     override fun onCreateView(
@@ -64,14 +82,14 @@ class ExplorerFragment : Fragment() {
 
     private fun onSeriesListItemInteraction(serie: Series) {
         Log.d(TAG, "Series clicked: ${serie.title}")
-        viewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
-        repository.getSerieVolumes(serie) { viewModel.setItemList(ListTypes.VOLUMES.ordinal, it) }
+        listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
+        viewModel.getSerieVolumes(serie) { listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, it) }
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
     private fun onVolumesListItemInteraction(volume: Volume) {
         Log.d(TAG, "Volume clicked: ${volume.title}")
-        viewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
-        repository.getVolumeParts(volume) { viewModel.setItemList(ListTypes.PARTS.ordinal, it) }
+        listItemViewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
+        viewModel.getVolumeParts(volume) { listItemViewModel.setItemList(ListTypes.PARTS.ordinal, it) }
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
     private fun onPartsListItemInteraction(part: Part) {

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<set xmlns:android="http://schemas.android.com/apk/res/android">
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+    <objectAnimator
+        android:propertyName="x"
+        android:valueFrom="0dp"
+        android:valueTo="0dp" />
     <objectAnimator
         android:propertyName="y"
         android:valueFrom="1000dp"

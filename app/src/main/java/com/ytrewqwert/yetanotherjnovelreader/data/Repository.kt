@@ -12,6 +12,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import java.time.Instant
 import java.time.Period
 
+// TODO: Add option to force retrieve from remote
 class Repository private constructor(appContext: Context) {
     companion object {
         @Volatile

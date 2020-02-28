@@ -59,6 +59,10 @@ class MainActivity : AppCompatActivity(),
         recentsListViewModel.itemClickedEvent.observe(this) {
             onPartsListItemInteraction(it.item as? Part)
         }
+
+        recentsListViewModel.getRefreshLiveEvent(recentPartsFragId).observe(this) {
+            mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

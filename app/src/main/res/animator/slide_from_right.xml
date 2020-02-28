@@ -6,6 +6,10 @@
         android:valueFrom="500dp"
         android:valueTo="0dp" />
     <objectAnimator
+        android:propertyName="y"
+        android:valueFrom="0dp"
+        android:valueTo="0dp" />
+    <objectAnimator
         android:propertyName="alpha"
         android:valueFrom="0"
         android:valueTo="1" />
