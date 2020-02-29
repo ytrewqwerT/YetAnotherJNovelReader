@@ -66,8 +66,11 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
     fun getSerieJson(serieId: String, callback: (serieJson: JSONObject) -> Unit) {
-        val url = "$API_ADDR/series/findOne?filter=" +
-                "{\"where\":{\"id\":\"${serieId}\"},\"include\":[\"volumes\",\"parts\"]}"
+        val url = ParameterizedURLBuilder("$API_ADDR/series/findOne")
+            .addFilter("id", serieId)
+            .addInclude("volumes")
+            .addInclude("parts")
+            .build()
         val request = JsonObjectRequest(
             Request.Method.GET, url, null,
             Response.Listener<JSONObject> {
@@ -98,8 +101,10 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
     fun getPartsJsonAfter(time: Instant, callback: (partsJson: JSONArray) -> Unit) {
-        val url = "$API_ADDR/parts?filter=" +
-                "{\"where\":{\"launchDate\":{\"gt\":\"${time}\"}},\"order\":\"launchDate+DESC\"}"
+        val url = ParameterizedURLBuilder("$API_ADDR/parts")
+            .addFilter("launchDate", "{\"gt\":\"${time}\"}")
+            .addOrder("launchDate+DESC")
+            .build()
         val request = JsonArrayRequest(
             Request.Method.GET, url, null,
             Response.Listener {
@@ -112,7 +117,9 @@ class RemoteRepository private constructor(
     }
 
     fun getUserPartProgressJson(userId: String, callback: (partProgress: JSONArray?) -> Unit) {
-        val url = "$API_ADDR/users/${userId}?filter={\"include\":\"readParts\"}"
+        val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")
+            .addInclude("readParts")
+            .build()
         val request = AuthorizedJsonObjectRequest(
             authToken, Request.Method.GET, url, null,
             Response.Listener {
