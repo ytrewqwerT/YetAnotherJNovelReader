@@ -21,7 +21,7 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
     }
     fun getSerieVolumes(callback: (List<Volume>) -> Unit) {
         val series = curSeries
-        if (series != null) repository.getSerieVolumes(series, callback)
+        if (series != null) repository.getSerieVolumes(series.id, callback)
         else callback(emptyList())
     }
 

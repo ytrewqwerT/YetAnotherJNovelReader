@@ -12,7 +12,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import java.time.Instant
 import java.time.Period
 
-// TODO: Add option to force retrieve from remote
 class Repository private constructor(appContext: Context) {
     companion object {
         @Volatile
@@ -55,7 +54,7 @@ class Repository private constructor(appContext: Context) {
 
     fun getPart(part: Part, callback: (Spanned?) -> Unit) { getPart(part.id, callback) }
     fun getPart(partId: String, callback: (Spanned?) -> Unit) {
-        remote.getPartJson(partId) {
+        remote.getPartContentJson(partId) {
             val partHtml = it?.getString("dataHTML")
             if (partHtml != null) callback(Html.fromHtml(partHtml, 0))
             else callback(null)
@@ -76,38 +75,24 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getSeries(callback: (List<Series>) -> Unit) {
-        if (local.getSeries().isEmpty()) {
-            remote.getSeriesJson {
-                local.addData(it)
-                callback(local.getSeries())
-            }
-        } else {
+        remote.getSeriesJson {
+            local.addData(it)
             callback(local.getSeries())
         }
     }
-    fun getSerieVolumes(series: Series, callback: (List<Volume>) -> Unit) =
-        getSerieVolumes(series.id, callback)
     fun getSerieVolumes(seriesId: String, callback: (List<Volume>) -> Unit) {
-        if (local.getVolumes(seriesId).isNotEmpty()) {
+        remote.getSerieVolumesJson(seriesId) {
+            local.addData(it)
             callback(local.getVolumes(seriesId))
-        } else {
-            remote.getSerieJson(seriesId) {
-                local.addData(it)
-                callback(local.getVolumes(seriesId))
-            }
         }
     }
 
     fun getUsername() = prefStore.username
 
     fun getVolumeParts(volume: Volume, callback: (List<Part>) -> Unit) {
-        if (local.getParts(volume.id).isNotEmpty()) {
+        remote.getVolumePartsJson(volume.id) {
+            local.addData(it)
             callback(local.getParts(volume.id))
-        } else {
-            remote.getSerieJson(volume.serieId) {
-                local.addData(it)
-                callback(local.getParts(volume.id))
-            }
         }
     }
 

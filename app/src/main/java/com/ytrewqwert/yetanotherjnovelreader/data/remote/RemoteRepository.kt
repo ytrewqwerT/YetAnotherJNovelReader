@@ -17,7 +17,7 @@ import java.time.Instant
 
 class RemoteRepository private constructor(
     appContext: Context,
-    var authToken: String?
+    private var authToken: String?
 ) {
 
     companion object {
@@ -36,58 +36,25 @@ class RemoteRepository private constructor(
     }
 
     private val requestQueue: RequestQueue by lazy { Volley.newRequestQueue(appContext) }
-    val imageLoader = ImageLoader(requestQueue, DiskImageLoader(appContext))
+    private val imageLoader = ImageLoader(requestQueue, DiskImageLoader(appContext))
 
     fun getImage(source: String, callback: (Bitmap?) -> Unit) {
         imageLoader.get(source, object : ImageLoader.ImageListener {
             override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
-                Log.d(TAG, "Got response for image ${source}: ${response?.bitmap}")
+                Log.d(TAG, "ImageSuccess: Source = $source")
                 callback(response?.bitmap)
             }
             override fun onErrorResponse(error: VolleyError?) {
-                Log.w(TAG, "Failed to get image: $error")
+                Log.w(TAG, "ImageFailure: $error")
                 callback(null)
             }
         })
     }
 
-    fun getSeriesJson(callback: (seriesJson: JSONArray) -> Unit) {
-        val request = JsonArrayRequest(
-            Request.Method.GET,
-            "$API_ADDR/series",
-            null,
-            Response.Listener<JSONArray> {
-                Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
-                Log.v(TAG, it.toString(4))
-                callback(it)
-            },
-            Response.ErrorListener { Log.w(TAG, "SeriesFailure: $it") }
-        )
-        requestQueue.add(request)
-    }
-    fun getSerieJson(serieId: String, callback: (serieJson: JSONObject) -> Unit) {
-        val url = ParameterizedURLBuilder("$API_ADDR/series/findOne")
-            .addFilter("id", serieId)
-            .addInclude("volumes")
-            .addInclude("parts")
-            .build()
-        val request = JsonObjectRequest(
-            Request.Method.GET, url, null,
-            Response.Listener<JSONObject> {
-                Log.d(TAG, "SerieSuccess: Found series $serieId")
-                Log.v(TAG, it.toString(4))
-                callback(it)
-            },
-            Response.ErrorListener { Log.w(TAG, "SerieFailure: $it") }
-        )
-        requestQueue.add(request)
-    }
-
-    fun getPartJson(partId: String, callback: (partJson: JSONObject?) -> Unit) {
+    fun getPartContentJson(partId: String, callback: (partJson: JSONObject?) -> Unit) {
+        val url = "$API_ADDR/parts/${partId}/partData"
         val request = AuthorizedJsonObjectRequest(
-            authToken, Request.Method.GET,
-            "$API_ADDR/parts/${partId}/partData",
-            null,
+            authToken, Request.Method.GET, url, null,
             Response.Listener {
                 Log.d(TAG, "PartSuccess: Found part $partId")
                 Log.v(TAG, it.toString(4))
@@ -112,6 +79,48 @@ class RemoteRepository private constructor(
                 callback(it)
             },
             Response.ErrorListener { Log.w(TAG, "RecentPartFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
+
+    fun getSeriesJson(callback: (seriesJson: JSONArray) -> Unit) {
+        val url = "$API_ADDR/series"
+        val request = JsonArrayRequest(
+            Request.Method.GET, url, null,
+            Response.Listener<JSONArray> {
+                Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
+                Log.v(TAG, it.toString(4))
+                callback(it)
+            },
+            Response.ErrorListener { Log.w(TAG, "SeriesFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
+    fun getSerieVolumesJson(serieId: String, callback: (volumesJson: JSONArray) -> Unit) {
+        val url = ParameterizedURLBuilder("$API_ADDR/volumes")
+            .addFilter("serieId", serieId)
+            .build()
+        val request = JsonArrayRequest(
+            Request.Method.GET, url, null,
+            Response.Listener {
+                Log.d(TAG, "SeriesVolumesSuccess: Found ${it.length()} volumes")
+                callback(it)
+            },
+            Response.ErrorListener { Log.w(TAG, "SeriesVolumesFailure: $it") }
+        )
+        requestQueue.add(request)
+    }
+    fun getVolumePartsJson(volumeId: String, callback: (partsJson: JSONArray) -> Unit) {
+        val url = ParameterizedURLBuilder("$API_ADDR/parts")
+            .addFilter("volumeId", volumeId)
+            .build()
+        val request = JsonArrayRequest(
+            Request.Method.GET, url, null,
+            Response.Listener {
+                Log.d(TAG, "VolumePartsSuccess: Found ${it.length()} parts")
+                callback(it)
+            },
+            Response.ErrorListener { Log.w(TAG, "VolumePartsFailure: $it") }
         )
         requestQueue.add(request)
     }
