@@ -12,7 +12,6 @@
 
     <style name="ReaderTheme" parent="AppTheme">
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="colorPrimaryDark">@color/navbarReaderColor</item>
     </style>
 
 </resources>

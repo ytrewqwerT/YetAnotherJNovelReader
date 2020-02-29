@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#1166DD</color>
-    <color name="colorPrimaryDark">#0B428F</color>
+    <color name="colorPrimaryDark">#0B3D86</color>
     <color name="colorAccent">#FF7979</color>
     <color name="navbarReaderColor">#EEEEEE</color>
     <color name="disabled">#88888888</color>
