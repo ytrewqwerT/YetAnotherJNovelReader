@@ -28,6 +28,7 @@ class PartActivity : AppCompatActivity() {
 
     private var partId: String = ""
     private var mainTextViewWidth = 0
+    private var statusBarHeight = 0
 
     private val viewModel by viewModels<PartViewModel> {
         PartViewModelFactory(
@@ -35,6 +36,7 @@ class PartActivity : AppCompatActivity() {
         )
     }
 
+    private lateinit var statusBackground: View
     private lateinit var loadBar: ProgressBar
     private lateinit var scrollView: ScrollView
     private lateinit var textView: TextView
@@ -49,10 +51,12 @@ class PartActivity : AppCompatActivity() {
 
         partId = intent.getStringExtra(EXTRA_PART_ID)
 
+        statusBackground = findViewById(R.id.status_bar_background)
         loadBar = findViewById(R.id.load_bar)
         scrollView = findViewById(R.id.content_scroll_container)
         textView = findViewById<TextView>(R.id.content_view)
 
+        initialiseStatusBarHeight()
         determineMainTextViewWidth()
         initialiseObserversListeners()
 
@@ -118,6 +122,15 @@ class PartActivity : AppCompatActivity() {
                 else -> View.VISIBLE
             }
         }
+    }
+
+    private fun initialiseStatusBarHeight() {
+        statusBarHeight = resources.getDimensionPixelSize(R.dimen.default_status_bar_height)
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (resourceId > 0) statusBarHeight = resources.getDimensionPixelSize(resourceId)
+        statusBackground.layoutParams.height = statusBarHeight
+        toolbar.setPadding(0, statusBarHeight, 0, 0)
+        toolbar.layoutParams.height += statusBarHeight
     }
 
     private fun transitionToContent() {
