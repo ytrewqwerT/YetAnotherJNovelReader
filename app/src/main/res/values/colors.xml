@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1166DD</color>
-    <color name="colorPrimaryDark">#0B3D86</color>
+    <color name="textColorOnPrimary">#FFF</color>
+    <color name="colorPrimary">#16D</color>
+    <color name="colorPrimaryDark">#16D</color>
     <color name="colorAccent">#FF7979</color>
-    <color name="navbarReaderColor">#EEEEEE</color>
-    <color name="disabled">#88888888</color>
+    <color name="navbarReaderColor">#FFF</color>
+    <color name="disabled">#8888</color>
 </resources>

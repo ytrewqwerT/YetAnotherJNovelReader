@@ -36,6 +36,7 @@ class PartActivity : AppCompatActivity() {
         )
     }
 
+    private lateinit var layoutRoot: View
     private lateinit var statusBackground: View
     private lateinit var loadBar: ProgressBar
     private lateinit var scrollView: ScrollView
@@ -51,14 +52,17 @@ class PartActivity : AppCompatActivity() {
 
         partId = intent.getStringExtra(EXTRA_PART_ID)
 
+        layoutRoot = findViewById(R.id.layout_root)
         statusBackground = findViewById(R.id.status_bar_background)
         loadBar = findViewById(R.id.load_bar)
         scrollView = findViewById(R.id.content_scroll_container)
-        textView = findViewById<TextView>(R.id.content_view)
+        textView = findViewById(R.id.content_view)
 
         initialiseStatusBarHeight()
         determineMainTextViewWidth()
         initialiseObserversListeners()
+
+        setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
 
         if (viewModel.initialPartProgress.value != null) transitionToContent()
     }
@@ -122,6 +126,8 @@ class PartActivity : AppCompatActivity() {
     }
 
     private fun initialiseStatusBarHeight() {
+        layoutRoot.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+
         statusBarHeight = resources.getDimensionPixelSize(R.dimen.default_status_bar_height)
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) statusBarHeight = resources.getDimensionPixelSize(resourceId)
@@ -130,16 +136,29 @@ class PartActivity : AppCompatActivity() {
         toolbar.layoutParams.height += statusBarHeight
     }
 
+    private fun setStatusBarTextColor(isLight: Boolean) {
+        var uiVisibility = window.decorView.systemUiVisibility
+        var mask = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        if (isLight) {
+            uiVisibility = uiVisibility or mask
+        } else {
+            mask = mask.inv()
+            uiVisibility = uiVisibility and mask
+        }
+        window.decorView.systemUiVisibility = uiVisibility
+    }
 
     private fun toggleTopAppBarVisibility() {
         when (toolbar.visibility) {
             View.VISIBLE -> {
+                setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
                 val animator = AnimatorInflater.loadAnimator(this, R.animator.hide_top_app_bar)
                 animator.setTarget(toolbar)
                 animator.addListener(onEnd = { toolbar.visibility = View.GONE })
                 animator.start()
             }
             else -> {
+                setStatusBarTextColor(false)
                 val animator = AnimatorInflater.loadAnimator(this, R.animator.show_top_app_bar)
                 animator.setTarget(toolbar)
                 animator.addListener(onStart = { toolbar.visibility = View.VISIBLE })

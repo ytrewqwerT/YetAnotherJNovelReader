@@ -5,13 +5,14 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="android:windowLightStatusBar">@bool/isLightMode</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/navbarReaderColor</item>
         <item name="android:windowLightNavigationBar">@bool/isLightMode</item>
     </style>
 
     <style name="ReaderTheme" parent="AppTheme">
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="colorPrimaryDark">#0000</item>
+
     </style>
 
 </resources>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".partreader.PartActivity">
 
     <View
@@ -15,6 +16,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:elevation="2dp"
+        app:titleTextColor="@color/textColorOnPrimary"
         android:background="?attr/colorPrimary"
         android:visibility="gone"
         android:layout_width="match_parent"
