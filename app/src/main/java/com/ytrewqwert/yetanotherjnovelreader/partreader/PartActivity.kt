@@ -117,10 +117,7 @@ class PartActivity : AppCompatActivity() {
         }
         // Attaching to scrollView would have been preferred, but it doesn't seem to want to work...
         textView.setOnClickListener {
-            toolbar.visibility = when (toolbar.visibility) {
-                View.VISIBLE -> View.GONE
-                else -> View.VISIBLE
-            }
+            toggleTopAppBarVisibility()
         }
     }
 
@@ -131,6 +128,24 @@ class PartActivity : AppCompatActivity() {
         statusBackground.layoutParams.height = statusBarHeight
         toolbar.setPadding(0, statusBarHeight, 0, 0)
         toolbar.layoutParams.height += statusBarHeight
+    }
+
+
+    private fun toggleTopAppBarVisibility() {
+        when (toolbar.visibility) {
+            View.VISIBLE -> {
+                val animator = AnimatorInflater.loadAnimator(this, R.animator.hide_top_app_bar)
+                animator.setTarget(toolbar)
+                animator.addListener(onEnd = { toolbar.visibility = View.GONE })
+                animator.start()
+            }
+            else -> {
+                val animator = AnimatorInflater.loadAnimator(this, R.animator.show_top_app_bar)
+                animator.setTarget(toolbar)
+                animator.addListener(onStart = { toolbar.visibility = View.VISIBLE })
+                animator.start()
+            }
+        }
     }
 
     private fun transitionToContent() {

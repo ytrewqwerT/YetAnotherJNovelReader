@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+    <objectAnimator
+        android:propertyName="x"
+        android:valueFrom="0dp"
+        android:valueTo="0dp"
+        android:duration="@android:integer/config_shortAnimTime" />
+    <objectAnimator
+        android:propertyName="y"
+        android:valueFrom="0dp"
+        android:valueTo="-150dp"
+        android:duration="@android:integer/config_shortAnimTime" />
+</set>
