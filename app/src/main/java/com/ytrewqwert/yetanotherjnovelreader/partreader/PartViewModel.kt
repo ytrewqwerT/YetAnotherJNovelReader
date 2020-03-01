@@ -32,6 +32,7 @@ class PartViewModel(
 
     val fontSize: Int get() = repository.fontSize
     val fontStyle: Typeface get() = repository.fontStyle
+    val margin: Int get() = repository.readerMargin
 
     private var progressChanged = false
     var currentPartProgress = 0.0

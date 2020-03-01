@@ -8,6 +8,7 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
@@ -16,6 +17,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.addListener
+import androidx.core.view.setMargins
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
@@ -90,6 +93,10 @@ class PartActivity : AppCompatActivity() {
         val textSize = viewModel.fontSize.toFloat()
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
         textView.typeface = viewModel.fontStyle
+        val margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, viewModel.margin.toFloat(), resources.displayMetrics)
+        textView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            setMargins(margin.toInt())
+        }
     }
 
     private fun determineMainTextViewWidth() {
