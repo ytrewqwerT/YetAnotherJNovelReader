@@ -55,7 +55,9 @@ class MainActivity : AppCompatActivity(),
 
         // Catch Part clicks from the recent parts page in the viewpager
         val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
-        mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
+        mainViewModel.fetchPartProgress {
+            mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
+        }
         recentsListViewModel.itemClickedEvent.observe(this) {
             onPartsListItemInteraction(it.item as? Part)
         }
