@@ -17,7 +17,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.addListener
-import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -93,9 +92,14 @@ class PartActivity : AppCompatActivity() {
         val textSize = viewModel.fontSize.toFloat()
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
         textView.typeface = viewModel.fontStyle
-        val margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, viewModel.margin.toFloat(), resources.displayMetrics)
+        val margin = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, viewModel.margin.toFloat(), resources.displayMetrics
+        ).toInt()
         textView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            setMargins(margin.toInt())
+            setMargins(margin, 0, margin, 0)
+        }
+        scrollView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            setMargins(0, margin, 0, margin)
         }
     }
 
