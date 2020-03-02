@@ -96,9 +96,8 @@ class Repository private constructor(appContext: Context) {
         if (userId != null) {
             prefStore.email = email
             prefStore.password = password
-            remote.getUserPartProgressJson(userId) {
-                if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
-            }
+            val partProgress = remote.getUserPartProgressJson(userId)
+            if (partProgress != null) local.setPartsProgress(UnknownPartsProgress(partProgress))
         }
         return loginJson != null
     }
@@ -125,12 +124,11 @@ class Repository private constructor(appContext: Context) {
         if (userId == null) {
             onComplete(false)
         } else {
-            remote.getUserPartProgressJson(userId) {
-                if (it == null) onComplete(false)
-                else {
-                    local.setPartsProgress(UnknownPartsProgress(it))
-                    onComplete(true)
-                }
+            val partProgress = remote.getUserPartProgressJson(userId)
+            if (partProgress == null) onComplete(false)
+            else {
+                local.setPartsProgress(UnknownPartsProgress(partProgress))
+                onComplete(true)
             }
         }
     }

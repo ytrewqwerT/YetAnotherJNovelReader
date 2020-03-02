@@ -127,25 +127,29 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
-    fun getUserPartProgressJson(userId: String, callback: (partProgress: JSONArray?) -> Unit) {
-        val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")
-            .addInclude("readParts")
-            .build()
-        val request = AuthorizedJsonObjectRequest(
-            authToken, Request.Method.GET, url, null,
-            Response.Listener {
-                val partProgress = it.getJSONArray("readParts")
-                Log.d(TAG, "PartProgressSuccess: Found ${partProgress.length()} parts")
-                Log.v(TAG, partProgress.toString(4))
-                callback(partProgress)
-            },
-            Response.ErrorListener { Log.w(TAG, "PartProgressFailure: $it") }
-        )
-        requestQueue.add(request)
-    }
+    suspend fun getUserPartProgressJson(userId: String) =
+        suspendCancellableCoroutine<JSONArray?> { cont ->
+            val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")
+                .addInclude("readParts")
+                .build()
+            val request = AuthorizedJsonObjectRequest(
+                authToken, Request.Method.GET, url, null,
+                Response.Listener {
+                    val partProgress = it.getJSONArray("readParts")
+                    Log.d(TAG, "PartProgressSuccess: Found ${partProgress.length()} parts")
+                    Log.v(TAG, partProgress.toString(4))
+                    cont.resume(partProgress)
+                },
+                Response.ErrorListener {
+                    Log.w(TAG, "PartProgressFailure: $it")
+                    cont.resume(null)
+                }
+            )
+            requestQueue.add(request)
+        }
 
     suspend fun login(email: String, password: String): JSONObject? {
-        return suspendCancellableCoroutine<JSONObject?> { cont ->
+        return suspendCancellableCoroutine { cont ->
             val args = JSONObject().put("email", email).put("password", password)
 
             val request = JsonObjectRequest(
