@@ -10,10 +10,12 @@ import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.DialogLoginBinding
+import kotlinx.coroutines.launch
 
 class LoginDialog : DialogFragment() {
 
@@ -51,8 +53,8 @@ class LoginDialog : DialogFragment() {
             dialog.setOnShowListener {
                 val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 button.setOnClickListener {
-                    viewModel.login { loginSuccessful ->
-                        if (loginSuccessful) {
+                    lifecycleScope.launch {
+                        if (viewModel.login()) {
                             listener?.onLoginResult(true)
                             dialog.dismiss()
                         } else {

@@ -42,13 +42,12 @@ class Repository private constructor(appContext: Context) {
         else callback(null)
     }
 
-    fun getPart(partId: String, callback: (Spanned?) -> Unit) {
-        refreshLoginIfAuthExpired {
-            remote.getPartContentJson(partId) {
-                val partHtml = it?.getString("dataHTML")
-                if (partHtml != null) callback(Html.fromHtml(partHtml, 0))
-                else callback(null)
-            }
+    suspend fun getPart(partId: String, callback: (Spanned?) -> Unit) {
+        refreshLoginIfAuthExpired()
+        remote.getPartContentJson(partId) {
+            val partHtml = it?.getString("dataHTML")
+            if (partHtml != null) callback(Html.fromHtml(partHtml, 0))
+            else callback(null)
         }
     }
 
@@ -89,74 +88,71 @@ class Repository private constructor(appContext: Context) {
 
     fun isMember() = prefStore.isMember
 
-    fun login(email: String, password: String, callback: (loggedIn: Boolean) -> Unit) {
-        remote.login(email, password) { loginJson ->
-            prefStore.setUserData(loginJson)
+    suspend fun login(email: String, password: String): Boolean {
+        val loginJson = remote.login(email, password)
+        prefStore.setUserData(loginJson)
 
-            val userId = prefStore.userId
-            if (userId != null) {
-                prefStore.email = email
-                prefStore.password = password
-                remote.getUserPartProgressJson(userId) {
-                    if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
-                }
+        val userId = prefStore.userId
+        if (userId != null) {
+            prefStore.email = email
+            prefStore.password = password
+            remote.getUserPartProgressJson(userId) {
+                if (it != null) local.setPartsProgress(UnknownPartsProgress(it))
             }
-            callback(loginJson != null)
         }
+        return loginJson != null
     }
     fun loggedIn() = (prefStore.authToken != null)
-    fun logout(callback: (loggedOut: Boolean) -> Unit) {
-        remote.logout {
-            // Don't care whether the user was actually logged out or not. Just clear data.
-            prefStore.clearUserData()
-            prefStore.email = null
-            prefStore.password = null
-            callback(true)
-        }
+    suspend fun logout(): Boolean {
+        remote.logout()
+        // Don't care whether the user was actually logged out or not. Just clear data.
+        prefStore.clearUserData()
+        prefStore.email = null
+        prefStore.password = null
+        return true
     }
 
-    fun setPartProgress(partId: String, progress: Double) {
-        refreshLoginIfAuthExpired {
-            local.setPartProgress(partId, progress)
-            val userId = prefStore.userId
-            if (userId != null) remote.setUserPartProgress(userId, partId, progress)
-        }
+    suspend fun setPartProgress(partId: String, progress: Double) {
+        refreshLoginIfAuthExpired()
+        local.setPartProgress(partId, progress)
+        val userId = prefStore.userId
+        if (userId != null) remote.setUserPartProgress(userId, partId, progress)
     }
 
-    fun fetchPartProgress(onComplete: (fetchSuccess: Boolean) -> Unit) {
-        refreshLoginIfAuthExpired {
-            val userId = prefStore.userId
-            if (userId == null) {
-                onComplete(false)
-            } else {
-                remote.getUserPartProgressJson(userId) {
-                    if (it == null) onComplete(false)
-                    else {
-                        local.setPartsProgress(UnknownPartsProgress(it))
-                        onComplete(true)
-                    }
+    suspend fun fetchPartProgress(onComplete: (fetchSuccess: Boolean) -> Unit) {
+        refreshLoginIfAuthExpired()
+        val userId = prefStore.userId
+        if (userId == null) {
+            onComplete(false)
+        } else {
+            remote.getUserPartProgressJson(userId) {
+                if (it == null) onComplete(false)
+                else {
+                    local.setPartsProgress(UnknownPartsProgress(it))
+                    onComplete(true)
                 }
             }
         }
     }
 
-    private fun loginFromStore(callback: (loggedIn: Boolean) -> Unit) {
+    private suspend fun loginFromStore(): Boolean {
         val email = prefStore.email
         val password = prefStore.password
-        if (email != null && password != null) {
-            login(email, password) {
-                if (!it) {
-                    prefStore.email = null
-                    prefStore.password = null
-                }
-                callback(it)
+        return if (email != null && password != null) {
+            val loggedIn = login(email, password)
+            if (!loggedIn) {
+                prefStore.email = null
+                prefStore.password = null
             }
+            loggedIn
         } else {
-            callback(false)
+            false
         }
     }
-    private fun refreshLoginIfAuthExpired(onComplete: (refreshed: Boolean) -> Unit) {
-        if (prefStore.authExpired()) remote.logout { loginFromStore(onComplete) }
-        else onComplete(false)
+    private suspend fun refreshLoginIfAuthExpired(): Boolean {
+        return if (prefStore.authExpired()) {
+            remote.logout()
+            loginFromStore()
+        } else false
     }
 }

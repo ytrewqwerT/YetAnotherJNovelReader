@@ -8,14 +8,11 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
     val email = MutableLiveData<String>()
     val password = MutableLiveData<String>()
 
-    fun login(callback: (Boolean) -> Unit) {
+    suspend fun login(): Boolean {
         val emailText = email.value
         val passwordText = password.value
-        if (emailText.isNullOrEmpty() || passwordText.isNullOrEmpty()) {
-            callback(false)
-        } else {
-            repository.login(emailText, passwordText, callback)
-        }
-    }
 
+        if (emailText.isNullOrEmpty() || passwordText.isNullOrEmpty()) return false
+        return repository.login(emailText, passwordText)
+    }
 }

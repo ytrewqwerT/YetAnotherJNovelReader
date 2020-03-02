@@ -53,12 +53,14 @@ class PartViewModel(
         }
 
     init {
-        repository.getPart(partId) {
-            if (it != null) {
-                _contents.value = it
-                insertImages(it)
-            } else {
-                errorEvent.value = "Failed to get part data"
+        viewModelScope.launch {
+            repository.getPart(partId) {
+                if (it != null) {
+                    _contents.value = it
+                    insertImages(it)
+                } else {
+                    errorEvent.value = "Failed to get part data"
+                }
             }
         }
         partProgress = repository.getPartProgress(partId)
@@ -102,7 +104,7 @@ class PartViewModel(
     fun uploadProgressNow() {
         // Only upload if the value has changed since last upload
         if (progressChanged) {
-            repository.setPartProgress(partId, currentPartProgress)
+            viewModelScope.launch { repository.setPartProgress(partId, currentPartProgress) }
             progressChanged = false
         }
     }

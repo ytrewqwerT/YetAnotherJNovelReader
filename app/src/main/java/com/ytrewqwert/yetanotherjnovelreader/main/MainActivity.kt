@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.viewpager.widget.ViewPager
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -18,6 +19,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity(),
@@ -55,9 +57,13 @@ class MainActivity : AppCompatActivity(),
 
         // Catch Part clicks from the recent parts page in the viewpager
         val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
-        mainViewModel.fetchPartProgress {
-            mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
+
+        lifecycleScope.launch {
+            mainViewModel.fetchPartProgress {
+                mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
+            }
         }
+
         recentsListViewModel.itemClickedEvent.observe(this) {
             onPartsListItemInteraction(it.item as? Part)
         }
@@ -92,9 +98,12 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
             if (mainViewModel.loggedIn()) {
-                mainViewModel.logout { logoutResult ->
-                    if (logoutResult) onLoginResult(false)
-                    else Toast.makeText(this, "Logout failed", Toast.LENGTH_LONG).show()
+                lifecycleScope.launch {
+                    if (mainViewModel.logout()) onLoginResult(false)
+                    else {
+                        Toast.makeText(this@MainActivity, "Logout failed", Toast.LENGTH_LONG)
+                            .show()
+                    }
                 }
             } else {
                 LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")

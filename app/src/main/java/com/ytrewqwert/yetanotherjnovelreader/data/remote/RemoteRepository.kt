@@ -11,9 +11,11 @@ import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
+import kotlin.coroutines.resume
 
 class RemoteRepository private constructor(
     appContext: Context,
@@ -142,37 +144,39 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
-    fun login(email: String, password: String, callback: (JSONObject?) -> Unit) {
-        val args = JSONObject().put("email", email).put("password", password)
+    suspend fun login(email: String, password: String): JSONObject? {
+        return suspendCancellableCoroutine<JSONObject?> { cont ->
+            val args = JSONObject().put("email", email).put("password", password)
 
-        val request = JsonObjectRequest(
-            Request.Method.POST,
-            "$API_ADDR/users/login?include=user",
-            args,
-            Response.Listener {
-                Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
-                authToken = it?.getString("id")
-                callback(it)
-            },
-            Response.ErrorListener {
-                Log.w(TAG, "LoginFailure: $it")
-                callback(null)
-            }
-        )
-        requestQueue.add(request)
+            val request = JsonObjectRequest(
+                Request.Method.POST,
+                "$API_ADDR/users/login?include=user",
+                args,
+                Response.Listener {
+                    Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
+                    authToken = it?.getString("id")
+                    cont.resume(it)
+                },
+                Response.ErrorListener {
+                    Log.w(TAG, "LoginFailure: $it")
+                    cont.resume(null)
+                }
+            )
+            requestQueue.add(request)
+        }
     }
-    fun logout(callback: (Boolean) -> Unit) {
+    suspend fun logout() = suspendCancellableCoroutine<Boolean> { cont ->
         val request = AuthorizedStringRequest(
             authToken, Request.Method.POST,
             "$API_ADDR/users/logout",
             Response.Listener {
                 Log.d(TAG, "LogoutSuccess")
                 authToken = null
-                callback(true)
+                cont.resume(true)
             },
             Response.ErrorListener {
                 Log.w(TAG, "LogoutFailure? $it")
-                callback(false)
+                cont.resume(false)
             }
         )
         requestQueue.add(request)
