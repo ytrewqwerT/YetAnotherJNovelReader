@@ -69,6 +69,7 @@ class RemoteRepository private constructor(
         )
         requestQueue.add(request)
     }
+
     fun getPartsJsonAfter(time: Instant, callback: (partsJson: JSONArray) -> Unit) {
         val url = ParameterizedURLBuilder("$API_ADDR/parts")
             .addFilter("launchDate", "{\"gt\":\"${time}\"}")
@@ -85,47 +86,58 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
-    fun getSeriesJson(callback: (seriesJson: JSONArray) -> Unit) {
+    suspend fun getSeriesJson() = suspendCancellableCoroutine<JSONArray?> { cont ->
         val url = "$API_ADDR/series"
         val request = JsonArrayRequest(
             Request.Method.GET, url, null,
             Response.Listener<JSONArray> {
                 Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
                 Log.v(TAG, it.toString(4))
-                callback(it)
+                cont.resume(it)
             },
-            Response.ErrorListener { Log.w(TAG, "SeriesFailure: $it") }
+            Response.ErrorListener {
+                Log.w(TAG, "SeriesFailure: $it")
+                cont.resume(null)
+            }
         )
         requestQueue.add(request)
     }
-    fun getSerieVolumesJson(serieId: String, callback: (volumesJson: JSONArray) -> Unit) {
-        val url = ParameterizedURLBuilder("$API_ADDR/volumes")
-            .addFilter("serieId", serieId)
-            .build()
-        val request = JsonArrayRequest(
-            Request.Method.GET, url, null,
-            Response.Listener {
-                Log.d(TAG, "SeriesVolumesSuccess: Found ${it.length()} volumes")
-                callback(it)
-            },
-            Response.ErrorListener { Log.w(TAG, "SeriesVolumesFailure: $it") }
-        )
-        requestQueue.add(request)
-    }
-    fun getVolumePartsJson(volumeId: String, callback: (partsJson: JSONArray) -> Unit) {
-        val url = ParameterizedURLBuilder("$API_ADDR/parts")
-            .addFilter("volumeId", volumeId)
-            .build()
-        val request = JsonArrayRequest(
-            Request.Method.GET, url, null,
-            Response.Listener {
-                Log.d(TAG, "VolumePartsSuccess: Found ${it.length()} parts")
-                callback(it)
-            },
-            Response.ErrorListener { Log.w(TAG, "VolumePartsFailure: $it") }
-        )
-        requestQueue.add(request)
-    }
+    suspend fun getSerieVolumesJson(serieId: String) =
+        suspendCancellableCoroutine<JSONArray?> { cont ->
+            val url = ParameterizedURLBuilder("$API_ADDR/volumes")
+                .addFilter("serieId", serieId)
+                .build()
+            val request = JsonArrayRequest(
+                Request.Method.GET, url, null,
+                Response.Listener {
+                    Log.d(TAG, "SeriesVolumesSuccess: Found ${it.length()} volumes")
+                    cont.resume(it)
+                },
+                Response.ErrorListener {
+                    Log.w(TAG, "SeriesVolumesFailure: $it")
+                    cont.resume(null)
+                }
+            )
+            requestQueue.add(request)
+        }
+    suspend fun getVolumePartsJson(volumeId: String) =
+        suspendCancellableCoroutine<JSONArray?> { cont ->
+            val url = ParameterizedURLBuilder("$API_ADDR/parts")
+                .addFilter("volumeId", volumeId)
+                .build()
+            val request = JsonArrayRequest(
+                Request.Method.GET, url, null,
+                Response.Listener {
+                    Log.d(TAG, "VolumePartsSuccess: Found ${it.length()} parts")
+                    cont.resume(it)
+                },
+                Response.ErrorListener {
+                    Log.w(TAG, "VolumePartsFailure: $it")
+                    cont.resume(null)
+                }
+            )
+            requestQueue.add(request)
+        }
 
     suspend fun getUserPartProgressJson(userId: String) =
         suspendCancellableCoroutine<JSONArray?> { cont ->

@@ -11,27 +11,23 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
     private var curSeries: Series? = null
     private var curVolume: Volume? = null
 
-    fun getSeries(callback: (List<Series>) -> Unit) {
-        repository.getSeries(callback)
-    }
+    suspend fun getSeries() = repository.getSeries()
 
-    fun getSerieVolumes(series: Series, callback: (List<Volume>) -> Unit) {
+    suspend fun getSerieVolumes(series: Series): List<Volume> {
         curSeries = series
-        getSerieVolumes(callback)
+        return getSerieVolumes()
     }
-    fun getSerieVolumes(callback: (List<Volume>) -> Unit) {
-        val series = curSeries
-        if (series != null) repository.getSerieVolumes(series.id, callback)
-        else callback(emptyList())
+    suspend fun getSerieVolumes(): List<Volume> {
+        val series = curSeries ?: return emptyList()
+        return repository.getSerieVolumes(series.id)
     }
 
-    fun getVolumeParts(volume: Volume, callback: (List<Part>) -> Unit) {
+    suspend fun getVolumeParts(volume: Volume): List<Part> {
         curVolume = volume
-        getVolumeParts(callback)
+        return getVolumeParts()
     }
-    fun getVolumeParts(callback: (List<Part>) -> Unit) {
-        val volume = curVolume
-        if (volume != null) repository.getVolumeParts(volume, callback)
-        else callback(emptyList())
+    suspend fun getVolumeParts(): List<Part> {
+        val volume = curVolume ?: return emptyList()
+        return  repository.getVolumeParts(volume)
     }
 }

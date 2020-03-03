@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
@@ -18,6 +19,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.Series
 import com.ytrewqwert.yetanotherjnovelreader.data.Volume
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
+import kotlinx.coroutines.launch
 
 class ExplorerFragment : Fragment() {
 
@@ -37,23 +39,17 @@ class ExplorerFragment : Fragment() {
 
         listItemViewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
 
-        viewModel.getSeries { listItemViewModel.setItemList(ListTypes.SERIES.ordinal, it) }
+        refreshSeriesList()
         setListItemFragment(ListTypes.SERIES.ordinal, ListTypes.SERIES.name)
 
         listItemViewModel.getRefreshLiveEvent(ListTypes.SERIES.ordinal).observe(this) {
-            viewModel.getSeries {
-                listItemViewModel.setItemList(ListTypes.SERIES.ordinal, it)
-            }
+            refreshSeriesList()
         }
         listItemViewModel.getRefreshLiveEvent(ListTypes.VOLUMES.ordinal).observe(this) {
-            viewModel.getSerieVolumes {
-                listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, it)
-            }
+            refreshVolumesList()
         }
         listItemViewModel.getRefreshLiveEvent(ListTypes.PARTS.ordinal).observe(this) {
-            viewModel.getVolumeParts {
-                listItemViewModel.setItemList(ListTypes.PARTS.ordinal, it)
-            }
+            refreshPartsList()
         }
     }
 
@@ -83,13 +79,13 @@ class ExplorerFragment : Fragment() {
     private fun onSeriesListItemInteraction(serie: Series) {
         Log.d(TAG, "Series clicked: ${serie.title}")
         listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
-        viewModel.getSerieVolumes(serie) { listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, it) }
+        refreshVolumesList(serie)
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
     private fun onVolumesListItemInteraction(volume: Volume) {
         Log.d(TAG, "Volume clicked: ${volume.title}")
         listItemViewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
-        viewModel.getVolumeParts(volume) { listItemViewModel.setItemList(ListTypes.PARTS.ordinal, it) }
+        refreshPartsList(volume)
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
     private fun onPartsListItemInteraction(part: Part) {
@@ -97,6 +93,33 @@ class ExplorerFragment : Fragment() {
         val intent = Intent(context, PartActivity::class.java)
         intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
         startActivity(intent)
+    }
+
+    private fun refreshSeriesList() {
+        lifecycleScope.launch {
+            val series = viewModel.getSeries()
+            listItemViewModel.setItemList(ListTypes.SERIES.ordinal, series)
+        }
+    }
+    private fun refreshVolumesList(serie: Series? = null) {
+        lifecycleScope.launch {
+            val volumes = if (serie != null) {
+                viewModel.getSerieVolumes(serie)
+            } else {
+                viewModel.getSerieVolumes()
+            }
+            listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, volumes)
+        }
+    }
+    private fun refreshPartsList(volume: Volume? = null) {
+        lifecycleScope.launch {
+            val parts = if (volume != null) {
+                viewModel.getVolumeParts(volume)
+            } else {
+                viewModel.getVolumeParts()
+            }
+            listItemViewModel.setItemList(ListTypes.PARTS.ordinal, parts)
+        }
     }
 
     private fun setListItemFragment(fragmentId: Int, fragmentTag: String?) {

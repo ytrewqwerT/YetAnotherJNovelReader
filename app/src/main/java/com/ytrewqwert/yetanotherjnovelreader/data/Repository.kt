@@ -64,26 +64,24 @@ class Repository private constructor(appContext: Context) {
         }
     }
 
-    fun getSeries(callback: (List<Series>) -> Unit) {
-        remote.getSeriesJson {
-            local.addData(it)
-            callback(local.getSeries())
-        }
+    suspend fun getSeries(): List<Series> {
+        val seriesJson = remote.getSeriesJson()
+        if (seriesJson != null) local.addData(seriesJson)
+        return local.getSeries()
     }
-    fun getSerieVolumes(seriesId: String, callback: (List<Volume>) -> Unit) {
-        remote.getSerieVolumesJson(seriesId) {
-            local.addData(it)
-            callback(local.getVolumes(seriesId))
-        }
+
+    suspend fun getSerieVolumes(seriesId: String): List<Volume> {
+        val volumesJson = remote.getSerieVolumesJson(seriesId)
+        if (volumesJson != null) local.addData(volumesJson)
+        return local.getVolumes(seriesId)
     }
 
     fun getUsername() = prefStore.username
 
-    fun getVolumeParts(volume: Volume, callback: (List<Part>) -> Unit) {
-        remote.getVolumePartsJson(volume.id) {
-            local.addData(it)
-            callback(local.getParts(volume.id))
-        }
+    suspend fun getVolumeParts(volume: Volume): List<Part> {
+        val partsJson = remote.getVolumePartsJson(volume.id)
+        if (partsJson != null) local.addData(partsJson)
+        return local.getParts(volume.id)
     }
 
     fun isMember() = prefStore.isMember
