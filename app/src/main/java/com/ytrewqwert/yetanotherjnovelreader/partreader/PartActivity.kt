@@ -181,7 +181,7 @@ class PartActivity : AppCompatActivity() {
     private fun transitionToContent() {
         // Set scrollview position before transitioning
         val percentage = viewModel.initialPartProgress.value ?: 0.0
-        val position = textView.height * percentage
+        val position = (textView.height - scrollView.height) * percentage
         scrollView.scrollTo(0, position.toInt())
 
         val loadBarAnimator = AnimatorInflater.loadAnimator(this, android.R.animator.fade_out)
