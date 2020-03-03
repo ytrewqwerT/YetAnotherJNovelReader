@@ -1,6 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
 import android.animation.AnimatorInflater
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,33 +9,41 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import kotlinx.coroutines.launch
 
-class ListItemFragment : Fragment(), ListItem.InteractionListener {
+class ListItemFragment : Fragment(), ListItem.InteractionListener,
+    ImageSource {
     companion object {
         private const val TAG = "ListItemFragment"
         const val ARG_ID = "${TAG}_ID"
     }
 
-    private val viewModel by lazy {
-        // If a parent fragment exists, let it manage this fragment's contents instead of activity.
-        ViewModelProvider(parentFragment ?: requireActivity())[ListItemViewModel::class.java]
-    }
+    private val viewModel by viewModels<ListItemViewModel>(
+        ownerProducer = { parentFragment ?: requireActivity() },
+        factoryProducer = { ListItemViewModelFactory(Repository.getInstance(requireContext())) }
+    )
 
     private var uid = 0
-    private var recyclerViewAdapter = CustomRecyclerViewAdapter(this)
+    private var recyclerViewAdapter = CustomRecyclerViewAdapter(this, this)
 
     private lateinit var loadBar: RelativeLayout
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
 
     private var animating = false
+
+    override fun getImage(source: String, callback: (Bitmap?) -> Unit) {
+        lifecycleScope.launch { callback(viewModel.getImage(source)) }
+    }
 
     override fun onClick(item: ListItem) {
         viewModel.listItemFragmentViewOnClick(uid, item)

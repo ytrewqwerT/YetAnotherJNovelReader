@@ -40,15 +40,20 @@ class RemoteRepository private constructor(
     private val requestQueue: RequestQueue by lazy { Volley.newRequestQueue(appContext) }
     private val imageLoader = ImageLoader(requestQueue, DiskImageLoader(appContext))
 
-    fun getImage(source: String, callback: (Bitmap?) -> Unit) {
+    suspend fun getImage(source: String) = suspendCancellableCoroutine<Bitmap?>{ cont ->
         imageLoader.get(source, object : ImageLoader.ImageListener {
             override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
                 Log.d(TAG, "ImageSuccess: Source = $source")
-                callback(response?.bitmap)
+                val bitmap = response?.bitmap
+                if (bitmap != null) {
+                    cont.resume(response.bitmap)
+                } else if (!isImmediate) {
+                    throw IllegalStateException("Volley successfully retrieved a null image?")
+                }
             }
             override fun onErrorResponse(error: VolleyError?) {
                 Log.w(TAG, "ImageFailure: $error")
-                callback(null)
+                cont.resume(null)
             }
         })
     }

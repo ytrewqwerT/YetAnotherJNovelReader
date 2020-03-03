@@ -9,11 +9,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
-import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import kotlinx.android.synthetic.main.recycler_item.view.*
 
 class CustomRecyclerViewAdapter(
-    private val listener: ListItem.InteractionListener? = null
+    private val listener: ListItem.InteractionListener? = null,
+    private val imageSource: ImageSource? = null
 ) : RecyclerView.Adapter<CustomRecyclerViewAdapter.ViewHolder>() {
 
     private var items: List<ListItem> = emptyList()
@@ -26,8 +26,9 @@ class CustomRecyclerViewAdapter(
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
 
-        val repository = Repository.getInstance(holder.imageView.context)
-        repository.getImage(contents.mImageUrl) { holder.imageView.setImageBitmap(it) }
+        if (contents.mImageUrl != null) {
+            imageSource?.getImage(contents.mImageUrl) { holder.imageView.setImageBitmap(it) }
+        }
 
         if (contents.progress != null) {
             val percentage = (100 * contents.progress).toInt()

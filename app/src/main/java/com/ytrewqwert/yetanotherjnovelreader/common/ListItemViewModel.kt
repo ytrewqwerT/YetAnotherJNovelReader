@@ -1,15 +1,19 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
+import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 
-class ListItemViewModel : ViewModel() {
+class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     private val refreshListEvent = ArrayList<SingleLiveEvent<Boolean>>()
     private val itemLists = ArrayList<MutableLiveData< List<ListItem> >>()
     val itemClickedEvent = SingleLiveEvent<EventData>()
+
+    suspend fun getImage(source: String): Bitmap? = repository.getImage(source)
 
     fun getItemList(fragmentId: Int): LiveData<List<ListItem>> {
         while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())

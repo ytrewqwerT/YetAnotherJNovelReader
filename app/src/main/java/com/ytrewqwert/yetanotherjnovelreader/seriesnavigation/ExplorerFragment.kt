@@ -14,6 +14,7 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
+import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.Series
@@ -32,7 +33,9 @@ class ExplorerFragment : Fragment() {
     private val viewModel by viewModels<ExplorerViewModel> {
         ExplorerViewModelFactory(Repository.getInstance(requireContext()))
     }
-    private val listItemViewModel by viewModels<ListItemViewModel>()
+    private val listItemViewModel by viewModels<ListItemViewModel> {
+        ListItemViewModelFactory(Repository.getInstance(requireContext()))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -65,29 +66,32 @@ class PartViewModel(
         partProgress = repository.getPartProgress(partId)
     }
 
-    private fun insertImages(spanned: Spanned) {
+    private suspend fun insertImages(spanned: Spanned) {
         val spanBuilder =
             (spanned as? SpannableStringBuilder) ?: SpannableStringBuilder(spanned)
 
-        tempImages = spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java).size
-
-        for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {
-            repository.getImage(img.source) { bitmap ->
-                if (bitmap != null) {
-                    val drawable = BitmapDrawable(resources, bitmap)
-                    drawable.scaleToWidth(imgWidth)
-                    val newImg = ImageSpan(drawable)
-
-                    val start = spanBuilder.getSpanStart(img)
-                    val end = spanBuilder.getSpanEnd(img)
-                    spanBuilder.removeSpan(img)
-                    spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    _contents.value = spanBuilder
-
-                    tempImages--
-                }
+        coroutineScope {
+            for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {
+                launch { insertImage(img, spanBuilder) }
             }
         }
+        tempImages = 0
+    }
+
+    private suspend fun insertImage(
+        img: ImageSpan,
+        spanBuilder: SpannableStringBuilder
+    ) {
+        val bitmap = repository.getImage(img.source) ?: return
+        val drawable = BitmapDrawable(resources, bitmap)
+        drawable.scaleToWidth(imgWidth)
+        val newImg = ImageSpan(drawable)
+
+        val start = spanBuilder.getSpanStart(img)
+        val end = spanBuilder.getSpanEnd(img)
+        spanBuilder.removeSpan(img)
+        spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        _contents.value = spanBuilder
     }
 
     private fun setInitialPartsProgress(value: Double) {

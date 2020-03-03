@@ -37,9 +37,9 @@ class Repository private constructor(appContext: Context) {
         remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
     }
 
-    fun getImage(source: String?, callback: (Bitmap?) -> Unit) {
-        if (source != null) remote.getImage(source, callback)
-        else callback(null)
+    suspend fun getImage(source: String?): Bitmap? {
+        if (source == null) return null
+        return remote.getImage(source)
     }
 
     suspend fun getPart(partId: String): Spanned? {
