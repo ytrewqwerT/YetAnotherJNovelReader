@@ -42,13 +42,11 @@ class Repository private constructor(appContext: Context) {
         else callback(null)
     }
 
-    suspend fun getPart(partId: String, callback: (Spanned?) -> Unit) {
+    suspend fun getPart(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
-        remote.getPartContentJson(partId) {
-            val partHtml = it?.getString("dataHTML")
-            if (partHtml != null) callback(Html.fromHtml(partHtml, 0))
-            else callback(null)
-        }
+        val contentJson = remote.getPartContentJson(partId)
+        val partHtml = contentJson?.getString("dataHTML") ?: return null
+        return Html.fromHtml(partHtml, 0)
     }
 
     fun getPartProgress(partId: String) = local.getPart(partId)?.progress ?: 0.0

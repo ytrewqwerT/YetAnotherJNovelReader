@@ -53,22 +53,23 @@ class RemoteRepository private constructor(
         })
     }
 
-    fun getPartContentJson(partId: String, callback: (partJson: JSONObject?) -> Unit) {
-        val url = "$API_ADDR/parts/${partId}/partData"
-        val request = AuthorizedJsonObjectRequest(
-            authToken, Request.Method.GET, url, null,
-            Response.Listener {
-                Log.d(TAG, "PartSuccess: Found part $partId")
-                Log.v(TAG, it.toString(4))
-                callback(it)
-            },
-            Response.ErrorListener {
-                Log.w(TAG, "PartFailure: $it")
-                callback(null)
-            }
-        )
-        requestQueue.add(request)
-    }
+    suspend fun getPartContentJson(partId: String) =
+        suspendCancellableCoroutine<JSONObject?> { cont ->
+            val url = "$API_ADDR/parts/${partId}/partData"
+            val request = AuthorizedJsonObjectRequest(
+                authToken, Request.Method.GET, url, null,
+                Response.Listener {
+                    Log.d(TAG, "PartSuccess: Found part $partId")
+                    Log.v(TAG, it.toString(4))
+                    cont.resume(it)
+                },
+                Response.ErrorListener {
+                    Log.w(TAG, "PartFailure: $it")
+                    cont.resume(null)
+                }
+            )
+            requestQueue.add(request)
+        }
 
     suspend fun getPartsJsonAfter(time: Instant) = suspendCancellableCoroutine<JSONArray?> { cont ->
         val url = ParameterizedURLBuilder("$API_ADDR/parts")

@@ -54,13 +54,12 @@ class PartViewModel(
 
     init {
         viewModelScope.launch {
-            repository.getPart(partId) {
-                if (it != null) {
-                    _contents.value = it
-                    insertImages(it)
-                } else {
-                    errorEvent.value = "Failed to get part data"
-                }
+            val partData = repository.getPart(partId)
+            if (partData != null) {
+                _contents.value = partData
+                insertImages(partData)
+            } else {
+                errorEvent.value = "Failed to get part data"
             }
         }
         partProgress = repository.getPartProgress(partId)
