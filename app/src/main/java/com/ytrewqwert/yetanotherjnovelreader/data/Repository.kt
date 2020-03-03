@@ -53,15 +53,16 @@ class Repository private constructor(appContext: Context) {
 
     fun getPartProgress(partId: String) = local.getPart(partId)?.progress ?: 0.0
 
-    fun getRecentParts(callback: (List<Part>) -> Unit) {
+    suspend fun getRecentParts(): List<Part> {
         val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
-        remote.getPartsJsonAfter(oneMonthAgo) {
-            // Funnel through LocalRepository and back so that part progress is attached to parts
-            local.addData(it)
-            val partIds = ArrayList<String>()
-            for (i in 0 until it.length()) partIds.add(it.getJSONObject(i).getString("id"))
-            callback(local.getParts(partIds))
+        val partsJson = remote.getPartsJsonAfter(oneMonthAgo) ?: return emptyList()
+        // Funnel through LocalRepository and back so that part progress is attached to parts
+        local.addData(partsJson)
+        val partIds = ArrayList<String>()
+        for (i in 0 until partsJson.length()) {
+            partIds.add(partsJson.getJSONObject(i).getString("id"))
         }
+        return local.getParts(partIds)
     }
 
     suspend fun getSeries(): List<Series> {
@@ -116,19 +117,12 @@ class Repository private constructor(appContext: Context) {
         if (userId != null) remote.setUserPartProgress(userId, partId, progress)
     }
 
-    suspend fun fetchPartProgress(onComplete: (fetchSuccess: Boolean) -> Unit) {
+    suspend fun fetchPartProgress(): Boolean {
         refreshLoginIfAuthExpired()
-        val userId = prefStore.userId
-        if (userId == null) {
-            onComplete(false)
-        } else {
-            val partProgress = remote.getUserPartProgressJson(userId)
-            if (partProgress == null) onComplete(false)
-            else {
-                local.setPartsProgress(UnknownPartsProgress(partProgress))
-                onComplete(true)
-            }
-        }
+        val userId = prefStore.userId ?: return false
+        val partProgress = remote.getUserPartProgressJson(userId) ?: return false
+        local.setPartsProgress(UnknownPartsProgress(partProgress))
+        return true
     }
 
     private suspend fun loginFromStore(): Boolean {
@@ -146,7 +140,7 @@ class Repository private constructor(appContext: Context) {
         }
     }
     private suspend fun refreshLoginIfAuthExpired(): Boolean {
-        return if (prefStore.authExpired()) {
+        return if (loggedIn() && prefStore.authExpired()) {
             remote.logout()
             loginFromStore()
         } else false

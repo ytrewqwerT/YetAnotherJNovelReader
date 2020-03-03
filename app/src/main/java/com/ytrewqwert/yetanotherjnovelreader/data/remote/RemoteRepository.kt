@@ -70,7 +70,7 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
-    fun getPartsJsonAfter(time: Instant, callback: (partsJson: JSONArray) -> Unit) {
+    suspend fun getPartsJsonAfter(time: Instant) = suspendCancellableCoroutine<JSONArray?> { cont ->
         val url = ParameterizedURLBuilder("$API_ADDR/parts")
             .addFilter("launchDate", "{\"gt\":\"${time}\"}")
             .addOrder("launchDate+DESC")
@@ -79,9 +79,12 @@ class RemoteRepository private constructor(
             Request.Method.GET, url, null,
             Response.Listener {
                 Log.d(TAG, "RecentPartSuccess: Found ${it.length()} parts")
-                callback(it)
+                cont.resume(it)
             },
-            Response.ErrorListener { Log.w(TAG, "RecentPartFailure: $it") }
+            Response.ErrorListener {
+                Log.w(TAG, "RecentPartFailure: $it")
+                cont.resume(null)
+            }
         )
         requestQueue.add(request)
     }

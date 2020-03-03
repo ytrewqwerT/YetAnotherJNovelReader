@@ -8,11 +8,11 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
 
     suspend fun logout() = repository.logout()
 
-    suspend fun fetchPartProgress(onComplete: (Boolean) -> Unit) {
-        repository.fetchPartProgress { onComplete(it) }
+    suspend fun fetchPartProgress(): Boolean {
+        return repository.fetchPartProgress()
     }
-    fun getRecentParts(callback: (List<Part>) -> Unit) {
-        repository.getRecentParts { callback(it) }
+    suspend fun getRecentParts(): List<Part> {
+        return repository.getRecentParts()
     }
     fun loggedIn() = repository.loggedIn()
     fun getUsername() = repository.getUsername()

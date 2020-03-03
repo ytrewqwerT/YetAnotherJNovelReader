@@ -59,9 +59,8 @@ class MainActivity : AppCompatActivity(),
         val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
 
         lifecycleScope.launch {
-            mainViewModel.fetchPartProgress {
-                mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
-            }
+            mainViewModel.fetchPartProgress()
+            refreshRecentPartsList(recentPartsFragId)
         }
 
         recentsListViewModel.itemClickedEvent.observe(this) {
@@ -69,7 +68,9 @@ class MainActivity : AppCompatActivity(),
         }
 
         recentsListViewModel.getRefreshLiveEvent(recentPartsFragId).observe(this) {
-            mainViewModel.getRecentParts { recentsListViewModel.setItemList(recentPartsFragId, it) }
+            lifecycleScope.launch {
+                refreshRecentPartsList(recentPartsFragId)
+            }
         }
     }
 
@@ -120,6 +121,11 @@ class MainActivity : AppCompatActivity(),
             intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
             startActivity(intent)
         } else Log.e(TAG, "Clicked item handled by MainActivity was null")
+    }
+
+    private suspend fun refreshRecentPartsList(recentPartsFragId: Int) {
+        val recentParts = mainViewModel.getRecentParts()
+        recentsListViewModel.setItemList(recentPartsFragId, recentParts)
     }
 
     private fun updateMenu() {
