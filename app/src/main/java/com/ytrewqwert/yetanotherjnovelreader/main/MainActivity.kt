@@ -70,10 +70,9 @@ class MainActivity : AppCompatActivity(),
             onPartsListItemInteraction(it.item as? Part)
         }
 
-        recentsListViewModel.getRefreshLiveEvent(recentPartsFragId).observe(this) {
-            lifecycleScope.launch {
-                refreshRecentPartsList(recentPartsFragId)
-            }
+        recentsListViewModel.getItemList(recentPartsFragId).observe(this) {
+            if (it != null) return@observe
+            lifecycleScope.launch { refreshRecentPartsList(recentPartsFragId) }
         }
     }
 

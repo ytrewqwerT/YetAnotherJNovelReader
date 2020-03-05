@@ -44,16 +44,7 @@ class ExplorerFragment : Fragment() {
 
         refreshSeriesList()
         setListItemFragment(ListTypes.SERIES.ordinal, ListTypes.SERIES.name)
-
-        listItemViewModel.getRefreshLiveEvent(ListTypes.SERIES.ordinal).observe(this) {
-            refreshSeriesList()
-        }
-        listItemViewModel.getRefreshLiveEvent(ListTypes.VOLUMES.ordinal).observe(this) {
-            refreshVolumesList()
-        }
-        listItemViewModel.getRefreshLiveEvent(ListTypes.PARTS.ordinal).observe(this) {
-            refreshPartsList()
-        }
+        observeListRefresh()
     }
 
     override fun onCreateView(
@@ -68,6 +59,21 @@ class ExplorerFragment : Fragment() {
         // Propagate to child fragment
         val curFragment = childFragmentManager.findFragmentById(R.id.fragment_container)
         curFragment?.onResume()
+    }
+
+    private fun observeListRefresh() {
+        listItemViewModel.getItemList(ListTypes.SERIES.ordinal).observe(this) {
+            if (it != null) return@observe
+            refreshSeriesList()
+        }
+        listItemViewModel.getItemList(ListTypes.VOLUMES.ordinal).observe(this) {
+            if (it != null) return@observe
+            refreshVolumesList()
+        }
+        listItemViewModel.getItemList(ListTypes.PARTS.ordinal).observe(this) {
+            if (it != null) return@observe
+            refreshPartsList()
+        }
     }
 
     private fun onListItemInteraction(item: ListItem) {

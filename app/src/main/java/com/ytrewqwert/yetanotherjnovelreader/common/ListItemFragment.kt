@@ -55,8 +55,14 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         uid = requireArguments().getInt(ARG_ID, 0)
 
         viewModel.getItemList(uid).observe(this) {
-            recyclerViewAdapter.setItems(it)
-            transitionToContent()
+            when (it) {
+                null -> transitionToLoading()
+                else -> {
+                    recyclerViewAdapter.setItems(it)
+                    transitionToContent()
+                }
+            }
+
         }
     }
 
@@ -71,8 +77,8 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
-            transitionToLoading()
-            viewModel.notifyRefreshLiveEvent(uid)
+            // Content manager should observe itemList and update its value if null.
+            viewModel.setItemList(uid, null)
         }
 
         with (recyclerView) {
