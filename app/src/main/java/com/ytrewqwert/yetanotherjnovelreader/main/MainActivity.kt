@@ -36,8 +36,11 @@ class MainActivity : AppCompatActivity(),
     private val recentsListViewModel by viewModels<ListItemViewModel> {
         ListItemViewModelFactory(Repository.getInstance(this))
     }
+
     private var appBarMenu: Menu? = null
     private lateinit var viewPager: ViewPager
+
+    private val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,22 +61,12 @@ class MainActivity : AppCompatActivity(),
             }
         }
 
-        // Catch Part clicks from the recent parts page in the viewpager
-        val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
-
         lifecycleScope.launch {
             mainViewModel.fetchPartProgress()
-            refreshRecentPartsList(recentPartsFragId)
+            mainViewModel.fetchRecentParts()
         }
 
-        recentsListViewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? Part)
-        }
-
-        recentsListViewModel.getItemList(recentPartsFragId).observe(this) {
-            if (it != null) return@observe
-            lifecycleScope.launch { refreshRecentPartsList(recentPartsFragId) }
-        }
+        observeViewModels()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -101,19 +94,34 @@ class MainActivity : AppCompatActivity(),
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
             if (mainViewModel.loggedIn()) {
-                lifecycleScope.launch {
-                    if (mainViewModel.logout()) onLoginResult(false)
-                    else {
-                        Toast.makeText(this@MainActivity, "Logout failed", Toast.LENGTH_LONG)
-                            .show()
-                    }
-                }
+                mainViewModel.logout()
             } else {
                 LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
             }
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun observeViewModels() {
+        mainViewModel.logoutEvent.observe(this) { loggedOut ->
+            if (loggedOut) onLoginResult(false)
+            else {
+                Toast.makeText(this@MainActivity, "Logout failed", Toast.LENGTH_LONG)
+                    .show()
+            }
+        }
+        mainViewModel.recentParts.observe(this) {
+            recentsListViewModel.setItemList(recentPartsFragId, it)
+        }
+
+        recentsListViewModel.itemClickedEvent.observe(this) {
+            onPartsListItemInteraction(it.item as? Part)
+        }
+        recentsListViewModel.getItemList(recentPartsFragId).observe(this) {
+            if (it != null) return@observe
+            lifecycleScope.launch { mainViewModel.fetchRecentParts() }
+        }
     }
 
     private fun onPartsListItemInteraction(part: Part?) {
@@ -123,11 +131,6 @@ class MainActivity : AppCompatActivity(),
             intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
             startActivity(intent)
         } else Log.e(TAG, "Clicked item handled by MainActivity was null")
-    }
-
-    private suspend fun refreshRecentPartsList(recentPartsFragId: Int) {
-        val recentParts = mainViewModel.getRecentParts()
-        recentsListViewModel.setItemList(recentPartsFragId, recentParts)
     }
 
     private fun updateMenu() {
