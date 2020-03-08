@@ -31,8 +31,8 @@ class PreferenceStore private constructor(private val appContext: Context)
         private const val FONT_STYLE_KEY = "FONT_STYLE"
         private const val FONT_SIZE_KEY = "FONT_SIZE" // TODO: Coordinate key with R.xml.preferences
         private const val FONT_SIZE_DEFAULT = 15 // TODO: Maybe move value to resource file?
-        private const val READER_MARGIN_KEY = "READER_MARGIN"
-        private const val READER_MARGIN_DEFAULT = 16
+        private const val MARGIN_KEY = "READER_MARGIN"
+        private const val MARGIN_DEFAULT = 16
 
         @Volatile
         private var INSTANCE: PreferenceStore? = null
@@ -84,11 +84,10 @@ class PreferenceStore private constructor(private val appContext: Context)
 
     private val _fontSize = MutableLiveData(sharedPref.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT))
     private val _fontStyle = MutableLiveData<Typeface>()
+    private val _readerMargin = MutableLiveData(sharedPref.getInt(MARGIN_KEY, MARGIN_DEFAULT))
     val fontSize: LiveData<Int> = _fontSize
     val fontStyle: LiveData<Typeface> = _fontStyle
-
-    val readerMargin: Int
-        get() = sharedPref.getInt(READER_MARGIN_KEY, READER_MARGIN_DEFAULT)
+    val readerMargin: LiveData<Int> = _readerMargin
 
     fun authExpired(): Boolean {
         if (authToken == null) return true
@@ -121,6 +120,9 @@ class PreferenceStore private constructor(private val appContext: Context)
             }
             FONT_STYLE_KEY -> {
                 _fontStyle.value = updateTypeface()
+            }
+            MARGIN_KEY -> {
+                _readerMargin.value = sharedPref.getInt(MARGIN_KEY, MARGIN_DEFAULT)
             }
         }
     }

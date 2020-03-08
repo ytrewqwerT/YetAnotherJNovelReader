@@ -50,7 +50,8 @@
                 android:id="@+id/content_scroll_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="invisible">
+                android:visibility="invisible"
+                app:readerMargin="@{viewModel.margin}">
 
                 <TextView
                     android:id="@+id/content_view"
@@ -61,7 +62,7 @@
                     android:justificationMode="inter_word"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/text_margin" />
+                    app:readerMargin="@{viewModel.margin}" />
             </ScrollView>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

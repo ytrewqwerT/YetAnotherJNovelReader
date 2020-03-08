@@ -4,11 +4,9 @@ import android.animation.AnimatorInflater
 import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
@@ -17,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.addListener
-import androidx.core.view.updateLayoutParams
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -92,19 +89,6 @@ class PartActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         viewModel.uploadProgressNow()
-    }
-    override fun onResume() {
-        super.onResume()
-
-        val margin = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, viewModel.margin.toFloat(), resources.displayMetrics
-        ).toInt()
-        textView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            setMargins(margin, 0, margin, 0)
-        }
-        scrollView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            setMargins(0, margin, 0, margin)
-        }
     }
 
     private fun determineMainTextViewWidth() {

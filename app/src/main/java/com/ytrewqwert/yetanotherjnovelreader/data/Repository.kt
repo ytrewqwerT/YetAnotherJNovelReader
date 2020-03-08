@@ -30,7 +30,7 @@ class Repository private constructor(appContext: Context) {
 
     val fontSize get() = prefStore.fontSize
     val fontStyle get() = prefStore.fontStyle
-    val readerMargin: Int get() = prefStore.readerMargin
+    val readerMargin get() = prefStore.readerMargin
 
     init {
         remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
