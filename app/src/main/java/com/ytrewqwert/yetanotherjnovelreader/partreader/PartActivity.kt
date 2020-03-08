@@ -18,9 +18,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.addListener
 import androidx.core.view.updateLayoutParams
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 
 class PartActivity : AppCompatActivity() {
@@ -32,6 +34,7 @@ class PartActivity : AppCompatActivity() {
     private var mainTextViewWidth = 0
     private var statusBarHeight = 0
 
+    private lateinit var binding: ActivityPartBinding
     private val viewModel by viewModels<PartViewModel> {
         PartViewModelFactory(
             Repository.getInstance(applicationContext), resources, partId, mainTextViewWidth
@@ -47,12 +50,16 @@ class PartActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_part)
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_part)
+        binding.lifecycleOwner = this
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         partId = intent.getStringExtra(EXTRA_PART_ID)
+        determineMainTextViewWidth()
+        binding.viewModel = viewModel
 
         layoutRoot = findViewById(R.id.layout_root)
         statusBackground = findViewById(R.id.status_bar_background)
@@ -61,7 +68,6 @@ class PartActivity : AppCompatActivity() {
         textView = findViewById(R.id.content_view)
 
         initialiseStatusBarHeight()
-        determineMainTextViewWidth()
         initialiseObserversListeners()
 
         setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
@@ -89,9 +95,7 @@ class PartActivity : AppCompatActivity() {
     }
     override fun onResume() {
         super.onResume()
-        val textSize = viewModel.fontSize.toFloat()
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-        textView.typeface = viewModel.fontStyle
+
         val margin = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, viewModel.margin.toFloat(), resources.displayMetrics
         ).toInt()
@@ -111,7 +115,6 @@ class PartActivity : AppCompatActivity() {
     }
 
     private fun initialiseObserversListeners() {
-        viewModel.contents.observe(this) { textView.text = it }
         viewModel.initialPartProgress.observe(this) {
             transitionToContent()
         }

@@ -3,6 +3,8 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Typeface
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
@@ -13,7 +15,8 @@ import java.time.Instant
 import java.time.Period
 
 
-class PreferenceStore private constructor(private val appContext: Context) {
+class PreferenceStore private constructor(private val appContext: Context)
+    : SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
         private const val EMAIL_KEY = "EMAIL"
@@ -42,7 +45,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
             }
     }
 
-    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext)
+    private val sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext)
     private val encryptedPreferences: SharedPreferences
 
     init {
@@ -52,45 +55,40 @@ class PreferenceStore private constructor(private val appContext: Context) {
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
+
+        sharedPref.registerOnSharedPreferenceChangeListener(this)
     }
 
     var email: String?
-        get() = sharedPreferences.getString(EMAIL_KEY, null)
-        set(value) = sharedPreferences.setString(EMAIL_KEY, value)
+        get() = sharedPref.getString(EMAIL_KEY, null)
+        set(value) = sharedPref.setString(EMAIL_KEY, value)
     var password: String?
         get() = encryptedPreferences.getString(PASSWORD_KEY, null)
         set(value) = encryptedPreferences.setString(PASSWORD_KEY, value)
 
     var userId: String?
-        get() = sharedPreferences.getString(USER_ID_KEY, null)
-        set(value) = sharedPreferences.setString(USER_ID_KEY, value)
+        get() = sharedPref.getString(USER_ID_KEY, null)
+        set(value) = sharedPref.setString(USER_ID_KEY, value)
     var authToken: String?
-        get() = sharedPreferences.getString(AUTH_TOKEN_KEY, null)
-        set(value) = sharedPreferences.setString(AUTH_TOKEN_KEY, value)
+        get() = sharedPref.getString(AUTH_TOKEN_KEY, null)
+        set(value) = sharedPref.setString(AUTH_TOKEN_KEY, value)
     var authDate: String?
-        get() = sharedPreferences.getString(AUTH_DATE_KEY, null)
-        set(value) = sharedPreferences.setString(AUTH_DATE_KEY, value)
+        get() = sharedPref.getString(AUTH_DATE_KEY, null)
+        set(value) = sharedPref.setString(AUTH_DATE_KEY, value)
     var username: String?
-        get() = sharedPreferences.getString(USERNAME_KEY, null)
-        set(value) = sharedPreferences.setString(USERNAME_KEY, value)
+        get() = sharedPref.getString(USERNAME_KEY, null)
+        set(value) = sharedPref.setString(USERNAME_KEY, value)
     var isMember: Boolean?
-        get() = sharedPreferences.getBoolean(IS_MEMBER_KEY, false)
-        set(value) = sharedPreferences.setBoolean(IS_MEMBER_KEY, value ?: false)
+        get() = sharedPref.getBoolean(IS_MEMBER_KEY, false)
+        set(value) = sharedPref.setBoolean(IS_MEMBER_KEY, value ?: false)
 
-    val fontSize: Int
-        get() = sharedPreferences.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT)
-    val fontStyle: Typeface
-        get() {
-            val styleString = sharedPreferences.getString(FONT_STYLE_KEY, "default")
-            return when (styleString) {
-                "default" -> Typeface.defaultFromStyle(Typeface.NORMAL)
+    private val _fontSize = MutableLiveData(sharedPref.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT))
+    private val _fontStyle = MutableLiveData<Typeface>()
+    val fontSize: LiveData<Int> = _fontSize
+    val fontStyle: LiveData<Typeface> = _fontStyle
 
-                // Recreating every time the style is requested is probably a bad idea
-                else -> Typeface.createFromAsset(appContext.assets, "fonts/$styleString")
-            }
-        }
     val readerMargin: Int
-        get() = sharedPreferences.getInt(READER_MARGIN_KEY, READER_MARGIN_DEFAULT)
+        get() = sharedPref.getInt(READER_MARGIN_KEY, READER_MARGIN_DEFAULT)
 
     fun authExpired(): Boolean {
         if (authToken == null) return true
@@ -114,5 +112,26 @@ class PreferenceStore private constructor(private val appContext: Context) {
         username = user?.getString("username")
         val curSub = user?.getJSONObject("currentSubscription")
         isMember = curSub?.getString("status") == "active"
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            FONT_SIZE_KEY -> {
+                _fontSize.value = sharedPref.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT)
+            }
+            FONT_STYLE_KEY -> {
+                _fontStyle.value = updateTypeface()
+            }
+        }
+    }
+
+    private fun updateTypeface(): Typeface {
+        val styleString = sharedPref.getString(FONT_STYLE_KEY, "default")!!
+        return when (styleString) {
+            "default" -> Typeface.defaultFromStyle(Typeface.NORMAL)
+
+            // Recreating every time the style is requested is probably a bad idea
+            else -> Typeface.createFromAsset(appContext.assets, "fonts/$styleString")
+        }
     }
 }

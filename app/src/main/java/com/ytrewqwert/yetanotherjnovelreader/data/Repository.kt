@@ -2,7 +2,6 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Typeface
 import android.text.Html
 import android.text.Spanned
 import com.ytrewqwert.yetanotherjnovelreader.data.local.LocalRepository
@@ -29,8 +28,8 @@ class Repository private constructor(appContext: Context) {
     private val local: LocalRepository = LocalRepository.getInstance()
     private val remote: RemoteRepository
 
-    val fontSize: Int get() = prefStore.fontSize
-    val fontStyle: Typeface get() = prefStore.fontStyle
+    val fontSize get() = prefStore.fontSize
+    val fontStyle get() = prefStore.fontStyle
     val readerMargin: Int get() = prefStore.readerMargin
 
     init {
