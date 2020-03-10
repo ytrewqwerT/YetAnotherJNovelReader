@@ -3,7 +3,9 @@ package com.ytrewqwert.yetanotherjnovelreader.partreader
 import android.animation.AnimatorInflater
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextPaint
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -20,6 +22,8 @@ import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
+import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderAdapter
+import com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader.ScrollReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 
 class PartActivity : AppCompatActivity() {
@@ -63,7 +67,8 @@ class PartActivity : AppCompatActivity() {
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
-        readerFragment = ScrollReaderFragment()
+        readerFragment =
+            ScrollReaderFragment()
         with (supportFragmentManager.beginTransaction()) {
             add(R.id.reader_container, readerFragment)
             commit()
@@ -104,6 +109,12 @@ class PartActivity : AppCompatActivity() {
     }
 
     private fun initialiseObserversListeners() {
+        viewModel.contents.observe(this) {
+            val subSpans = PagedReaderAdapter.Paginator(it, mainTextViewWidth, TextPaint()).split(it)
+            for (span in subSpans) {
+                Log.d("SplitSpans", "$span")
+            }
+        }
         viewModel.partReady.observe(this) {
             if (it) transitionToContent()
         }
