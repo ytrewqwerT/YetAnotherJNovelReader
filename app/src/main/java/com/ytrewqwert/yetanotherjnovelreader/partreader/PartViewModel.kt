@@ -25,8 +25,10 @@ class PartViewModel(
 ) : ViewModel() {
 
     val errorEvent = SingleLiveEvent<String>()
+    val partReady = SingleLiveEvent<Boolean>()
+    val gotoProgressEvent = SingleLiveEvent<Boolean>()
+    val showAppBar = SingleLiveEvent<Boolean>()
 
-    val initialPartProgress = SingleLiveEvent<Double>()
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
 
@@ -34,35 +36,38 @@ class PartViewModel(
     val fontStyle get() = repository.fontStyle
     val margin get() = repository.readerMargin
 
-    private var progressChanged = false
-    var currentPartProgress = 0.0
-        set(value) {
-            field = value
-            progressChanged = true
-        }
-
-    private var tempImages = -1
-        set(value) {
-            field = value
-            if (value == 0 && partProgress != -1.0) setInitialPartsProgress(partProgress)
-        }
-    private var partProgress = -1.0
-        set(value) {
-            field = value
-            if (tempImages == 0) setInitialPartsProgress(value)
-        }
+    private var savedProgress = 0.0
+    val currentProgress = MutableLiveData(0.0)
 
     init {
         viewModelScope.launch {
-            val partData = repository.getPart(partId)
-            if (partData != null) {
-                _contents.value = partData
-                insertImages(partData)
-            } else {
-                errorEvent.value = "Failed to get part data"
-            }
+            getPartData()
+            // Responding too quickly upon activity creation results in
+            // the scrollview's position not being updated, so wait.
+            delay(100)
+            savedProgress = repository.getPartProgress(partId)
+            currentProgress.value = savedProgress
+
+            partReady.value = true
         }
-        partProgress = repository.getPartProgress(partId)
+    }
+
+    fun uploadProgressNow() {
+        // Only upload if the value has changed since last upload
+        val progress = currentProgress.value ?: 0.0
+        if (progress != savedProgress) {
+            viewModelScope.launch { repository.setPartProgress(partId, progress) }
+        }
+    }
+
+    private suspend fun getPartData() {
+        val partData = repository.getPart(partId)
+        if (partData != null) {
+            _contents.value = partData
+            insertImages(partData)
+        } else {
+            errorEvent.value = "Failed to get part data"
+        }
     }
 
     private suspend fun insertImages(spanned: Spanned) {
@@ -74,7 +79,6 @@ class PartViewModel(
                 launch { insertImage(img, spanBuilder) }
             }
         }
-        tempImages = 0
     }
 
     private suspend fun insertImage(
@@ -91,23 +95,5 @@ class PartViewModel(
         spanBuilder.removeSpan(img)
         spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         _contents.value = spanBuilder
-    }
-
-    private fun setInitialPartsProgress(value: Double) {
-        viewModelScope.launch {
-            // Responding too quickly upon activity creation results in
-            // the scrollview's position not being updated, so wait.
-            delay(100)
-            initialPartProgress.value = value
-            currentPartProgress = value
-        }
-    }
-
-    fun uploadProgressNow() {
-        // Only upload if the value has changed since last upload
-        if (progressChanged) {
-            viewModelScope.launch { repository.setPartProgress(partId, currentPartProgress) }
-            progressChanged = false
-        }
     }
 }
