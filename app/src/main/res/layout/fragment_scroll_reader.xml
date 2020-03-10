@@ -10,10 +10,9 @@
     </data>
 
     <FrameLayout
-        android:clickable="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".partreader.ScrollReaderFragment">
+        tools:context=".partreader.scrollreader.ScrollReaderFragment">
 
         <ScrollView
             android:id="@+id/content_scroll_container"

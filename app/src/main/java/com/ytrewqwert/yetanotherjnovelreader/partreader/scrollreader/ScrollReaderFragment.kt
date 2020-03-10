@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.partreader
+package com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentScrollReaderBinding
+import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
 class ScrollReaderFragment : Fragment() {
 
@@ -26,7 +27,7 @@ class ScrollReaderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(
-            inflater, R.layout.fragment_scroll_reader, null, false
+            inflater, R.layout.fragment_scroll_reader, container, false
         )
         binding?.lifecycleOwner = viewLifecycleOwner
         binding?.viewModel = viewModel
