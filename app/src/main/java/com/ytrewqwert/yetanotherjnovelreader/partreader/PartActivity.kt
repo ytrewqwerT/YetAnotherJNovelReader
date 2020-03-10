@@ -8,14 +8,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.ScrollView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.addListener
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
@@ -41,9 +41,9 @@ class PartActivity : AppCompatActivity() {
     private lateinit var layoutRoot: View
     private lateinit var statusBackground: View
     private lateinit var loadBar: ProgressBar
-    private lateinit var scrollView: ScrollView
-    private lateinit var textView: TextView
     private lateinit var toolbar: Toolbar
+    private lateinit var readerContainer: FragmentContainerView
+    private lateinit var readerFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,25 +51,30 @@ class PartActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_part)
         binding.lifecycleOwner = this
 
-        toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
         partId = intent.getStringExtra(EXTRA_PART_ID)
         determineMainTextViewWidth()
         binding.viewModel = viewModel
 
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
         layoutRoot = findViewById(R.id.layout_root)
         statusBackground = findViewById(R.id.status_bar_background)
         loadBar = findViewById(R.id.load_bar)
-        scrollView = findViewById(R.id.content_scroll_container)
-        textView = findViewById(R.id.content_view)
+        readerContainer = findViewById(R.id.reader_container)
+
+        readerFragment = ScrollReaderFragment()
+        with (supportFragmentManager.beginTransaction()) {
+            add(R.id.reader_container, readerFragment)
+            commit()
+        }
 
         initialiseStatusBarHeight()
         initialiseObserversListeners()
 
         setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
 
-        if (viewModel.initialPartProgress.value != null) transitionToContent()
+        if (viewModel.partReady.value == true) transitionToContent()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -99,27 +104,15 @@ class PartActivity : AppCompatActivity() {
     }
 
     private fun initialiseObserversListeners() {
-        viewModel.initialPartProgress.observe(this) {
-            transitionToContent()
+        viewModel.partReady.observe(this) {
+            if (it) transitionToContent()
         }
         viewModel.errorEvent.observe(this) { error ->
             Toast.makeText(this, error, Toast.LENGTH_LONG).show()
             finish()
         }
-
-        scrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-            val tvHeight = textView.height
-            val svHeight = scrollView.height
-            viewModel.currentPartProgress = if (svHeight < tvHeight) {
-                // tvHeight - svHeight == scrollY when scrolled to bottom of scrollView
-                scrollY.toDouble() / (tvHeight - svHeight)
-            } else {
-                1.0
-            }
-        }
-        // Attaching to scrollView would have been preferred, but it doesn't seem to want to work...
-        textView.setOnClickListener {
-            toggleTopAppBarVisibility()
+        viewModel.showAppBar.observe(this) {
+            setAppBarVisibility(it)
         }
     }
 
@@ -146,39 +139,36 @@ class PartActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = uiVisibility
     }
 
-    private fun toggleTopAppBarVisibility() {
-        when (toolbar.visibility) {
-            View.VISIBLE -> {
-                setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
-                val animator = AnimatorInflater.loadAnimator(this, R.animator.hide_top_app_bar)
-                animator.setTarget(toolbar)
-                animator.addListener(onEnd = { toolbar.visibility = View.GONE })
-                animator.start()
-            }
-            else -> {
+    private fun setAppBarVisibility(visible: Boolean) {
+        when (visible) {
+            true -> {
                 setStatusBarTextColor(false)
                 val animator = AnimatorInflater.loadAnimator(this, R.animator.show_top_app_bar)
                 animator.setTarget(toolbar)
                 animator.addListener(onStart = { toolbar.visibility = View.VISIBLE })
                 animator.start()
             }
+            else -> {
+                setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
+                val animator = AnimatorInflater.loadAnimator(this, R.animator.hide_top_app_bar)
+                animator.setTarget(toolbar)
+                animator.addListener(onEnd = { toolbar.visibility = View.GONE })
+                animator.start()
+            }
         }
     }
 
     private fun transitionToContent() {
-        // Set scrollview position before transitioning
-        val percentage = viewModel.initialPartProgress.value ?: 0.0
-        val position = (textView.height - scrollView.height) * percentage
-        scrollView.scrollTo(0, position.toInt())
+        viewModel.gotoProgressEvent.value = true
 
         val loadBarAnimator = AnimatorInflater.loadAnimator(this, android.R.animator.fade_out)
         loadBarAnimator.setTarget(loadBar)
         loadBarAnimator.addListener(onEnd = { loadBar.visibility = View.GONE })
         loadBarAnimator.start()
 
-        val scrollViewAnimator = AnimatorInflater.loadAnimator(this, R.animator.slide_from_bottom)
-        scrollViewAnimator.setTarget(scrollView)
-        scrollViewAnimator.addListener(onStart = { scrollView.visibility = View.VISIBLE })
-        scrollViewAnimator.start()
+        val contentAnimator = AnimatorInflater.loadAnimator(this, R.animator.slide_from_bottom)
+        contentAnimator.setTarget(readerContainer)
+        contentAnimator.addListener(onStart = { readerContainer.visibility = View.VISIBLE })
+        contentAnimator.start()
     }
 }
