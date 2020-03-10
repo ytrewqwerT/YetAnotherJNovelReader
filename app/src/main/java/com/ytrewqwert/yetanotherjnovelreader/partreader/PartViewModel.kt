@@ -63,25 +63,23 @@ class PartViewModel(
     private suspend fun getPartData() {
         val partData = repository.getPart(partId)
         if (partData != null) {
-            _contents.value = partData
-            insertImages(partData)
-        } else {
-            errorEvent.value = "Failed to get part data"
-        }
+            _contents.value = replaceTempImages(partData)
+        } else errorEvent.value = "Failed to get part data"
     }
 
-    private suspend fun insertImages(spanned: Spanned) {
+    private suspend fun replaceTempImages(spanned: Spanned): Spanned {
         val spanBuilder =
             (spanned as? SpannableStringBuilder) ?: SpannableStringBuilder(spanned)
 
         coroutineScope {
             for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {
-                launch { insertImage(img, spanBuilder) }
+                launch { replaceTempImage(img, spanBuilder) }
             }
         }
+        return spanBuilder
     }
 
-    private suspend fun insertImage(
+    private suspend fun replaceTempImage(
         img: ImageSpan,
         spanBuilder: SpannableStringBuilder
     ) {
@@ -90,10 +88,11 @@ class PartViewModel(
         drawable.scaleToWidth(imgWidth)
         val newImg = ImageSpan(drawable)
 
-        val start = spanBuilder.getSpanStart(img)
-        val end = spanBuilder.getSpanEnd(img)
-        spanBuilder.removeSpan(img)
-        spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        _contents.value = spanBuilder
+        synchronized(spanBuilder) {
+            val start = spanBuilder.getSpanStart(img)
+            val end = spanBuilder.getSpanEnd(img)
+            spanBuilder.removeSpan(img)
+            spanBuilder.setSpan(newImg, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
     }
 }
