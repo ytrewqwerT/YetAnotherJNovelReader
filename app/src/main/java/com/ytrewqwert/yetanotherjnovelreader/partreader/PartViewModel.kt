@@ -6,10 +6,12 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
+import android.util.TypedValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
@@ -20,9 +22,11 @@ import kotlinx.coroutines.launch
 class PartViewModel(
     private val repository: Repository,
     private val resources: Resources,
-    private val partId: String,
-    private val imgWidth: Int
+    private val partId: String
 ) : ViewModel() {
+    val pageWidthPx: Int
+    val pageHeightPx: Int
+    val fontSizePx: Int
 
     val errorEvent = SingleLiveEvent<String>()
     val partReady = SingleLiveEvent<Boolean>()
@@ -40,6 +44,17 @@ class PartViewModel(
     val currentProgress = MutableLiveData(0.0)
 
     init {
+        val displayMetrics = resources.displayMetrics
+        val marginDp = margin.value
+        val marginPx = if (marginDp != null) {
+            (marginDp * displayMetrics.density).toInt()
+        } else resources.getDimensionPixelSize(R.dimen.text_margin)
+        pageWidthPx = displayMetrics.widthPixels - 2 * marginPx
+        pageHeightPx = displayMetrics.heightPixels - 2 * marginPx
+
+        val fontSizeSp = fontSize.value ?: 15
+        fontSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSizeSp.toFloat(), displayMetrics).toInt()
+
         viewModelScope.launch {
             getPartData()
             // Responding too quickly upon activity creation results in
@@ -85,7 +100,7 @@ class PartViewModel(
     ) {
         val bitmap = repository.getImage(img.source) ?: return
         val drawable = BitmapDrawable(resources, bitmap)
-        drawable.scaleToWidth(imgWidth)
+        drawable.scaleToWidth(pageWidthPx)
         val newImg = ImageSpan(drawable)
 
         synchronized(spanBuilder) {

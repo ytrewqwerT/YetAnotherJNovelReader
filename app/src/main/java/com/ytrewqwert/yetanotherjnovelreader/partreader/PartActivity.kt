@@ -3,9 +3,6 @@ package com.ytrewqwert.yetanotherjnovelreader.partreader
 import android.animation.AnimatorInflater
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextPaint
-import android.util.DisplayMetrics
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,8 +19,7 @@ import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
-import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderAdapter
-import com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader.ScrollReaderFragment
+import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 
 class PartActivity : AppCompatActivity() {
@@ -32,13 +28,12 @@ class PartActivity : AppCompatActivity() {
     }
 
     private var partId: String = ""
-    private var mainTextViewWidth = 0
     private var statusBarHeight = 0
 
     private lateinit var binding: ActivityPartBinding
     private val viewModel by viewModels<PartViewModel> {
         PartViewModelFactory(
-            Repository.getInstance(applicationContext), resources, partId, mainTextViewWidth
+            Repository.getInstance(applicationContext), resources, partId
         )
     }
 
@@ -56,7 +51,6 @@ class PartActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         partId = intent.getStringExtra(EXTRA_PART_ID)
-        determineMainTextViewWidth()
         binding.viewModel = viewModel
 
         toolbar = findViewById(R.id.toolbar)
@@ -67,8 +61,7 @@ class PartActivity : AppCompatActivity() {
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
-        readerFragment =
-            ScrollReaderFragment()
+        readerFragment = PagedReaderFragment()
         with (supportFragmentManager.beginTransaction()) {
             add(R.id.reader_container, readerFragment)
             commit()
@@ -101,20 +94,7 @@ class PartActivity : AppCompatActivity() {
         viewModel.uploadProgressNow()
     }
 
-    private fun determineMainTextViewWidth() {
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        mainTextViewWidth =
-            displayMetrics.widthPixels - 2 * resources.getDimensionPixelSize(R.dimen.text_margin)
-    }
-
     private fun initialiseObserversListeners() {
-        viewModel.contents.observe(this) {
-            val subSpans = PagedReaderAdapter.Paginator(it, mainTextViewWidth, TextPaint()).split(it)
-            for (span in subSpans) {
-                Log.d("SplitSpans", "$span")
-            }
-        }
         viewModel.partReady.observe(this) {
             if (it) transitionToContent()
         }
