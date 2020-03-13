@@ -54,12 +54,15 @@ class PagedReaderAdapter(
                 var adjustedHeight = height
                 var offset = 0
 
-                for (i in 0 until layout.lineCount) {
+                var i = 0
+                while (i < layout.lineCount) {
                     if (adjustedHeight < layout.getLineBottom(i)) {
                         addPage(span.subSequence(offset, layout.getLineStart(i)))
+                        while (i < layout.lineCount && lineIsBlank(layout, i)) i++
                         offset = layout.getLineStart(i)
                         adjustedHeight = height + layout.getLineTop(i)
                     }
+                    i++
                 }
                 addPage(span.subSequence(offset, span.length))
             }
@@ -68,6 +71,13 @@ class PagedReaderAdapter(
 
         private fun addPage(text: CharSequence) {
             if (text.isNotEmpty()) pages.add(text)
+        }
+
+        private fun lineIsBlank(layout: StaticLayout, lineNo: Int): Boolean {
+            val start = layout.getLineStart(lineNo)
+            val end = layout.getLineEnd(lineNo)
+            val line = layout.text.subSequence(start, end)
+            return line.isBlank()
         }
 
         // Separates images from the text
