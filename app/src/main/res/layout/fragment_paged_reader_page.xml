@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".partreader.pagedreader.PagedReaderPageFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/page_contents"
+    <data>
+        <variable
+            name="viewModel"
+            type="com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel" />
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:context=".partreader.pagedreader.PagedReaderPageFragment">
 
-</FrameLayout>
+        <TextView
+            android:id="@+id/page_contents"
+            android:textSize="@{viewModel.fontSize}"
+            android:typeface="@{viewModel.fontStyle}"
+            android:hyphenationFrequency="full"
+            android:justificationMode="inter_word"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:readerMarginHorizontal="@{viewModel.margin}"
+            app:readerMarginVertical="@{viewModel.margin}"/>
+
+    </FrameLayout>
+</layout>
