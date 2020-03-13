@@ -67,7 +67,7 @@ class ScrollReaderFragment : Fragment() {
             viewModel.currentProgress.value = getScrollPercentage()
         }
         textView?.setOnClickListener {
-            viewModel.showAppBar.value = !(viewModel.showAppBar.value ?: false)
+            viewModel.toggleAppBarVisibility()
         }
     }
 
