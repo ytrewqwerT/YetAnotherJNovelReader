@@ -13,21 +13,30 @@ object BindingAdapters {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeDP.toFloat())
     }
 
-    @BindingAdapter("app:readerMargin")
+    @BindingAdapter("app:readerMarginHorizontal")
     @JvmStatic
-    fun textViewReaderMargin(textView: TextView, sizeDIP: Int) {
+    fun textViewReaderMarginHorizontal(textView: TextView, sizeDIP: Int) {
         val margin = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, sizeDIP.toFloat(), textView.resources.displayMetrics
         ).toInt()
-        textView.setPadding(margin, 0, margin, 0)
+        textView.setPadding(margin, textView.paddingTop, margin, textView.paddingBottom)
     }
 
-    @BindingAdapter("app:readerMargin")
+    @BindingAdapter("app:readerMarginVertical")
     @JvmStatic
-    fun scrollViewReaderMargin(scrollView: ScrollView, sizeDIP: Int) {
+    fun textViewReaderMarginVertical(textView: TextView, sizeDIP: Int) {
+        val margin = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, sizeDIP.toFloat(), textView.resources.displayMetrics
+        ).toInt()
+        textView.setPadding(textView.paddingLeft, margin, textView.paddingRight, margin)
+    }
+
+    @BindingAdapter("app:readerMarginVertical")
+    @JvmStatic
+    fun scrollViewReaderMarginVertical(scrollView: ScrollView, sizeDIP: Int) {
         val margin = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, sizeDIP.toFloat(), scrollView.resources.displayMetrics
         ).toInt()
-        scrollView.setPadding(0, margin, 0, margin)
+        scrollView.setPadding(scrollView.paddingLeft, margin, scrollView.paddingRight, margin)
     }
 }

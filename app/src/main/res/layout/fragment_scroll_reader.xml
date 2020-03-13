@@ -18,7 +18,7 @@
             android:id="@+id/content_scroll_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:readerMargin="@{viewModel.margin}">
+            app:readerMarginVertical="@{viewModel.margin}">
 
             <TextView
                 android:id="@+id/content_view"
@@ -29,7 +29,7 @@
                 android:justificationMode="inter_word"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:readerMargin="@{viewModel.margin}" />
+                app:readerMarginHorizontal="@{viewModel.margin}" />
         </ScrollView>
 
     </FrameLayout>
