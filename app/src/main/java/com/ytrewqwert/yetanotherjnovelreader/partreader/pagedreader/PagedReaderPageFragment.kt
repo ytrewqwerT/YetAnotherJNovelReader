@@ -35,6 +35,9 @@ class PagedReaderPageFragment : Fragment() {
 
         val text = requireArguments().getCharSequence(ARG_PAGE_CONTENT) ?: "Page content not given"
         textView?.text = text
+        textView?.setOnClickListener {
+            viewModel.toggleAppBarVisibility()
+        }
         return view
     }
 

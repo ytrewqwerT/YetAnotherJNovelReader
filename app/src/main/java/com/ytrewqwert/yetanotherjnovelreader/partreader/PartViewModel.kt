@@ -67,6 +67,10 @@ class PartViewModel(
         }
     }
 
+    fun toggleAppBarVisibility() {
+        showAppBar.value = !(showAppBar.value ?: false)
+    }
+
     fun uploadProgressNow() {
         // Only upload if the value has changed since last upload
         val progress = currentProgress.value ?: 0.0
