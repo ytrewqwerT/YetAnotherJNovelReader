@@ -1,10 +1,12 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader
 
+import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.style.ImageSpan
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -13,33 +15,64 @@ class PagedReaderAdapter(
     fa: FragmentActivity
 ) : FragmentStateAdapter(fa) {
 
-    private var numPages = 0
+    private val pages = ArrayList<CharSequence>()
 
-    override fun getItemCount(): Int = numPages
+    override fun getItemCount(): Int = pages.size
 
     override fun createFragment(position: Int): Fragment {
-        TODO("Not yet implemented")
+        val fragment = PagedReaderPageFragment()
+        val bundle = Bundle()
+        bundle.putCharSequence("PAGED_READER_PAGE_CONTENT", pages[position])
+        fragment.arguments = bundle
+        return fragment
     }
 
-    fun setReaderContents(content: CharSequence) {
-
+    fun setReaderContents(content: Spanned, width: Int, height: Int, paint: TextPaint) {
+        pages.clear()
+        val paginator = Paginator(content, width, height, paint)
+        val newPages = paginator.paginateText()
+        pages.addAll(newPages)
+        notifyDataSetChanged()
     }
 
     class Paginator(
         private val text: Spanned,
         private val width: Int,
+        private val height: Int,
         private val paint: TextPaint
     ) {
-        private val layout = StaticLayout.Builder.obtain(text, 0, text.length, paint, width)
-            .build()
+        private val pages = ArrayList<CharSequence>()
 
-        fun paginate() {
+        init {
+            Log.d("Paginator", "width/height = $width/$height")
+        }
 
+        fun paginateText(): List<CharSequence> {
+            val spans = split(text)
+            for (span in spans) {
+                val layout = StaticLayout.Builder.obtain(span, 0, span.length, paint, width).build()
+                var adjustedHeight = height
+                var offset = 0
+
+                for (i in 0 until layout.lineCount) {
+                    if (adjustedHeight < layout.getLineBottom(i)) {
+                        addPage(span.subSequence(offset, layout.getLineStart(i)))
+                        offset = layout.getLineStart(i)
+                        adjustedHeight = height + layout.getLineTop(i)
+                    }
+                }
+                addPage(span.subSequence(offset, span.length))
+            }
+            return pages
+        }
+
+        private fun addPage(text: CharSequence) {
+            if (text.isNotEmpty()) pages.add(text)
         }
 
         // Separates images from the text
         // Returns the split Spanned objects in the order they occurred in the original Spanned
-        fun split(spanned: Spanned): List<Spanned> {
+        private fun split(spanned: Spanned): List<Spanned> {
             val resultList = ArrayList<Spanned>()
             var textSpanStart = 0
             var textSpanEnd = 0

@@ -9,8 +9,10 @@ import androidx.fragment.app.Fragment
 import com.ytrewqwert.yetanotherjnovelreader.R
 
 class PagedReaderPageFragment : Fragment() {
+    companion object {
+        const val ARG_PAGE_CONTENT = "PAGED_READER_PAGE_CONTENT"
+    }
 
-    private var pageId: Int = -1
     private var textView: TextView? = null
 
     override fun onCreateView(
@@ -19,7 +21,8 @@ class PagedReaderPageFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_paged_reader_page, container, false)
         textView = view.findViewById(R.id.page_contents)
-        val text = "pageId $pageId" // TODO: temp text
+
+        val text = requireArguments().getCharSequence(ARG_PAGE_CONTENT) ?: "Page content not given"
         textView?.text = text
         return view
     }
