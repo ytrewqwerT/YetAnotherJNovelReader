@@ -109,9 +109,14 @@ class Repository private constructor(appContext: Context) {
 
     suspend fun setPartProgress(partId: String, progress: Double) {
         refreshLoginIfAuthExpired()
-        local.setPartProgress(partId, progress)
+        val boundedProgress = when {
+            progress > 1.0 -> 1.0
+            progress < 0.0 -> 0.0
+            else -> progress
+        }
+        local.setPartProgress(partId, boundedProgress)
         val userId = prefStore.userId
-        if (userId != null) remote.setUserPartProgress(userId, partId, progress)
+        if (userId != null) remote.setUserPartProgress(userId, partId, boundedProgress)
     }
 
     suspend fun fetchPartProgress(): Boolean {
