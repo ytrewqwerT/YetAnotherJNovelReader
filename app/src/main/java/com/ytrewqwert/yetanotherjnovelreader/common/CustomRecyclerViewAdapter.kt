@@ -26,6 +26,7 @@ class CustomRecyclerViewAdapter(
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
 
+        holder.imageView.setImageDrawable(null)
         if (contents.mImageUrl != null) {
             imageSource?.getImage(contents.mImageUrl) { holder.imageView.setImageBitmap(it) }
         }
