@@ -63,7 +63,7 @@ class PartActivity : AppCompatActivity() {
 
         readerFragment = PagedReaderFragment()
         with (supportFragmentManager.beginTransaction()) {
-            add(R.id.reader_container, readerFragment)
+            replace(R.id.reader_container, readerFragment)
             commit()
         }
 
