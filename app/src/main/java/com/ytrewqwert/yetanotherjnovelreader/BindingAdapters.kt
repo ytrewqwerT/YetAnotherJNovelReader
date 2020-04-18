@@ -4,6 +4,7 @@ import android.util.TypedValue
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LiveData
 
 object BindingAdapters {
 
@@ -38,5 +39,17 @@ object BindingAdapters {
             TypedValue.COMPLEX_UNIT_DIP, sizeDIP.toFloat(), scrollView.resources.displayMetrics
         ).toInt()
         scrollView.setPadding(scrollView.paddingLeft, margin, scrollView.paddingRight, margin)
+    }
+
+    @BindingAdapter("app:partProgress")
+    @JvmStatic
+    fun setScrollReaderPosition(scrollView: ScrollView, position: LiveData<Double>) {
+        position.value?.let {
+            val childHeight = scrollView.getChildAt(0).height
+            val svHeight = scrollView.height
+            val scrollPos = (childHeight - svHeight) * it
+            if (scrollView.scrollY != scrollPos.toInt())
+                scrollView.scrollTo(0, scrollPos.toInt())
+        }
     }
 }

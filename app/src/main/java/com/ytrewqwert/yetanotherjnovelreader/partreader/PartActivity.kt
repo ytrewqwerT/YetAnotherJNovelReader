@@ -19,7 +19,7 @@ import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
-import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderFragment
+import com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader.ScrollReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 
 class PartActivity : AppCompatActivity() {
@@ -61,10 +61,17 @@ class PartActivity : AppCompatActivity() {
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
-        readerFragment = PagedReaderFragment()
+        readerFragment = ScrollReaderFragment()
         with (supportFragmentManager.beginTransaction()) {
             replace(R.id.reader_container, readerFragment)
             commit()
+        }
+
+        // Indirectly notify the ReaderFragment to refresh its position after rendering has
+        // completed since it may have responded to the value before rendering finished, resulting
+        // in possible mis-positioning.
+        layoutRoot.post {
+            viewModel.currentProgress.value = viewModel.currentProgress.value
         }
 
         initialiseStatusBarHeight()

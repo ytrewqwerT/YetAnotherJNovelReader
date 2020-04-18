@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentScrollReaderBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
@@ -60,21 +59,11 @@ class ScrollReaderFragment : Fragment() {
     }
 
     private fun initialiseObserversListeners() {
-        viewModel.gotoProgressEvent.observe(viewLifecycleOwner) {
-            scrollToPosition(viewModel.currentProgress.value ?: 0.0)
-        }
         scrollView?.setOnScrollChangeListener { _, _, _, _, _ ->
             viewModel.currentProgress.value = getScrollPercentage()
         }
         textView?.setOnClickListener {
             viewModel.toggleAppBarVisibility()
         }
-    }
-
-    private fun scrollToPosition(percentage: Double) {
-        val tvHeight = textView?.height ?: 0
-        val svHeight = scrollView?.height ?: 0
-        val position = (tvHeight - svHeight) * percentage
-        scrollView?.scrollTo(0, position.toInt())
     }
 }
