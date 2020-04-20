@@ -28,6 +28,7 @@ class Repository private constructor(appContext: Context) {
     private val local: LocalRepository = LocalRepository.getInstance()
     private val remote: RemoteRepository
 
+    val horizontalReader get() = prefStore.horizontalReader
     val fontSize get() = prefStore.fontSize
     val fontStyle get() = prefStore.fontStyle
     val readerMargin get() = prefStore.readerMargin

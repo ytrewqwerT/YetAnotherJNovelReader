@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader
 import android.content.SharedPreferences
 import android.graphics.drawable.BitmapDrawable
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 
 fun BitmapDrawable.scaleToWidth(width: Int) {
     val height = width * intrinsicHeight / intrinsicWidth
@@ -29,6 +30,14 @@ fun ViewPager.addOnPageSelectedListener(listener: (position: Int) -> Unit) {
             position: Int, positionOffset: Float, positionOffsetPixels: Int
         ) {}
 
+        override fun onPageSelected(position: Int) {
+            listener(position)
+        }
+    })
+}
+
+fun ViewPager2.addOnPageSelectedListener(listener: (position: Int) -> Unit) {
+    registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             listener(position)
         }

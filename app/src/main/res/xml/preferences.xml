@@ -4,10 +4,14 @@
 
     <PreferenceCategory
         app:title="@string/reader">
+        <SwitchPreference
+            android:key="HORIZONTAL_READER"
+            android:title="Paged Reader"
+            android:defaultValue="false"
+            android:summary="Swipe horizontally to change pages" />
         <SeekBarPreference
             app:key="FONT_SIZE"
             app:title="@string/font_size"
-            app:icon="@drawable/ic_format_size_on_background_24dp"
             app:defaultValue="15"
             app:min="8"
             android:max="32"
