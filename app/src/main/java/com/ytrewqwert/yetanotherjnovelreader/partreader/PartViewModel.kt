@@ -36,6 +36,7 @@ class PartViewModel(
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
 
+    val horizontalReader get() = repository.horizontalReader
     val fontSize get() = repository.fontSize
     val fontStyle get() = repository.fontStyle
     val margin get() = repository.readerMargin

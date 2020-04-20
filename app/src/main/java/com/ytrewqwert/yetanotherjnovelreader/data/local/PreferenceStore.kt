@@ -28,6 +28,8 @@ class PreferenceStore private constructor(private val appContext: Context)
         private const val USERNAME_KEY = "USERNAME"
         private const val IS_MEMBER_KEY = "IS_MEMBER"
 
+        private const val IS_HORIZONTAL_KEY = "HORIZONTAL_READER"
+        private const val IS_HORIZONTAL_DEFAULT = false
         private const val FONT_STYLE_KEY = "FONT_STYLE"
         private const val FONT_SIZE_KEY = "FONT_SIZE" // TODO: Coordinate key with R.xml.preferences
         private const val FONT_SIZE_DEFAULT = 15 // TODO: Maybe move value to resource file?
@@ -82,9 +84,12 @@ class PreferenceStore private constructor(private val appContext: Context)
         get() = sharedPref.getBoolean(IS_MEMBER_KEY, false)
         set(value) = sharedPref.setBoolean(IS_MEMBER_KEY, value ?: false)
 
+    private val _horizontalReader =
+        MutableLiveData(sharedPref.getBoolean(IS_HORIZONTAL_KEY, IS_HORIZONTAL_DEFAULT))
     private val _fontSize = MutableLiveData(sharedPref.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT))
     private val _fontStyle = MutableLiveData<Typeface>()
     private val _readerMargin = MutableLiveData(sharedPref.getInt(MARGIN_KEY, MARGIN_DEFAULT))
+    val horizontalReader: LiveData<Boolean> = _horizontalReader
     val fontSize: LiveData<Int> = _fontSize
     val fontStyle: LiveData<Typeface> = _fontStyle
     val readerMargin: LiveData<Int> = _readerMargin
@@ -115,6 +120,10 @@ class PreferenceStore private constructor(private val appContext: Context)
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
+            IS_HORIZONTAL_KEY -> {
+                _horizontalReader.value =
+                    sharedPref.getBoolean(IS_HORIZONTAL_KEY, IS_HORIZONTAL_DEFAULT)
+            }
             FONT_SIZE_KEY -> {
                 _fontSize.value = sharedPref.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT)
             }

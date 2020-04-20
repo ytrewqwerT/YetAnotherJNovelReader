@@ -20,6 +20,7 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderFragment
+import com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader.ScrollReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 
 class PartActivity : AppCompatActivity() {
@@ -42,7 +43,6 @@ class PartActivity : AppCompatActivity() {
     private lateinit var loadBar: ProgressBar
     private lateinit var toolbar: Toolbar
     private lateinit var readerContainer: FragmentContainerView
-    private lateinit var readerFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,10 +61,11 @@ class PartActivity : AppCompatActivity() {
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
-        readerFragment = PagedReaderFragment()
-        with (supportFragmentManager.beginTransaction()) {
-            replace(R.id.reader_container, readerFragment)
-            commit()
+        viewModel.horizontalReader.observe(this) { isHorizontal ->
+            when (isHorizontal) {
+                true ->  setReaderFragment(PagedReaderFragment())
+                false -> setReaderFragment(ScrollReaderFragment())
+            }
         }
 
         // Indirectly notify the ReaderFragment to refresh its position after rendering has
@@ -168,5 +169,12 @@ class PartActivity : AppCompatActivity() {
         contentAnimator.setTarget(readerContainer)
         contentAnimator.addListener(onStart = { readerContainer.visibility = View.VISIBLE })
         contentAnimator.start()
+    }
+
+    private fun setReaderFragment(frag: Fragment) {
+        with (supportFragmentManager.beginTransaction()) {
+            replace(R.id.reader_container, frag)
+            commit()
+        }
     }
 }

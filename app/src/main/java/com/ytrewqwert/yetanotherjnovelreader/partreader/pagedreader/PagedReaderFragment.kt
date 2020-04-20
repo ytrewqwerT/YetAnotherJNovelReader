@@ -32,7 +32,6 @@ class PagedReaderFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        pager?.adapter = null
         pager = null
     }
 
