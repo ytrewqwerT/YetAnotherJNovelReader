@@ -50,7 +50,11 @@ class PagedReaderAdapter(
         fun paginateText(): List<CharSequence> {
             val spans = split(text)
             for (span in spans) {
-                val layout = StaticLayout.Builder.obtain(span, 0, span.length, paint, width).build()
+                val layout = StaticLayout.Builder
+                    .obtain(span, 0, span.length, paint, width)
+                    .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL)
+                    .setJustificationMode(StaticLayout.JUSTIFICATION_MODE_INTER_WORD)
+                    .build()
                 var adjustedHeight = height
                 var offset = 0
 

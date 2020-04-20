@@ -40,7 +40,10 @@ class PagedReaderFragment : Fragment() {
         partViewModel.contents.observe(viewLifecycleOwner) {
             val width = partViewModel.pageWidthPx
             val height = partViewModel.pageHeightPx
-            val paint = TextPaint().apply { textSize = partViewModel.fontSizePx.toFloat() }
+            val paint = TextPaint().apply {
+                textSize = partViewModel.fontSizePx.toFloat()
+                typeface = partViewModel.fontStyle.value
+            }
             pagerAdapter.setReaderContents(it, width, height, paint)
         }
     }
