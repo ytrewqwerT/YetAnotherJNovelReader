@@ -5,6 +5,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
+import androidx.viewpager2.widget.ViewPager2
 
 object BindingAdapters {
 
@@ -51,5 +52,14 @@ object BindingAdapters {
             if (scrollView.scrollY != scrollPos.toInt())
                 scrollView.scrollTo(0, scrollPos.toInt())
         }
+    }
+
+    @BindingAdapter("app:partProgress")
+    @JvmStatic
+    fun setPagedReaderPosition(pager: ViewPager2, position: LiveData<Double>) {
+        val numPages = pager.adapter?.itemCount ?: 1
+        val percentage = position.value ?: 0.0
+        val pagePos = (percentage * numPages).toInt()
+        pager.setCurrentItem(pagePos, true)
     }
 }
