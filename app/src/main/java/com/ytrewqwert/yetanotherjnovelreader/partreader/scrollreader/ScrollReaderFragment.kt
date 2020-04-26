@@ -36,6 +36,11 @@ class ScrollReaderFragment : Fragment() {
         textView = view?.findViewById(R.id.content_view)
         initialiseObserversListeners()
 
+        // Indirectly notify scrollView to update its position when textView's layout changes
+        textView?.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            viewModel.currentProgress.value = viewModel.currentProgress.value
+        }
+
         return view
     }
 

@@ -4,7 +4,6 @@ import android.util.TypedValue
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.viewpager2.widget.ViewPager2
 
 object BindingAdapters {
@@ -44,22 +43,20 @@ object BindingAdapters {
 
     @BindingAdapter("app:partProgress")
     @JvmStatic
-    fun setScrollReaderPosition(scrollView: ScrollView, position: LiveData<Double>) {
-        position.value?.let {
-            val childHeight = scrollView.getChildAt(0).height
-            val svHeight = scrollView.height
-            val scrollPos = (childHeight - svHeight) * it
-            if (scrollView.scrollY != scrollPos.toInt())
-                scrollView.scrollTo(0, scrollPos.toInt())
+    fun setScrollReaderPosition(scrollView: ScrollView, position: Double) {
+        val childHeight = scrollView.getChildAt(0).height
+        val svHeight = scrollView.height
+        val scrollPos = (childHeight - svHeight) * position
+        if (scrollView.scrollY != scrollPos.toInt()) {
+            scrollView.scrollTo(0, scrollPos.toInt())
         }
     }
 
     @BindingAdapter("app:partProgress")
     @JvmStatic
-    fun setPagedReaderPosition(pager: ViewPager2, position: LiveData<Double>) {
+    fun setPagedReaderPosition(pager: ViewPager2, position: Double) {
         val numPages = pager.adapter?.itemCount ?: 1
-        val percentage = position.value ?: 0.0
-        val pagePos = (percentage * (numPages - 1)).toInt() // Pages are 0-indexed
+        val pagePos = (position * (numPages - 1)).toInt() // Pages are 0-indexed
         pager.setCurrentItem(pagePos, true)
     }
 }
