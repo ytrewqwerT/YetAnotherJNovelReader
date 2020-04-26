@@ -78,9 +78,12 @@ class PartActivity : AppCompatActivity() {
         // Notify viewModel once the reader's dimensions are known
         readerContainer.post {
             readerContainer.let {
-                val width = it.width - it.paddingLeft - it.paddingRight
-                val height = it.height - it.paddingTop - it.paddingBottom
-                viewModel.setImageDimens(width, height)
+                val marginDIP = viewModel.margin.value?.toFloat() ?: 0F
+                val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDIP, resources.displayMetrics)
+                val width = it.width - 2 * marginPx
+                val height = it.height - 2 * marginPx
+                viewModel.setPageDimens(width.toInt(), height.toInt())
+
             }
         }
 
@@ -126,7 +129,7 @@ class PartActivity : AppCompatActivity() {
             val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, it.toFloat(), resources.displayMetrics)
             val width = readerContainer.width - 2 * marginPx
             val height = readerContainer.height - 2 * marginPx
-            viewModel.setImageDimens(width.toInt(), height.toInt())
+            viewModel.setPageDimens(width.toInt(), height.toInt())
         }
     }
 

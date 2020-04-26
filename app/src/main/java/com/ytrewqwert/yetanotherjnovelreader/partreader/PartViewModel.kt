@@ -71,7 +71,7 @@ class PartViewModel(
         showAppBar.value = !(showAppBar.value ?: false)
     }
 
-    fun setImageDimens(widthPx: Int, heightPx: Int) {
+    fun setPageDimens(widthPx: Int, heightPx: Int) {
         pageWidthPx = widthPx
         pageHeightPx = heightPx
         // Update contents to have correctly sized images
