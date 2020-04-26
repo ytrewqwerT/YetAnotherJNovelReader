@@ -59,7 +59,7 @@ object BindingAdapters {
     fun setPagedReaderPosition(pager: ViewPager2, position: LiveData<Double>) {
         val numPages = pager.adapter?.itemCount ?: 1
         val percentage = position.value ?: 0.0
-        val pagePos = (percentage * numPages).toInt()
+        val pagePos = (percentage * (numPages - 1)).toInt() // Pages are 0-indexed
         pager.setCurrentItem(pagePos, true)
     }
 }

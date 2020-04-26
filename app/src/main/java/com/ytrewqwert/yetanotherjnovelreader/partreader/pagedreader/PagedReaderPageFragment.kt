@@ -8,17 +8,22 @@ import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderPageBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
 class PagedReaderPageFragment : Fragment() {
     companion object {
-        const val ARG_PAGE_CONTENT = "PAGED_READER_PAGE_CONTENT"
+        const val ARG_PAGE_NUM = "PAGED_READER_PAGE_NUM"
     }
 
     private var textView: TextView? = null
-    private val viewModel by activityViewModels<PartViewModel>()
+    private val partViewModel by activityViewModels<PartViewModel>()
+    private val pagedReaderViewModel by viewModels<PagedReaderViewModel>(
+        ownerProducer = { requireParentFragment() }
+    )
     private var binding: FragmentPagedReaderPageBinding? = null
 
     override fun onCreateView(
@@ -29,15 +34,19 @@ class PagedReaderPageFragment : Fragment() {
             inflater, R.layout.fragment_paged_reader_page, container, false
         )
         binding?.lifecycleOwner = viewLifecycleOwner
-        binding?.viewModel = viewModel
+        binding?.viewModel = partViewModel
         val view = binding?.root
         textView = view?.findViewById(R.id.page_contents)
 
-        val text = requireArguments().getCharSequence(ARG_PAGE_CONTENT) ?: "Page content not given"
-        textView?.text = text
         textView?.setOnClickListener {
-            viewModel.toggleAppBarVisibility()
+            partViewModel.toggleAppBarVisibility()
         }
+
+        val pageNum = requireArguments().getInt(ARG_PAGE_NUM, 0)
+        pagedReaderViewModel.getPageContent(pageNum)?.observe(viewLifecycleOwner) {
+            textView?.text = it
+        }
+
         return view
     }
 
@@ -45,5 +54,4 @@ class PagedReaderPageFragment : Fragment() {
         super.onDestroyView()
         textView = null
     }
-
 }

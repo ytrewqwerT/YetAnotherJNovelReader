@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.widget.ViewPager2
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -19,9 +20,10 @@ class PagedReaderFragment : Fragment() {
 
     private var binding: FragmentPagedReaderBinding? = null
     private val partViewModel by activityViewModels<PartViewModel>()
+    private val pagedReaderViewModel by viewModels<PagedReaderViewModel>()
 
     private var pager: ViewPager2? = null
-    private val pagerAdapter by lazy { PagedReaderAdapter(requireActivity()) }
+    private val pagerAdapter by lazy { PagedReaderAdapter(this) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,23 +44,29 @@ class PagedReaderFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        pager?.adapter = null
         pager = null
     }
 
     private fun initialiseObserversListeners() {
         partViewModel.contents.observe(viewLifecycleOwner) {
-            val width = partViewModel.pageWidthPx
-            val height = partViewModel.pageHeightPx
-            val paint = TextPaint().apply {
+            pagedReaderViewModel.pageWidth = partViewModel.pageWidthPx
+            pagedReaderViewModel.pageHeight = partViewModel.pageHeightPx
+            pagedReaderViewModel.paint = TextPaint().apply {
                 textSize = partViewModel.fontSizePx.toFloat()
                 typeface = partViewModel.fontStyle.value
             }
-            pagerAdapter.setReaderContents(it, width, height, paint)
+            val numPages = pagedReaderViewModel.setContents(it)
+            pagerAdapter.setNumPages(numPages)
         }
 
         pager?.addOnPageSelectedListener { position ->
             val numPages = pagerAdapter.itemCount
-            partViewModel.currentProgress.value = position.toDouble() / numPages
+            partViewModel.currentProgress.value = if (numPages > 1) {
+                position.toDouble() / (numPages - 1)
+            } else {
+                1.0
+            }
         }
     }
 }

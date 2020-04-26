@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.partreader
 import android.animation.AnimatorInflater
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -74,6 +75,14 @@ class PartActivity : AppCompatActivity() {
         layoutRoot.post {
             viewModel.currentProgress.value = viewModel.currentProgress.value
         }
+        // Notify viewModel once the reader's dimensions are known
+        readerContainer.post {
+            readerContainer.let {
+                val width = it.width - it.paddingLeft - it.paddingRight
+                val height = it.height - it.paddingTop - it.paddingBottom
+                viewModel.setImageDimens(width, height)
+            }
+        }
 
         initialiseStatusBarHeight()
         initialiseObserversListeners()
@@ -112,6 +121,12 @@ class PartActivity : AppCompatActivity() {
         }
         viewModel.showAppBar.observe(this) {
             setAppBarVisibility(it)
+        }
+        viewModel.margin.observe(this) {
+            val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, it.toFloat(), resources.displayMetrics)
+            val width = readerContainer.width - 2 * marginPx
+            val height = readerContainer.height - 2 * marginPx
+            viewModel.setImageDimens(width.toInt(), height.toInt())
         }
     }
 
