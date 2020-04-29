@@ -93,12 +93,6 @@ class PartActivity : AppCompatActivity() {
         viewModel.uploadProgressNow()
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Sync navigation bar visibility with the app bar
-        setNavigationBarVisibility(viewModel.showAppBar.value ?: false)
-    }
-
     private fun initialiseObserversListeners() {
         viewModel.partReady.observe(this) {
             if (it) transitionToContent()
