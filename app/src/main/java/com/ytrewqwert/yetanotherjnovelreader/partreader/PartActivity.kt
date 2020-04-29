@@ -93,6 +93,11 @@ class PartActivity : AppCompatActivity() {
         viewModel.uploadProgressNow()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.showAppBar.value = false
+    }
+
     private fun initialiseObserversListeners() {
         viewModel.partReady.observe(this) {
             if (it) transitionToContent()
