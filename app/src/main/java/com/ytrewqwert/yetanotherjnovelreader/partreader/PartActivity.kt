@@ -56,16 +56,80 @@ class PartActivity : AppCompatActivity() {
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         layoutRoot = findViewById(R.id.layout_root)
         statusBackground = findViewById(R.id.status_bar_background)
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
+        initialiseStatusBarHeight()
+        initialiseObserversListeners()
+        setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
+        if (viewModel.partReady.value == true) transitionToContent()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_reader, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean  = when (item?.itemId) {
+        android.R.id.home -> {
+            finish()
+            true
+        }
+        R.id.settings_button -> {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.uploadProgressNow()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Sync navigation bar visibility with the app bar
+        setNavigationBarVisibility(viewModel.showAppBar.value ?: false)
+    }
+
+    private fun initialiseObserversListeners() {
+        viewModel.partReady.observe(this) {
+            if (it) transitionToContent()
+        }
+        viewModel.errorEvent.observe(this) { error ->
+            Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+            finish()
+        }
+        viewModel.showAppBar.observe(this) {
+            setAppBarVisibility(it)
+            setNavigationBarVisibility(it)
+        }
+        viewModel.margin.observe(this) {
+            val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, it.toFloat(), resources.displayMetrics)
+            val width = readerContainer.width - 2 * marginPx
+            val height = readerContainer.height - 2 * marginPx
+            viewModel.setPageDimens(width.toInt(), height.toInt())
+        }
         viewModel.horizontalReader.observe(this) { isHorizontal ->
             when (isHorizontal) {
                 true ->  setReaderFragment(PagedReaderFragment())
                 false -> setReaderFragment(ScrollReaderFragment())
+            }
+        }
+
+        window.decorView.setOnSystemUiVisibilityChangeListener {
+            // Show the App bar if the navigation bar was manually brought up.
+            if (viewModel.showAppBar.value == true) return@setOnSystemUiVisibilityChangeListener
+            val newVisibility = window.decorView.systemUiVisibility
+            if (newVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION == 0) {
+                viewModel.showAppBar.value = true
             }
         }
 
@@ -86,55 +150,12 @@ class PartActivity : AppCompatActivity() {
 
             }
         }
-
-        initialiseStatusBarHeight()
-        initialiseObserversListeners()
-
-        setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
-
-        if (viewModel.partReady.value == true) transitionToContent()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_reader, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean  = when (item?.itemId) {
-        R.id.settings_button -> {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-            true
-        }
-        else -> super.onOptionsItemSelected(item)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.uploadProgressNow()
-    }
-
-    private fun initialiseObserversListeners() {
-        viewModel.partReady.observe(this) {
-            if (it) transitionToContent()
-        }
-        viewModel.errorEvent.observe(this) { error ->
-            Toast.makeText(this, error, Toast.LENGTH_LONG).show()
-            finish()
-        }
-        viewModel.showAppBar.observe(this) {
-            setAppBarVisibility(it)
-        }
-        viewModel.margin.observe(this) {
-            val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, it.toFloat(), resources.displayMetrics)
-            val width = readerContainer.width - 2 * marginPx
-            val height = readerContainer.height - 2 * marginPx
-            viewModel.setPageDimens(width.toInt(), height.toInt())
-        }
     }
 
     private fun initialiseStatusBarHeight() {
-        layoutRoot.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        layoutRoot.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
 
         statusBarHeight = resources.getDimensionPixelSize(R.dimen.default_status_bar_height)
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
@@ -144,6 +165,15 @@ class PartActivity : AppCompatActivity() {
         toolbar.layoutParams.height += statusBarHeight
     }
 
+    private fun setNavigationBarVisibility(visible: Boolean) {
+        window.decorView.systemUiVisibility = if (visible) {
+            (window.decorView.systemUiVisibility
+                    and (View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION).inv())
+        } else {
+            (window.decorView.systemUiVisibility
+                    or (View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION))
+        }
+    }
     private fun setStatusBarTextColor(isLight: Boolean) {
         var uiVisibility = window.decorView.systemUiVisibility
         var mask = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
