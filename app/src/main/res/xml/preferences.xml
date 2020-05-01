@@ -23,14 +23,12 @@
             android:defaultValue="1"
             android:entries="@array/font_names"
             android:entryValues="@array/font_files" />
-        <SeekBarPreference
-            app:key="READER_MARGIN"
-            app:title="Margin"
-            app:defaultValue="16"
-            app:min="0"
-            android:max="64"
-            app:showSeekBarValue="true" />
     </PreferenceCategory>
+
+    <Preference
+        android:title="Margins"
+        android:summary="Adjust margins around the reader"
+        android:fragment="com.ytrewqwert.yetanotherjnovelreader.settings.MarginFragment" />
 
 
 </PreferenceScreen>

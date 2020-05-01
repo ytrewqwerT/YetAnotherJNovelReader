@@ -5,6 +5,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.ytrewqwert.yetanotherjnovelreader.data.local.PreferenceStore
 
 object BindingAdapters {
 
@@ -16,29 +17,29 @@ object BindingAdapters {
 
     @BindingAdapter("app:readerMarginHorizontal")
     @JvmStatic
-    fun textViewReaderMarginHorizontal(textView: TextView, sizeDIP: Int) {
-        val margin = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, sizeDIP.toFloat(), textView.resources.displayMetrics
-        ).toInt()
-        textView.setPadding(margin, textView.paddingTop, margin, textView.paddingBottom)
+    fun textViewReaderMarginHorizontal(textView: TextView, marginsDIP: PreferenceStore.Margins) {
+        val displayMetrics = textView.resources.displayMetrics
+        val marginLeft = Utils.dpToPx(marginsDIP.left, displayMetrics)
+        val marginRight = Utils.dpToPx(marginsDIP.right, displayMetrics)
+        textView.setPadding(marginLeft, textView.paddingTop, marginRight, textView.paddingBottom)
     }
 
     @BindingAdapter("app:readerMarginVertical")
     @JvmStatic
-    fun textViewReaderMarginVertical(textView: TextView, sizeDIP: Int) {
-        val margin = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, sizeDIP.toFloat(), textView.resources.displayMetrics
-        ).toInt()
-        textView.setPadding(textView.paddingLeft, margin, textView.paddingRight, margin)
+    fun textViewReaderMarginVertical(textView: TextView, marginsDIP: PreferenceStore.Margins) {
+        val displayMetrics = textView.resources.displayMetrics
+        val marginTop = Utils.dpToPx(marginsDIP.top, displayMetrics)
+        val marginBottom = Utils.dpToPx(marginsDIP.bottom, displayMetrics)
+        textView.setPadding(textView.paddingLeft, marginTop, textView.paddingRight, marginBottom)
     }
 
     @BindingAdapter("app:readerMarginVertical")
     @JvmStatic
-    fun scrollViewReaderMarginVertical(scrollView: ScrollView, sizeDIP: Int) {
-        val margin = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, sizeDIP.toFloat(), scrollView.resources.displayMetrics
-        ).toInt()
-        scrollView.setPadding(scrollView.paddingLeft, margin, scrollView.paddingRight, margin)
+    fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDIP: PreferenceStore.Margins) {
+        val displayMetrics = scrollView.resources.displayMetrics
+        val marginTop = Utils.dpToPx(marginsDIP.top, displayMetrics)
+        val marginBottom = Utils.dpToPx(marginsDIP.bottom, displayMetrics)
+        scrollView.setPadding(scrollView.paddingLeft, marginTop, scrollView.paddingRight, marginBottom)
     }
 
     @BindingAdapter("app:partProgress")

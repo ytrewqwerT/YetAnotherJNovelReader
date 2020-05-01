@@ -3,7 +3,6 @@ package com.ytrewqwert.yetanotherjnovelreader.partreader
 import android.animation.AnimatorInflater
 import android.content.Intent
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.Utils
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderFragment
@@ -111,10 +111,7 @@ class PartActivity : AppCompatActivity() {
             setNavigationBarVisibility(it)
         }
         viewModel.margin.observe(this) {
-            val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, it.toFloat(), resources.displayMetrics)
-            val width = readerContainer.width - 2 * marginPx
-            val height = readerContainer.height - 2 * marginPx
-            viewModel.setPageDimens(width.toInt(), height.toInt())
+            updatePageDimens()
         }
         viewModel.horizontalReader.observe(this) { isHorizontal ->
             when (isHorizontal) {
@@ -131,14 +128,7 @@ class PartActivity : AppCompatActivity() {
         }
         // Notify viewModel once the reader's dimensions are known
         readerContainer.post {
-            readerContainer.let {
-                val marginDIP = viewModel.margin.value?.toFloat() ?: 0F
-                val marginPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDIP, resources.displayMetrics)
-                val width = it.width - 2 * marginPx
-                val height = it.height - 2 * marginPx
-                viewModel.setPageDimens(width.toInt(), height.toInt())
-
-            }
+            updatePageDimens()
         }
     }
 
@@ -214,5 +204,18 @@ class PartActivity : AppCompatActivity() {
             replace(R.id.reader_container, frag)
             commit()
         }
+    }
+
+    private fun updatePageDimens() {
+        var pageWidth = readerContainer.width
+        var pageHeight = readerContainer.height
+
+        val margins = viewModel.margin.value ?: return
+        pageHeight -= Utils.dpToPx(margins.top, resources.displayMetrics)
+        pageHeight -= Utils.dpToPx(margins.bottom, resources.displayMetrics)
+        pageWidth -= Utils.dpToPx(margins.left, resources.displayMetrics)
+        pageWidth -= Utils.dpToPx(margins.right, resources.displayMetrics)
+
+        viewModel.setPageDimens(pageWidth, pageHeight)
     }
 }

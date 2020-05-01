@@ -8,7 +8,6 @@ import android.text.Spanned
 import android.text.style.ImageSpan
 import android.util.TypedValue
 import androidx.lifecycle.*
-import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
@@ -45,14 +44,10 @@ class PartViewModel(
     }
 
     init {
-        val displayMetrics = resources.displayMetrics
-        val marginDp = margin.value
-        val marginPx = if (marginDp != null) {
-            (marginDp * displayMetrics.density).toInt()
-        } else resources.getDimensionPixelSize(R.dimen.text_margin)
-        pageWidthPx = displayMetrics.widthPixels - 2 * marginPx
-        pageHeightPx = displayMetrics.heightPixels - 2 * marginPx
+        pageWidthPx = 0
+        pageHeightPx = 0
 
+        val displayMetrics = resources.displayMetrics
         val fontSizeSp = fontSize.value ?: 15
         fontSizePx = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP, fontSizeSp.toFloat(), displayMetrics

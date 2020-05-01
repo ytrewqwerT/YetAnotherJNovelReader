@@ -19,23 +19,6 @@ class PreferenceStore private constructor(private val appContext: Context)
     : SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
-        private const val EMAIL_KEY = "EMAIL"
-        private const val PASSWORD_KEY = "PASSWORD"
-
-        private const val USER_ID_KEY = "USER_ID"
-        private const val AUTH_TOKEN_KEY = "AUTHENTICATION_TOKEN"
-        private const val AUTH_DATE_KEY = "AUTHENTICATION_DATE"
-        private const val USERNAME_KEY = "USERNAME"
-        private const val IS_MEMBER_KEY = "IS_MEMBER"
-
-        private const val IS_HORIZONTAL_KEY = "HORIZONTAL_READER"
-        private const val IS_HORIZONTAL_DEFAULT = false
-        private const val FONT_STYLE_KEY = "FONT_STYLE"
-        private const val FONT_SIZE_KEY = "FONT_SIZE" // TODO: Coordinate key with R.xml.preferences
-        private const val FONT_SIZE_DEFAULT = 15 // TODO: Maybe move value to resource file?
-        private const val MARGIN_KEY = "READER_MARGIN"
-        private const val MARGIN_DEFAULT = 16
-
         @Volatile
         private var INSTANCE: PreferenceStore? = null
 
@@ -62,37 +45,37 @@ class PreferenceStore private constructor(private val appContext: Context)
     }
 
     var email: String?
-        get() = sharedPref.getString(EMAIL_KEY, null)
-        set(value) = sharedPref.setString(EMAIL_KEY, value)
+        get() = sharedPref.getString(PrefKeys.EMAIL, null)
+        set(value) = sharedPref.setString(PrefKeys.EMAIL, value)
     var password: String?
-        get() = encryptedPreferences.getString(PASSWORD_KEY, null)
-        set(value) = encryptedPreferences.setString(PASSWORD_KEY, value)
+        get() = encryptedPreferences.getString(PrefKeys.PASSWORD, null)
+        set(value) = encryptedPreferences.setString(PrefKeys.PASSWORD, value)
 
     var userId: String?
-        get() = sharedPref.getString(USER_ID_KEY, null)
-        set(value) = sharedPref.setString(USER_ID_KEY, value)
+        get() = sharedPref.getString(PrefKeys.USER_ID, null)
+        set(value) = sharedPref.setString(PrefKeys.USER_ID, value)
     var authToken: String?
-        get() = sharedPref.getString(AUTH_TOKEN_KEY, null)
-        set(value) = sharedPref.setString(AUTH_TOKEN_KEY, value)
+        get() = sharedPref.getString(PrefKeys.AUTH_TOKEN, null)
+        set(value) = sharedPref.setString(PrefKeys.AUTH_TOKEN, value)
     var authDate: String?
-        get() = sharedPref.getString(AUTH_DATE_KEY, null)
-        set(value) = sharedPref.setString(AUTH_DATE_KEY, value)
+        get() = sharedPref.getString(PrefKeys.AUTH_DATE, null)
+        set(value) = sharedPref.setString(PrefKeys.AUTH_DATE, value)
     var username: String?
-        get() = sharedPref.getString(USERNAME_KEY, null)
-        set(value) = sharedPref.setString(USERNAME_KEY, value)
+        get() = sharedPref.getString(PrefKeys.USERNAME, null)
+        set(value) = sharedPref.setString(PrefKeys.USERNAME, value)
     var isMember: Boolean?
-        get() = sharedPref.getBoolean(IS_MEMBER_KEY, false)
-        set(value) = sharedPref.setBoolean(IS_MEMBER_KEY, value ?: false)
+        get() = sharedPref.getBoolean(PrefKeys.IS_MEMBER, false)
+        set(value) = sharedPref.setBoolean(PrefKeys.IS_MEMBER, value ?: false)
 
     private val _horizontalReader =
-        MutableLiveData(sharedPref.getBoolean(IS_HORIZONTAL_KEY, IS_HORIZONTAL_DEFAULT))
-    private val _fontSize = MutableLiveData(sharedPref.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT))
+        MutableLiveData(sharedPref.getBoolean(PrefKeys.IS_HORIZONTAL, PrefDefaults.IS_HORIZONTAL))
+    private val _fontSize = MutableLiveData(sharedPref.getInt(PrefKeys.FONT_SIZE, PrefDefaults.FONT_SIZE))
     private val _fontStyle = MutableLiveData<Typeface>()
-    private val _readerMargin = MutableLiveData(sharedPref.getInt(MARGIN_KEY, MARGIN_DEFAULT))
+    private val _readerMargin = MutableLiveData(getMargins())
     val horizontalReader: LiveData<Boolean> = _horizontalReader
     val fontSize: LiveData<Int> = _fontSize
     val fontStyle: LiveData<Typeface> = _fontStyle
-    val readerMargin: LiveData<Int> = _readerMargin
+    val readerMargin: LiveData<Margins> = _readerMargin
 
     fun authExpired(): Boolean {
         if (authToken == null) return true
@@ -119,25 +102,27 @@ class PreferenceStore private constructor(private val appContext: Context)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            IS_HORIZONTAL_KEY -> {
-                _horizontalReader.value =
-                    sharedPref.getBoolean(IS_HORIZONTAL_KEY, IS_HORIZONTAL_DEFAULT)
-            }
-            FONT_SIZE_KEY -> {
-                _fontSize.value = sharedPref.getInt(FONT_SIZE_KEY, FONT_SIZE_DEFAULT)
-            }
-            FONT_STYLE_KEY -> {
-                _fontStyle.value = updateTypeface()
-            }
-            MARGIN_KEY -> {
-                _readerMargin.value = sharedPref.getInt(MARGIN_KEY, MARGIN_DEFAULT)
+        with (PrefKeys) {
+            when (key) {
+                IS_HORIZONTAL -> {
+                    _horizontalReader.value =
+                        sharedPref.getBoolean(IS_HORIZONTAL, PrefDefaults.IS_HORIZONTAL)
+                }
+                FONT_SIZE -> {
+                    _fontSize.value = sharedPref.getInt(FONT_SIZE, PrefDefaults.FONT_SIZE)
+                }
+                FONT_STYLE -> {
+                    _fontStyle.value = updateTypeface()
+                }
+                MARGIN_TOP, MARGIN_BOTTOM, MARGIN_LEFT, MARGIN_RIGHT -> {
+                    _readerMargin.value = getMargins()
+                }
             }
         }
     }
 
     private fun updateTypeface(): Typeface {
-        val styleString = sharedPref.getString(FONT_STYLE_KEY, "default")!!
+        val styleString = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!
         return when (styleString) {
             "default" -> Typeface.defaultFromStyle(Typeface.NORMAL)
 
@@ -145,4 +130,14 @@ class PreferenceStore private constructor(private val appContext: Context)
             else -> Typeface.createFromAsset(appContext.assets, "fonts/$styleString")
         }
     }
+
+    private fun getMargins(): Margins {
+        val top = sharedPref.getInt(PrefKeys.MARGIN_TOP, PrefDefaults.MARGIN)
+        val bottom = sharedPref.getInt(PrefKeys.MARGIN_BOTTOM, PrefDefaults.MARGIN)
+        val left = sharedPref.getInt(PrefKeys.MARGIN_LEFT, PrefDefaults.MARGIN)
+        val right = sharedPref.getInt(PrefKeys.MARGIN_RIGHT, PrefDefaults.MARGIN)
+        return Margins(top, bottom, left, right)
+    }
+
+    data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)
 }
