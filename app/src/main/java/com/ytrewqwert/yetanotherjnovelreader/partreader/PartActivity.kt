@@ -95,7 +95,7 @@ class PartActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.showAppBar.value = false
+        setNavigationBarVisibility(viewModel.showAppBar.value ?: false)
     }
 
     private fun initialiseObserversListeners() {
@@ -120,15 +120,6 @@ class PartActivity : AppCompatActivity() {
             when (isHorizontal) {
                 true ->  setReaderFragment(PagedReaderFragment())
                 false -> setReaderFragment(ScrollReaderFragment())
-            }
-        }
-
-        window.decorView.setOnSystemUiVisibilityChangeListener {
-            // Show the App bar if the navigation bar was manually brought up.
-            if (viewModel.showAppBar.value == true) return@setOnSystemUiVisibilityChangeListener
-            val newVisibility = window.decorView.systemUiVisibility
-            if (newVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION == 0) {
-                viewModel.showAppBar.value = true
             }
         }
 
