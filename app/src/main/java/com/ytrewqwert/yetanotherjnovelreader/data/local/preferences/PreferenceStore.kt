@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.local
+package com.ytrewqwert.yetanotherjnovelreader.data.local.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -23,8 +23,12 @@ class PreferenceStore private constructor(private val appContext: Context)
         private var INSTANCE: PreferenceStore? = null
 
         fun getInstance(context: Context): PreferenceStore =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: PreferenceStore(context.applicationContext).also {
+            INSTANCE
+                ?: synchronized(this) {
+                INSTANCE
+                    ?: PreferenceStore(
+                        context.applicationContext
+                    ).also {
                     INSTANCE = it
                 }
             }
@@ -136,7 +140,12 @@ class PreferenceStore private constructor(private val appContext: Context)
         val bottom = sharedPref.getInt(PrefKeys.MARGIN_BOTTOM, PrefDefaults.MARGIN)
         val left = sharedPref.getInt(PrefKeys.MARGIN_LEFT, PrefDefaults.MARGIN)
         val right = sharedPref.getInt(PrefKeys.MARGIN_RIGHT, PrefDefaults.MARGIN)
-        return Margins(top, bottom, left, right)
+        return Margins(
+            top,
+            bottom,
+            left,
+            right
+        )
     }
 
     data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)

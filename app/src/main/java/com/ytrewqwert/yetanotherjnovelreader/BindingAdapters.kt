@@ -5,7 +5,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.ytrewqwert.yetanotherjnovelreader.data.local.PreferenceStore
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 
 object BindingAdapters {
 

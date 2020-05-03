@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import android.text.Html
 import android.text.Spanned
 import com.ytrewqwert.yetanotherjnovelreader.data.local.LocalRepository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.local.UnknownPartsProgress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import java.time.Instant
 import java.time.Period
