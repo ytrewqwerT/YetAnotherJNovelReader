@@ -15,8 +15,8 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
-import com.ytrewqwert.yetanotherjnovelreader.data.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity(),
 
         lifecycleScope.launch {
             mainViewModel.fetchPartProgress()
-            mainViewModel.fetchRecentParts()
         }
 
         observeViewModels()
@@ -116,7 +115,7 @@ class MainActivity : AppCompatActivity(),
         }
 
         recentsListViewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? Part)
+            onPartsListItemInteraction(it.item as? PartWithProgress)
         }
         recentsListViewModel.getItemList(recentPartsFragId).observe(this) {
             if (it != null) return@observe
@@ -124,11 +123,11 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun onPartsListItemInteraction(part: Part?) {
-        Log.d(TAG, "Part clicked: ${part?.title}")
+    private fun onPartsListItemInteraction(part: PartWithProgress?) {
+        Log.d(TAG, "Part clicked: ${part?.part?.title}")
         if (part != null) {
             val intent = Intent(this, PartActivity::class.java)
-            intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+            intent.putExtra(PartActivity.EXTRA_PART_ID, part.part.id)
             startActivity(intent)
         } else Log.e(TAG, "Clicked item handled by MainActivity was null")
     }

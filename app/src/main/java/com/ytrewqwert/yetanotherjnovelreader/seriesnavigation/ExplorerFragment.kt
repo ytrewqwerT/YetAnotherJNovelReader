@@ -14,10 +14,10 @@ import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
-import com.ytrewqwert.yetanotherjnovelreader.data.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.Series
-import com.ytrewqwert.yetanotherjnovelreader.data.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Serie
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Volume
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
 class ExplorerFragment : Fragment() {
@@ -85,14 +85,14 @@ class ExplorerFragment : Fragment() {
 
     private fun onListItemInteraction(item: ListItem) {
         when (item) {
-            is Series -> onSeriesListItemInteraction(item)
+            is Serie -> onSeriesListItemInteraction(item)
             is Volume -> onVolumesListItemInteraction(item)
-            is Part -> onPartsListItemInteraction(item)
+            is PartWithProgress -> onPartsListItemInteraction(item)
             else -> Log.e(TAG, "ListItemInteraction for $item's type not handled")
         }
     }
 
-    private fun onSeriesListItemInteraction(serie: Series) {
+    private fun onSeriesListItemInteraction(serie: Serie) {
         Log.d(TAG, "Series clicked: ${serie.title}")
         listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
         viewModel.fetchSerieVolumes(serie)
@@ -104,10 +104,10 @@ class ExplorerFragment : Fragment() {
         viewModel.fetchVolumeParts(volume)
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
-    private fun onPartsListItemInteraction(part: Part) {
-        Log.d(TAG, "Part clicked: ${part.title}")
+    private fun onPartsListItemInteraction(part: PartWithProgress) {
+        Log.d(TAG, "Part clicked: ${part.part.title}")
         val intent = Intent(context, PartActivity::class.java)
-        intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+        intent.putExtra(PartActivity.EXTRA_PART_ID, part.part.id)
         startActivity(intent)
     }
 

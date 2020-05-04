@@ -24,4 +24,8 @@ interface PartDao {
     @Transaction
     @Query("SELECT * FROM Part WHERE launchDate >= :time")
     fun getPartsSince(time: String): Flow<List<PartWithProgress>>
+
+    @Transaction
+    @Query("SELECT * FROM Part WHERE id = :partId")
+    suspend fun getParts(vararg partId: String): List<PartWithProgress>
 }

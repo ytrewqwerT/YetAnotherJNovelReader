@@ -23,4 +23,6 @@ class LocalRepository private constructor(appContext: Context) {
     fun getSerieVolumes(serieId: String): Flow<List<Volume>> = partDao.getSerieVolumes(serieId)
     fun getVolumeParts(volumeId: String): Flow<List<PartWithProgress>> = partDao.getVolumeParts(volumeId)
     fun getPartsSince(time: String): Flow<List<PartWithProgress>> = partDao.getPartsSince(time)
+
+    suspend fun getParts(vararg partId: String): List<PartWithProgress> = partDao.getParts(*partId)
 }

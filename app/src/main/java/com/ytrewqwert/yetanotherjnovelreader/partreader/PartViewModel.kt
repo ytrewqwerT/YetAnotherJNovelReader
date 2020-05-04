@@ -55,7 +55,7 @@ class PartViewModel(
 
         viewModelScope.launch {
             getPartData()
-            savedProgress = repository.getPartProgress(partId)
+            savedProgress = repository.getParts(partId).getOrNull(0)?.progress?.progress ?: 0.0
             currentProgress.value = savedProgress
 
             partReady.value = true

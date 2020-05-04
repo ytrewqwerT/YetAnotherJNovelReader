@@ -89,7 +89,10 @@ class Repository private constructor(appContext: Context) {
         return local.getPartsSince("$oneMonthAgo")
     }
 
+    suspend fun getParts(vararg partId: String): List<PartWithProgress> = local.getParts(*partId)
+
     fun getUsername() = prefStore.username
+    fun isMember() = prefStore.isMember ?: false
 
     suspend fun login(email: String, password: String): Boolean {
         val loginJson = remote.login(email, password)

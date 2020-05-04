@@ -39,7 +39,7 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
 
-    private var animating = false
+    private var isLoading = true
 
     override fun getImage(source: String, callback: (Bitmap?) -> Unit) {
         lifecycleScope.launch { callback(viewModel.getImage(source)) }
@@ -102,6 +102,8 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
     }
 
     private fun transitionToContent() {
+        if (!isLoading) return
+        isLoading = false
         val scrollViewAnimator =
             AnimatorInflater.loadAnimator(context, R.animator.slide_from_right)
         scrollViewAnimator.setTarget(recyclerView)
@@ -115,12 +117,13 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         loadBarAnimator.setTarget(loadBar)
         loadBarAnimator.addListener(onEnd = {
             loadBar.visibility = View.GONE
-            animating = false
         })
         loadBarAnimator.start()
     }
 
     private fun transitionToLoading() {
+        if (isLoading) return
+        isLoading = true
         val loadBarAnimator =
             AnimatorInflater.loadAnimator(context, R.animator.slide_from_top)
         loadBarAnimator.setTarget(loadBar)
@@ -132,7 +135,6 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         scrollViewAnimator.setTarget(recyclerView)
         scrollViewAnimator.addListener(onEnd = {
             recyclerView.visibility = View.GONE
-            animating = false
         })
         scrollViewAnimator.start()
     }
