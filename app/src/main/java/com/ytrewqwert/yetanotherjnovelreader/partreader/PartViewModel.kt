@@ -84,7 +84,7 @@ class PartViewModel(
     }
 
     private suspend fun getPartData() {
-        contentsNoImages = repository.getPart(partId)
+        contentsNoImages = repository.getPartContent(partId)
         if (contentsNoImages != null) {
             _contents.value = replaceTempImages(contentsNoImages ?: return)
         } else errorEvent.value = "Failed to get part data"
