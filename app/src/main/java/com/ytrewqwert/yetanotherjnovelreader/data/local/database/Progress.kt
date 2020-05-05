@@ -2,6 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.json.JSONArray
 import org.json.JSONObject
 
 @Entity
@@ -10,11 +11,14 @@ data class Progress(
     val progress: Double
 ) {
     companion object {
-        fun fromJson(source: JSONObject): Progress {
-            return Progress(
-                partId = source.getString("partId"),
-                progress = source.getDouble("completion")
-            )
+        fun fromJson(progressJson: JSONObject) = Progress(
+            partId = progressJson.getString("partId"),
+            progress = progressJson.getDouble("completion")
+        )
+        fun fromJson(progressesJson: JSONArray): List<Progress> = ArrayList<Progress>().also {
+            for (i in 0 until progressesJson.length()) {
+                it.add(fromJson(progressesJson.getJSONObject(i)))
+            }
         }
     }
 }

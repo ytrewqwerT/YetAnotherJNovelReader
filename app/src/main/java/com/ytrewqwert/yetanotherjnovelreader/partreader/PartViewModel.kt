@@ -102,7 +102,7 @@ class PartViewModel(
     }
 
     private suspend fun replaceTempImage(img: ImageSpan, spanBuilder: SpannableStringBuilder) {
-        val bitmap = repository.getImage(img.source) ?: return
+        val bitmap = repository.getImage(img.source ?: return)
         val drawable = BitmapDrawable(resources, bitmap)
         drawable.scaleToWidth(pageWidthPx)
         val newImg = ImageSpan(drawable)

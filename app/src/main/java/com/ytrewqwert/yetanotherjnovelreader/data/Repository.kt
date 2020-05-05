@@ -32,46 +32,30 @@ class Repository private constructor(appContext: Context) {
     val fontStyle get() = prefStore.fontStyle
     val readerMargin get() = prefStore.readerMargin
 
+    suspend fun getImage(source: String): Bitmap? = remote.getImage(source)
     suspend fun getPartContent(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
-        val contentJson = remote.getPartContentJson(partId)
-        val partHtml = contentJson?.getString("dataHTML") ?: return null
+        val partHtml = remote.getPartContentJson(partId) ?: return null
         return Html.fromHtml(partHtml, 0)
-    }
-    suspend fun getImage(source: String?): Bitmap? {
-        if (source == null) return null
-        return remote.getImage(source)
     }
 
     fun getSeries(scope: CoroutineScope): Flow<List<Serie>> {
         scope.launch {
-            val seriesJson = remote.getSeriesJson() ?: return@launch
-            val series = ArrayList<Serie>()
-            for (i in 0 until seriesJson.length()) {
-                series.add(Serie.fromJson(seriesJson.getJSONObject(i)))
-            }
+            val series = remote.getSeriesJson() ?: return@launch
             local.insertSeries(*series.toTypedArray())
         }
         return local.getSeries()
     }
     fun getSerieVolumes(scope: CoroutineScope, serieId: String): Flow<List<Volume>> {
         scope.launch {
-            val volumesJson = remote.getSerieVolumesJson(serieId) ?: return@launch
-            val volumes = ArrayList<Volume>()
-            for (i in 0 until volumesJson.length()) {
-                volumes.add(Volume.fromJson(volumesJson.getJSONObject(i)))
-            }
+            val volumes = remote.getSerieVolumesJson(serieId) ?: return@launch
             local.insertVolumes(*volumes.toTypedArray())
         }
         return local.getSerieVolumes(serieId)
     }
     fun getVolumeParts(scope: CoroutineScope, volumeId: String): Flow<List<PartWithProgress>> {
         scope.launch {
-            val partsJson = remote.getVolumePartsJson(volumeId) ?: return@launch
-            val parts = ArrayList<Part>()
-            for (i in 0 until partsJson.length()) {
-                parts.add(Part.fromJson(partsJson.getJSONObject(i)))
-            }
+            val parts = remote.getVolumePartsJson(volumeId) ?: return@launch
             local.insertParts(*parts.toTypedArray())
         }
         return local.getVolumeParts(volumeId)
@@ -79,11 +63,7 @@ class Repository private constructor(appContext: Context) {
     fun getRecentParts(scope: CoroutineScope): Flow<List<PartWithProgress>> {
         val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
         scope.launch {
-            val partsJson = remote.getPartsJsonAfter(oneMonthAgo) ?: return@launch
-            val parts = ArrayList<Part>()
-            for (i in 0 until partsJson.length()) {
-                parts.add(Part.fromJson(partsJson.getJSONObject(i)))
-            }
+            val parts = remote.getPartsJsonAfter(oneMonthAgo) ?: return@launch
             local.insertParts(*parts.toTypedArray())
         }
         return local.getPartsSince("$oneMonthAgo")
@@ -95,16 +75,17 @@ class Repository private constructor(appContext: Context) {
     fun isMember() = prefStore.isMember ?: false
 
     suspend fun login(email: String, password: String): Boolean {
-        val loginJson = remote.login(email, password)
-        prefStore.setUserData(loginJson)
+        val userData = remote.login(email, password)
+        prefStore.setUserData(userData)
 
+        // Save email/password if login successful
         val userId = prefStore.userId
         if (userId != null) {
             prefStore.email = email
             prefStore.password = password
             fetchPartProgress()
         }
-        return loginJson != null
+        return userData != null
     }
     fun loggedIn() = (prefStore.authToken != null)
     suspend fun logout(): Boolean {
@@ -131,11 +112,7 @@ class Repository private constructor(appContext: Context) {
     suspend fun fetchPartProgress(): Boolean {
         refreshLoginIfAuthExpired()
         val userId = prefStore.userId ?: return false
-        val progressJson = remote.getUserPartProgressJson(userId) ?: return false
-        val progresses = ArrayList<Progress>()
-        for (i in 0 until progressJson.length()) {
-            progresses.add(Progress.fromJson(progressJson.getJSONObject(i)))
-        }
+        val progresses = remote.getUserPartProgressJson(userId) ?: return false
         local.insertProgress(*progresses.toTypedArray())
         return true
     }

@@ -8,12 +8,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
 import com.ytrewqwert.yetanotherjnovelreader.setBoolean
 import com.ytrewqwert.yetanotherjnovelreader.setString
-import org.json.JSONObject
 import java.time.Instant
 import java.time.Period
-
 
 class PreferenceStore private constructor(private val appContext: Context)
     : SharedPreferences.OnSharedPreferenceChangeListener {
@@ -95,14 +94,12 @@ class PreferenceStore private constructor(private val appContext: Context)
         username = null
         isMember = false
     }
-    fun setUserData(data: JSONObject?) {
-        userId = data?.getString("userId")
-        authToken = data?.getString("id")
-        authDate = data?.getString("created")
-        val user = data?.getJSONObject("user")
-        username = user?.getString("username")
-        val curSub = user?.getJSONObject("currentSubscription")
-        isMember = curSub?.getString("status") == "active"
+    fun setUserData(userData: UserData?) {
+        userId = userData?.userId
+        authToken = userData?.authToken
+        authDate = userData?.authDate
+        username = userData?.username
+        isMember = userData?.isMember
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

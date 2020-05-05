@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
+import org.json.JSONArray
 import org.json.JSONObject
 
 @Entity
@@ -41,6 +42,11 @@ data class Volume(
                 tags = source.getString("tags"),
                 created = source.getString("created")
             )
+        }
+        fun fromJson(volumesJson: JSONArray): List<Volume> = ArrayList<Volume>().also {
+            for (i in 0 until volumesJson.length()) {
+                it.add(fromJson(volumesJson.getJSONObject(i)))
+            }
         }
     }
 

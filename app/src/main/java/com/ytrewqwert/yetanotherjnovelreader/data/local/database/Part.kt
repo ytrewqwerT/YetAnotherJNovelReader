@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
+import org.json.JSONArray
 import org.json.JSONObject
 
 @Entity
@@ -22,9 +23,9 @@ data class Part(
     val preview: Boolean
 ) : ListItem {
     companion object {
-        fun fromJson(source: JSONObject): Part {
+        fun fromJson(partJson: JSONObject): Part {
             // Find the value for coverThumbUrl (if it exists)
-            val attachments = source.getJSONArray("attachments")
+            val attachments = partJson.getJSONArray("attachments")
             var coverUrl = ""
             for (i in 0 until attachments.length()) {
                 val attachUrl = attachments.getJSONObject(i).getString("fullpath")
@@ -32,18 +33,23 @@ data class Part(
             }
 
             return Part(
-                id = source.getString("id"),
-                volumeId = source.getString("volumeId"),
-                serieId = source.getString("serieId"),
-                title = source.getString("title"),
-                titleslug = source.getString("titleslug"),
-                seriesPartNum = source.getInt("partNumber"),
+                id = partJson.getString("id"),
+                volumeId = partJson.getString("volumeId"),
+                serieId = partJson.getString("serieId"),
+                title = partJson.getString("title"),
+                titleslug = partJson.getString("titleslug"),
+                seriesPartNum = partJson.getInt("partNumber"),
                 coverUrl = coverUrl,
-                tags = source.getString("tags"),
-                launchDate = source.getString("launchDate"),
-                expired = source.getBoolean("expired"),
-                preview = source.getBoolean("preview")
+                tags = partJson.getString("tags"),
+                launchDate = partJson.getString("launchDate"),
+                expired = partJson.getBoolean("expired"),
+                preview = partJson.getBoolean("preview")
             )
+        }
+        fun fromJson(partsJson: JSONArray): List<Part> = ArrayList<Part>().also {
+            for (i in 0 until partsJson.length()) {
+                it.add(fromJson(partsJson.getJSONObject(i)))
+            }
         }
     }
 
