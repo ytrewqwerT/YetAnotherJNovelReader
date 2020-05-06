@@ -16,7 +16,7 @@ object BindingAdapters {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeDP.toFloat())
     }
 
-    @BindingAdapter("app:readerMarginHorizontal")
+    @BindingAdapter("readerMarginHorizontal")
     @JvmStatic
     fun textViewReaderMarginHorizontal(textView: TextView, marginsDIP: PreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
@@ -25,7 +25,7 @@ object BindingAdapters {
         textView.setPadding(marginLeft, textView.paddingTop, marginRight, textView.paddingBottom)
     }
 
-    @BindingAdapter("app:readerMarginVertical")
+    @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun textViewReaderMarginVertical(textView: TextView, marginsDIP: PreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
@@ -34,7 +34,7 @@ object BindingAdapters {
         textView.setPadding(textView.paddingLeft, marginTop, textView.paddingRight, marginBottom)
     }
 
-    @BindingAdapter("app:readerMarginVertical")
+    @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDIP: PreferenceStore.Margins) {
         val displayMetrics = scrollView.resources.displayMetrics
@@ -43,7 +43,7 @@ object BindingAdapters {
         scrollView.setPadding(scrollView.paddingLeft, marginTop, scrollView.paddingRight, marginBottom)
     }
 
-    @BindingAdapter("app:partProgress")
+    @BindingAdapter("partProgress")
     @JvmStatic
     fun setScrollReaderPosition(scrollView: ScrollView, position: Double) {
         val childHeight = scrollView.getChildAt(0).height
@@ -54,7 +54,7 @@ object BindingAdapters {
         }
     }
 
-    @BindingAdapter("app:partProgress")
+    @BindingAdapter("partProgress")
     @JvmStatic
     fun setPagedReaderPosition(pager: ViewPager2, position: Double) {
         val numPages = pager.adapter?.itemCount ?: 1
