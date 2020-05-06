@@ -55,7 +55,7 @@ class PartViewModel(
 
         viewModelScope.launch {
             getPartData()
-            savedProgress = repository.getPartProgress(partId)
+            savedProgress = repository.getParts(partId).getOrNull(0)?.progress?.progress ?: 0.0
             currentProgress.value = savedProgress
 
             partReady.value = true
@@ -84,7 +84,7 @@ class PartViewModel(
     }
 
     private suspend fun getPartData() {
-        contentsNoImages = repository.getPart(partId)
+        contentsNoImages = repository.getPartContent(partId)
         if (contentsNoImages != null) {
             _contents.value = replaceTempImages(contentsNoImages ?: return)
         } else errorEvent.value = "Failed to get part data"
@@ -102,7 +102,7 @@ class PartViewModel(
     }
 
     private suspend fun replaceTempImage(img: ImageSpan, spanBuilder: SpannableStringBuilder) {
-        val bitmap = repository.getImage(img.source) ?: return
+        val bitmap = repository.getImage(img.source ?: return)
         val drawable = BitmapDrawable(resources, bitmap)
         drawable.scaleToWidth(pageWidthPx)
         val newImg = ImageSpan(drawable)

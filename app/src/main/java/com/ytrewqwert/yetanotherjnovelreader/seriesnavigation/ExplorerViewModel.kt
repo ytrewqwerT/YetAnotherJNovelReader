@@ -4,43 +4,51 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ytrewqwert.yetanotherjnovelreader.data.Part
+import com.ytrewqwert.yetanotherjnovelreader.JobHolder
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.Series
-import com.ytrewqwert.yetanotherjnovelreader.data.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Serie
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Volume
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ExplorerViewModel(private val repository: Repository) : ViewModel() {
 
-    private var curSeries: Series? = null
-    private var curVolume: Volume? = null
+    var curSerie: Serie? = null
+    var curVolume: Volume? = null
 
-    private val _seriesList = MutableLiveData<List<Series>>()
+    private val seriesCollectorJob: JobHolder = JobHolder()
+    private val volumesCollectorJob: JobHolder = JobHolder()
+    private val partsCollectorJob: JobHolder = JobHolder()
+
+    private val _seriesList = MutableLiveData<List<Serie>>()
     private val _volumesList = MutableLiveData<List<Volume>>()
-    private val _partsList = MutableLiveData<List<Part>>()
-    val seriesList: LiveData<List<Series>> = _seriesList
+    private val _partsList = MutableLiveData<List<PartWithProgress>>()
+    val seriesList: LiveData<List<Serie>> = _seriesList
     val volumesList: LiveData<List<Volume>> = _volumesList
-    val partsList: LiveData<List<Part>> = _partsList
+    val partsList: LiveData<List<PartWithProgress>> = _partsList
 
-    fun fetchSeries() {
-        viewModelScope.launch { _seriesList.value = repository.getSeries() }
+    fun fetchSeries(onComplete: (success: Boolean) -> Unit = {}) {
+        seriesCollectorJob.job = viewModelScope.launch {
+            repository.getSeries(this, onComplete).collect {
+                _seriesList.value = it
+            }
+        }
     }
-
-    fun fetchSerieVolumes(series: Series) {
-        curSeries = series
-        fetchSerieVolumes()
+    fun fetchSerieVolumes(onComplete: (success: Boolean) -> Unit = {}) {
+        val series = curSerie ?: return
+        volumesCollectorJob.job = viewModelScope.launch {
+            repository.getSerieVolumes(this, series.id, onComplete).collect {
+                _volumesList.value = it
+            }
+        }
     }
-    fun fetchSerieVolumes() {
-        val series = curSeries ?: return
-        viewModelScope.launch { _volumesList.value = repository.getSerieVolumes(series.id) }
-    }
-
-    fun fetchVolumeParts(volume: Volume) {
-        curVolume = volume
-        fetchVolumeParts()
-    }
-    fun fetchVolumeParts() {
+    fun fetchVolumeParts(onComplete: (success: Boolean) -> Unit = {}) {
         val volume = curVolume ?: return
-        viewModelScope.launch { _partsList.value = repository.getVolumeParts(volume) }
+        partsCollectorJob.job = viewModelScope.launch {
+            repository.getVolumeParts(this, volume.id, onComplete).collect {
+                _partsList.value = it
+            }
+        }
     }
 }

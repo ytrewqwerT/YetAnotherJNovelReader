@@ -1,13 +1,10 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
-import android.animation.AnimatorInflater
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import androidx.core.animation.addListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -35,14 +32,11 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
     private var uid = 0
     private var recyclerViewAdapter = CustomRecyclerViewAdapter(this, this)
 
-    private lateinit var loadBar: RelativeLayout
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
 
-    private var animating = false
-
-    override fun getImage(source: String, callback: (Bitmap?) -> Unit) {
-        lifecycleScope.launch { callback(viewModel.getImage(source)) }
+    override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
+        lifecycleScope.launch { callback(source, viewModel.getImage(source)) }
     }
 
     override fun onClick(item: ListItem) {
@@ -54,15 +48,9 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
 
         uid = requireArguments().getInt(ARG_ID, 0)
 
+        viewModel.getIsReloading(uid).observe(this) { swipeRefreshLayout.isRefreshing = it }
         viewModel.getItemList(uid).observe(this) {
-            when (it) {
-                null -> transitionToLoading()
-                else -> {
-                    recyclerViewAdapter.setItems(it)
-                    transitionToContent()
-                }
-            }
-
+            if (it != null) recyclerViewAdapter.setItems(it)
         }
     }
 
@@ -71,14 +59,11 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_listitem_list, container, false)
-        loadBar = view.findViewById(R.id.load_bar)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         recyclerView = view.findViewById(R.id.list)
 
         swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.isRefreshing = false
-            // Content manager should observe itemList and update its value if null.
-            viewModel.setItemList(uid, null)
+            viewModel.setIsReloading(uid, true)
         }
 
         with (recyclerView) {
@@ -94,46 +79,5 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         super.onResume()
         // Force redraw for potentially updated recycler_item progress values
         recyclerViewAdapter.notifyDataSetChanged()
-        // Pausing switches back to the initial loading view for some reason, so switch it back
-        if (viewModel.getItemList(uid).value?.isNotEmpty() == true) {
-            loadBar.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
-        }
-    }
-
-    private fun transitionToContent() {
-        val scrollViewAnimator =
-            AnimatorInflater.loadAnimator(context, R.animator.slide_from_right)
-        scrollViewAnimator.setTarget(recyclerView)
-        scrollViewAnimator.addListener(onStart = {
-            recyclerView.visibility = View.VISIBLE
-        })
-        scrollViewAnimator.start()
-
-        val loadBarAnimator =
-            AnimatorInflater.loadAnimator(context, android.R.animator.fade_out)
-        loadBarAnimator.setTarget(loadBar)
-        loadBarAnimator.addListener(onEnd = {
-            loadBar.visibility = View.GONE
-            animating = false
-        })
-        loadBarAnimator.start()
-    }
-
-    private fun transitionToLoading() {
-        val loadBarAnimator =
-            AnimatorInflater.loadAnimator(context, R.animator.slide_from_top)
-        loadBarAnimator.setTarget(loadBar)
-        loadBarAnimator.addListener(onStart = { loadBar.visibility = View.VISIBLE })
-        loadBarAnimator.start()
-
-        val scrollViewAnimator =
-            AnimatorInflater.loadAnimator(context, R.animator.slide_to_bottom)
-        scrollViewAnimator.setTarget(recyclerView)
-        scrollViewAnimator.addListener(onEnd = {
-            recyclerView.visibility = View.GONE
-            animating = false
-        })
-        scrollViewAnimator.start()
     }
 }

@@ -25,10 +25,13 @@ class CustomRecyclerViewAdapter(
 
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
+        holder.imageUrl = contents.mImageUrl
 
         holder.imageView.setImageDrawable(null)
         if (contents.mImageUrl != null) {
-            imageSource?.getImage(contents.mImageUrl) { holder.imageView.setImageBitmap(it) }
+            imageSource?.getImage(contents.mImageUrl) { url, image ->
+                if (url == holder.imageUrl) holder.imageView.setImageBitmap(image)
+            }
         }
 
         if (contents.progress != null) {
@@ -66,5 +69,6 @@ class CustomRecyclerViewAdapter(
         val subText: TextView = view.subText
         val imageView: ImageView = view.image
         val progressBar: ProgressBar = view.progress
+        var imageUrl: String? = null
     }
 }

@@ -5,7 +5,8 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.ytrewqwert.yetanotherjnovelreader.data.local.PreferenceStore
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
+import kotlin.math.roundToInt
 
 object BindingAdapters {
 
@@ -15,7 +16,7 @@ object BindingAdapters {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeDP.toFloat())
     }
 
-    @BindingAdapter("app:readerMarginHorizontal")
+    @BindingAdapter("readerMarginHorizontal")
     @JvmStatic
     fun textViewReaderMarginHorizontal(textView: TextView, marginsDIP: PreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
@@ -24,7 +25,7 @@ object BindingAdapters {
         textView.setPadding(marginLeft, textView.paddingTop, marginRight, textView.paddingBottom)
     }
 
-    @BindingAdapter("app:readerMarginVertical")
+    @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun textViewReaderMarginVertical(textView: TextView, marginsDIP: PreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
@@ -33,7 +34,7 @@ object BindingAdapters {
         textView.setPadding(textView.paddingLeft, marginTop, textView.paddingRight, marginBottom)
     }
 
-    @BindingAdapter("app:readerMarginVertical")
+    @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDIP: PreferenceStore.Margins) {
         val displayMetrics = scrollView.resources.displayMetrics
@@ -42,7 +43,7 @@ object BindingAdapters {
         scrollView.setPadding(scrollView.paddingLeft, marginTop, scrollView.paddingRight, marginBottom)
     }
 
-    @BindingAdapter("app:partProgress")
+    @BindingAdapter("partProgress")
     @JvmStatic
     fun setScrollReaderPosition(scrollView: ScrollView, position: Double) {
         val childHeight = scrollView.getChildAt(0).height
@@ -53,11 +54,11 @@ object BindingAdapters {
         }
     }
 
-    @BindingAdapter("app:partProgress")
+    @BindingAdapter("partProgress")
     @JvmStatic
     fun setPagedReaderPosition(pager: ViewPager2, position: Double) {
         val numPages = pager.adapter?.itemCount ?: 1
-        val pagePos = (position * (numPages - 1)).toInt() // Pages are 0-indexed
+        val pagePos = (position * (numPages - 1)).roundToInt() // Pages are 0-indexed
         pager.setCurrentItem(pagePos, true)
     }
 }

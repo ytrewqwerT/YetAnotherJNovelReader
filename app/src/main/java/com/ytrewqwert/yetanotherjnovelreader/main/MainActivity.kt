@@ -8,19 +8,17 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.viewpager.widget.ViewPager
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
-import com.ytrewqwert.yetanotherjnovelreader.data.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity(),
@@ -61,12 +59,8 @@ class MainActivity : AppCompatActivity(),
             }
         }
 
-        lifecycleScope.launch {
-            mainViewModel.fetchPartProgress()
-            mainViewModel.fetchRecentParts()
-        }
-
         observeViewModels()
+        recentsListViewModel.setIsReloading(recentPartsFragId, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -86,7 +80,7 @@ class MainActivity : AppCompatActivity(),
         )
 
         // Resuming ListItemFragments force-updates them into (un)greying out non-viewable parts
-        //  and ExplorerFragment propagates the onResume ot its children to do the same.
+        //  and ExplorerFragment propagates the onResume to its children to do the same.
         // Not a great solution, I know.
         fragment?.onResume()
     }
@@ -116,19 +110,20 @@ class MainActivity : AppCompatActivity(),
         }
 
         recentsListViewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? Part)
+            onPartsListItemInteraction(it.item as? PartWithProgress)
         }
-        recentsListViewModel.getItemList(recentPartsFragId).observe(this) {
-            if (it != null) return@observe
-            lifecycleScope.launch { mainViewModel.fetchRecentParts() }
+        recentsListViewModel.getIsReloading(recentPartsFragId).observe(this) {
+            if (it) mainViewModel.fetchRecentParts {
+                recentsListViewModel.setIsReloading(recentPartsFragId, false)
+            }
         }
     }
 
-    private fun onPartsListItemInteraction(part: Part?) {
-        Log.d(TAG, "Part clicked: ${part?.title}")
+    private fun onPartsListItemInteraction(part: PartWithProgress?) {
+        Log.d(TAG, "Part clicked: ${part?.part?.title}")
         if (part != null) {
             val intent = Intent(this, PartActivity::class.java)
-            intent.putExtra(PartActivity.EXTRA_PART_ID, part.id)
+            intent.putExtra(PartActivity.EXTRA_PART_ID, part.part.id)
             startActivity(intent)
         } else Log.e(TAG, "Clicked item handled by MainActivity was null")
     }
