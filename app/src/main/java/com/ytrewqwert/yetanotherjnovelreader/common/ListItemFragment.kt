@@ -35,8 +35,8 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView
 
-    override fun getImage(source: String, callback: (Bitmap?) -> Unit) {
-        lifecycleScope.launch { callback(viewModel.getImage(source)) }
+    override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
+        lifecycleScope.launch { callback(source, viewModel.getImage(source)) }
     }
 
     override fun onClick(item: ListItem) {
