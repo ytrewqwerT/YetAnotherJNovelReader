@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
+import kotlin.math.roundToInt
 
 object BindingAdapters {
 
@@ -57,7 +58,7 @@ object BindingAdapters {
     @JvmStatic
     fun setPagedReaderPosition(pager: ViewPager2, position: Double) {
         val numPages = pager.adapter?.itemCount ?: 1
-        val pagePos = (position * (numPages - 1)).toInt() // Pages are 0-indexed
+        val pagePos = (position * (numPages - 1)).roundToInt() // Pages are 0-indexed
         pager.setCurrentItem(pagePos, true)
     }
 }
