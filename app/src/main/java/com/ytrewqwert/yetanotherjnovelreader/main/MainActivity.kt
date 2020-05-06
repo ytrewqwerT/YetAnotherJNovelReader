@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.viewpager.widget.ViewPager
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -20,7 +19,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgres
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity(),
@@ -61,11 +59,8 @@ class MainActivity : AppCompatActivity(),
             }
         }
 
-        lifecycleScope.launch {
-            mainViewModel.fetchPartProgress()
-        }
-
         observeViewModels()
+        recentsListViewModel.setIsReloading(recentPartsFragId, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -85,7 +80,7 @@ class MainActivity : AppCompatActivity(),
         )
 
         // Resuming ListItemFragments force-updates them into (un)greying out non-viewable parts
-        //  and ExplorerFragment propagates the onResume ot its children to do the same.
+        //  and ExplorerFragment propagates the onResume to its children to do the same.
         // Not a great solution, I know.
         fragment?.onResume()
     }
@@ -117,9 +112,10 @@ class MainActivity : AppCompatActivity(),
         recentsListViewModel.itemClickedEvent.observe(this) {
             onPartsListItemInteraction(it.item as? PartWithProgress)
         }
-        recentsListViewModel.getItemList(recentPartsFragId).observe(this) {
-            if (it != null) return@observe
-            lifecycleScope.launch { mainViewModel.fetchRecentParts() }
+        recentsListViewModel.getIsReloading(recentPartsFragId).observe(this) {
+            if (it) mainViewModel.fetchRecentParts {
+                recentsListViewModel.setIsReloading(recentPartsFragId, false)
+            }
         }
     }
 

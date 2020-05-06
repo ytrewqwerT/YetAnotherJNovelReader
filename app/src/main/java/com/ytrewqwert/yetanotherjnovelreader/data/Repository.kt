@@ -39,32 +39,44 @@ class Repository private constructor(appContext: Context) {
         return Html.fromHtml(partHtml, 0)
     }
 
-    fun getSeries(scope: CoroutineScope): Flow<List<Serie>> {
+    fun getSeries(
+        scope: CoroutineScope, onComplete: (success: Boolean) -> Unit = {}
+    ): Flow<List<Serie>> {
         scope.launch {
-            val series = remote.getSeriesJson() ?: return@launch
-            local.insertSeries(*series.toTypedArray())
+            val series = remote.getSeriesJson()
+            if (series != null) local.insertSeries(*series.toTypedArray())
+            onComplete(series != null)
         }
         return local.getSeries()
     }
-    fun getSerieVolumes(scope: CoroutineScope, serieId: String): Flow<List<Volume>> {
+    fun getSerieVolumes(
+        scope: CoroutineScope, serieId: String, onComplete: (success: Boolean) -> Unit = {}
+    ): Flow<List<Volume>> {
         scope.launch {
-            val volumes = remote.getSerieVolumesJson(serieId) ?: return@launch
-            local.insertVolumes(*volumes.toTypedArray())
+            val volumes = remote.getSerieVolumesJson(serieId)
+            if (volumes != null) local.insertVolumes(*volumes.toTypedArray())
+            onComplete(volumes != null)
         }
         return local.getSerieVolumes(serieId)
     }
-    fun getVolumeParts(scope: CoroutineScope, volumeId: String): Flow<List<PartWithProgress>> {
+    fun getVolumeParts(
+        scope: CoroutineScope, volumeId: String, onComplete: (success: Boolean) -> Unit = {}
+    ): Flow<List<PartWithProgress>> {
         scope.launch {
-            val parts = remote.getVolumePartsJson(volumeId) ?: return@launch
-            local.insertParts(*parts.toTypedArray())
+            val parts = remote.getVolumePartsJson(volumeId)
+            if (parts != null) local.insertParts(*parts.toTypedArray())
+            onComplete(parts != null)
         }
         return local.getVolumeParts(volumeId)
     }
-    fun getRecentParts(scope: CoroutineScope): Flow<List<PartWithProgress>> {
+    fun getRecentParts(
+        scope: CoroutineScope, onComplete: (success: Boolean) -> Unit = {}
+    ): Flow<List<PartWithProgress>> {
         val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
         scope.launch {
-            val parts = remote.getPartsJsonAfter(oneMonthAgo) ?: return@launch
-            local.insertParts(*parts.toTypedArray())
+            val parts = remote.getPartsJsonAfter(oneMonthAgo)
+            if (parts != null) local.insertParts(*parts.toTypedArray())
+            onComplete(parts != null)
         }
         return local.getPartsSince("$oneMonthAgo")
     }
@@ -97,7 +109,7 @@ class Repository private constructor(appContext: Context) {
         return true
     }
 
-    suspend fun setPartProgress(partId: String, progress: Double) {
+    suspend fun setPartProgress(partId: String, progress: Double): Boolean {
         refreshLoginIfAuthExpired()
         val boundedProgress = when {
             progress > 1.0 -> 1.0
@@ -106,8 +118,8 @@ class Repository private constructor(appContext: Context) {
         }
         local.insertProgress(Progress(partId, boundedProgress))
 
-        val userId = prefStore.userId
-        if (userId != null) remote.setUserPartProgress(userId, partId, boundedProgress)
+        val userId = prefStore.userId ?: return false
+        return remote.setUserPartProgress(userId, partId, boundedProgress)
     }
     suspend fun fetchPartProgress(): Boolean {
         refreshLoginIfAuthExpired()

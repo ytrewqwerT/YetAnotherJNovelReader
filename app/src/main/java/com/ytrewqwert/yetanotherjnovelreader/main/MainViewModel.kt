@@ -20,8 +20,8 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     fun fetchPartProgress() {
         viewModelScope.launch { repository.fetchPartProgress() }
     }
-    fun fetchRecentParts() {
-        viewModelScope.launch { repository.getRecentParts(viewModelScope) }
+    fun fetchRecentParts(onComplete: (success: Boolean) -> Unit = {}) {
+        viewModelScope.launch { repository.getRecentParts(viewModelScope, onComplete) }
     }
     fun loggedIn() = repository.loggedIn()
     fun getUsername() = repository.getUsername()

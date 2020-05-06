@@ -10,7 +10,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     private val itemLists = ArrayList<MutableLiveData< List<ListItem>? >>()
-    val itemClickedEvent = SingleLiveEvent<EventData>()
+    private val isReloading = ArrayList<MutableLiveData< Boolean >>()
+    val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
 
     suspend fun getImage(source: String): Bitmap? = repository.getImage(source)
 
@@ -18,17 +19,25 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
         return itemLists[fragmentId]
     }
-
-    fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
-        itemClickedEvent.value = EventData(fragmentId, item)
+    fun getIsReloading(fragmentId: Int): LiveData<Boolean> {
+        while (fragmentId >= isReloading.size) isReloading.add(MutableLiveData(false))
+        return isReloading[fragmentId]
     }
 
     fun setItemList(fragmentId: Int, list: List<ListItem>?) {
         while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
         itemLists[fragmentId].value = list
     }
+    fun setIsReloading(fragmentId: Int, reloading: Boolean) {
+        while (fragmentId >= isReloading.size) isReloading.add(MutableLiveData())
+        isReloading[fragmentId].value = reloading
+    }
 
-    data class EventData(
+    fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
+        itemClickedEvent.value = ItemClickEvent(fragmentId, item)
+    }
+
+    data class ItemClickEvent(
         val fragmentId: Int,
         val item: ListItem
     )

@@ -69,17 +69,20 @@ class ExplorerFragment : Fragment() {
         }
 
         listItemViewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
-        listItemViewModel.getItemList(ListTypes.SERIES.ordinal).observe(this) {
-            if (it != null) return@observe
-            viewModel.fetchSeries()
+        listItemViewModel.getIsReloading(ListTypes.SERIES.ordinal).observe(this) {
+            if (it) viewModel.fetchSeries {
+                listItemViewModel.setIsReloading(ListTypes.SERIES.ordinal, false)
+            }
         }
-        listItemViewModel.getItemList(ListTypes.VOLUMES.ordinal).observe(this) {
-            if (it != null) return@observe
-            viewModel.fetchSerieVolumes()
+        listItemViewModel.getIsReloading(ListTypes.VOLUMES.ordinal).observe(this) {
+            if (it) viewModel.fetchSerieVolumes {
+                listItemViewModel.setIsReloading(ListTypes.VOLUMES.ordinal, false)
+            }
         }
-        listItemViewModel.getItemList(ListTypes.PARTS.ordinal).observe(this) {
-            if (it != null) return@observe
-            viewModel.fetchVolumeParts()
+        listItemViewModel.getIsReloading(ListTypes.PARTS.ordinal).observe(this) {
+            if (it) viewModel.fetchVolumeParts {
+                listItemViewModel.setIsReloading(ListTypes.PARTS.ordinal, false)
+            }
         }
     }
 
@@ -95,13 +98,15 @@ class ExplorerFragment : Fragment() {
     private fun onSeriesListItemInteraction(serie: Serie) {
         Log.d(TAG, "Series clicked: ${serie.title}")
         listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
-        viewModel.fetchSerieVolumes(serie)
+        viewModel.curSerie = serie
+        listItemViewModel.setIsReloading(ListTypes.VOLUMES.ordinal, true)
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
     private fun onVolumesListItemInteraction(volume: Volume) {
         Log.d(TAG, "Volume clicked: ${volume.title}")
         listItemViewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
-        viewModel.fetchVolumeParts(volume)
+        viewModel.curVolume = volume
+        listItemViewModel.setIsReloading(ListTypes.PARTS.ordinal, true)
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
     private fun onPartsListItemInteraction(part: PartWithProgress) {

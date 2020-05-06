@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 
 class ExplorerViewModel(private val repository: Repository) : ViewModel() {
 
-    private var curSeries: Serie? = null
-    private var curVolume: Volume? = null
+    var curSerie: Serie? = null
+    var curVolume: Volume? = null
 
     private val seriesCollectorJob: JobHolder = JobHolder()
     private val volumesCollectorJob: JobHolder = JobHolder()
@@ -28,31 +28,27 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
     val volumesList: LiveData<List<Volume>> = _volumesList
     val partsList: LiveData<List<PartWithProgress>> = _partsList
 
-    fun fetchSeries() {
+    fun fetchSeries(onComplete: (success: Boolean) -> Unit = {}) {
         seriesCollectorJob.job = viewModelScope.launch {
-            repository.getSeries(this).collect { _seriesList.value = it }
+            repository.getSeries(this, onComplete).collect {
+                _seriesList.value = it
+            }
         }
     }
-
-    fun fetchSerieVolumes(series: Serie) {
-        curSeries = series
-        fetchSerieVolumes()
-    }
-    fun fetchSerieVolumes() {
-        val series = curSeries ?: return
+    fun fetchSerieVolumes(onComplete: (success: Boolean) -> Unit = {}) {
+        val series = curSerie ?: return
         volumesCollectorJob.job = viewModelScope.launch {
-            repository.getSerieVolumes(this, series.id).collect { _volumesList.value = it }
+            repository.getSerieVolumes(this, series.id, onComplete).collect {
+                _volumesList.value = it
+            }
         }
     }
-
-    fun fetchVolumeParts(volume: Volume) {
-        curVolume = volume
-        fetchVolumeParts()
-    }
-    fun fetchVolumeParts() {
+    fun fetchVolumeParts(onComplete: (success: Boolean) -> Unit = {}) {
         val volume = curVolume ?: return
         partsCollectorJob.job = viewModelScope.launch {
-            repository.getVolumeParts(this, volume.id).collect { _partsList.value = it }
+            repository.getVolumeParts(this, volume.id, onComplete).collect {
+                _partsList.value = it
+            }
         }
     }
 }
