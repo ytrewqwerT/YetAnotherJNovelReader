@@ -10,6 +10,8 @@ object PrefKeys {
     const val USERNAME = "USERNAME"
     const val IS_MEMBER = "IS_MEMBER"
 
+    const val IS_FOLLOW = "IS_FOLLOW"
+
     const val IS_HORIZONTAL = "HORIZONTAL_READER"
     const val FONT_STYLE = "FONT_STYLE"
     const val FONT_SIZE = "FONT_SIZE"

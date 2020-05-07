@@ -13,6 +13,11 @@ interface PartDao {
     suspend fun insertParts(vararg parts: Part)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProgress(vararg progress: Progress)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFollows(vararg follows: Follow)
+
+    @Delete
+    suspend fun deleteFollows(vararg follows: Follow)
 
     @Query("SELECT * FROM Serie")
     fun getAllSeries(): Flow<List<Serie>>
@@ -24,6 +29,8 @@ interface PartDao {
     @Transaction
     @Query("SELECT * FROM Part WHERE launchDate >= :time")
     fun getPartsSince(time: String): Flow<List<PartWithProgress>>
+    @Query("SELECT * FROM Follow")
+    fun getAllFollows(): Flow<List<Follow>>
 
     @Transaction
     @Query("SELECT * FROM Part WHERE id = :partId")

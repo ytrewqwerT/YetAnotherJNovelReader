@@ -13,4 +13,5 @@
     <string name="font">Font</string>
     <string name="reader">Reader</string>
     <string name="reader_margin">Reader Margin</string>
+    <string name="filter_followed_series">Filter Followed Series</string>
 </resources>

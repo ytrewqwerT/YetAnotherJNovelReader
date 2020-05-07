@@ -94,6 +94,10 @@ class MainActivity : AppCompatActivity(),
             }
             true
         }
+        R.id.following -> {
+            mainViewModel.toggleFilterFollowing()
+            true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -107,6 +111,14 @@ class MainActivity : AppCompatActivity(),
         }
         mainViewModel.recentParts.observe(this) {
             recentsListViewModel.setItemList(recentPartsFragId, it)
+        }
+        mainViewModel.isFilterFollowing.observe(this) {
+            val followMenuItem = appBarMenu?.findItem(R.id.following)
+            followMenuItem?.icon = if (it) {
+                resources.getDrawable(R.drawable.ic_star_white_24dp, null)
+            } else {
+                resources.getDrawable(R.drawable.ic_star_border_white_24dp, null)
+            }
         }
 
         recentsListViewModel.itemClickedEvent.observe(this) {

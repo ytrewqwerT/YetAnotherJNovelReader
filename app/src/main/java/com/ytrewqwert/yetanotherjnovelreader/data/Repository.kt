@@ -27,6 +27,10 @@ class Repository private constructor(appContext: Context) {
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
+    var isFilterFollowing
+        get() = prefStore.isFilterFollowing
+        set(value) { prefStore.isFilterFollowing = value }
+
     val horizontalReader get() = prefStore.horizontalReader
     val fontSize get() = prefStore.fontSize
     val fontStyle get() = prefStore.fontStyle

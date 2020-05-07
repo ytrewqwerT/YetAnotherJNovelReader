@@ -20,17 +20,9 @@ class PreferenceStore private constructor(private val appContext: Context)
     companion object {
         @Volatile
         private var INSTANCE: PreferenceStore? = null
-
-        fun getInstance(context: Context): PreferenceStore =
-            INSTANCE
-                ?: synchronized(this) {
-                INSTANCE
-                    ?: PreferenceStore(
-                        context.applicationContext
-                    ).also {
-                    INSTANCE = it
-                }
-            }
+        fun getInstance(context: Context): PreferenceStore = INSTANCE ?: synchronized(this) {
+            INSTANCE ?: PreferenceStore(context.applicationContext).also { INSTANCE = it }
+        }
     }
 
     private val sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext)
@@ -47,6 +39,7 @@ class PreferenceStore private constructor(private val appContext: Context)
         sharedPref.registerOnSharedPreferenceChangeListener(this)
     }
 
+    // User login details
     var email: String?
         get() = sharedPref.getString(PrefKeys.EMAIL, null)
         set(value) = sharedPref.setString(PrefKeys.EMAIL, value)
@@ -54,6 +47,7 @@ class PreferenceStore private constructor(private val appContext: Context)
         get() = encryptedPreferences.getString(PrefKeys.PASSWORD, null)
         set(value) = encryptedPreferences.setString(PrefKeys.PASSWORD, value)
 
+    // User account details
     var userId: String?
         get() = sharedPref.getString(PrefKeys.USER_ID, null)
         set(value) = sharedPref.setString(PrefKeys.USER_ID, value)
@@ -70,6 +64,12 @@ class PreferenceStore private constructor(private val appContext: Context)
         get() = sharedPref.getBoolean(PrefKeys.IS_MEMBER, false)
         set(value) = sharedPref.setBoolean(PrefKeys.IS_MEMBER, value ?: false)
 
+    // Non-reader settings
+    var isFilterFollowing: Boolean
+        get() = sharedPref.getBoolean(PrefKeys.IS_FOLLOW, false)
+        set(value) = sharedPref.setBoolean(PrefKeys.IS_FOLLOW, value)
+
+    // Reader settings
     private val _horizontalReader =
         MutableLiveData(sharedPref.getBoolean(PrefKeys.IS_HORIZONTAL, PrefDefaults.IS_HORIZONTAL))
     private val _fontSize = MutableLiveData(sharedPref.getInt(PrefKeys.FONT_SIZE, PrefDefaults.FONT_SIZE))
