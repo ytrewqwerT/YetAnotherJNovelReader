@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity(),
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         appBarMenu = menu
+        menu?.findItem(R.id.following)?.isChecked = mainViewModel.isFilterFollowing.value ?: false
         updateMenu()
         return true
     }
@@ -114,11 +115,8 @@ class MainActivity : AppCompatActivity(),
         }
         mainViewModel.isFilterFollowing.observe(this) {
             val followMenuItem = appBarMenu?.findItem(R.id.following)
-            followMenuItem?.icon = if (it) {
-                resources.getDrawable(R.drawable.ic_star_white_24dp, null)
-            } else {
-                resources.getDrawable(R.drawable.ic_star_border_white_24dp, null)
-            }
+            followMenuItem?.isChecked = it
+            updateMenu()
         }
 
         recentsListViewModel.itemClickedEvent.observe(this) {
@@ -149,6 +147,13 @@ class MainActivity : AppCompatActivity(),
         } else {
             nameHolder?.title = getString(R.string.not_logged_in)
             loginItem?.title = getString(R.string.login)
+        }
+
+        val followMenuItem = appBarMenu?.findItem(R.id.following)
+        followMenuItem?.icon = if (followMenuItem?.isChecked == true) {
+            resources.getDrawable(R.drawable.ic_star_white_24dp, null)
+        } else {
+            resources.getDrawable(R.drawable.ic_star_border_white_24dp, null)
         }
     }
 }
