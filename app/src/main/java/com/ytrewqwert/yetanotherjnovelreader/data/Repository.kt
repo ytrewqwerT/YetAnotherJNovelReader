@@ -83,7 +83,6 @@ class Repository private constructor(appContext: Context) {
 
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
-    fun getFollowedSeries(): Flow<List<Follow>> = local.getAllFollows()
     suspend fun insertFollows(vararg follow: Follow) { local.insertFollows(*follow) }
     suspend fun deleteFollows(vararg follow: Follow) { local.deleteFollows(*follow) }
 
@@ -125,7 +124,7 @@ class Repository private constructor(appContext: Context) {
         val userId = prefStore.userId ?: return false
         return remote.setUserPartProgress(userId, partId, boundedProgress)
     }
-    suspend fun fetchPartProgress(): Boolean {
+    private suspend fun fetchPartProgress(): Boolean {
         refreshLoginIfAuthExpired()
         val userId = prefStore.userId ?: return false
         val progresses = remote.getUserPartProgressJson(userId) ?: return false

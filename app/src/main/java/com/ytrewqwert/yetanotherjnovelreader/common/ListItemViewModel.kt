@@ -49,15 +49,15 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         when (item) {
             is PartFull -> {
                 serieId = item.part.serieId
-                following = item.following != null
+                following = item.isFollowed()
             }
             is VolumeFull -> {
                 serieId = item.volume.serieId
-                following = item.following != null
+                following = item.isFollowed()
             }
             is SerieFull -> {
                 serieId = item.serie.id
-                following = item.following != null
+                following = item.isFollowed()
             }
             else -> return
         }

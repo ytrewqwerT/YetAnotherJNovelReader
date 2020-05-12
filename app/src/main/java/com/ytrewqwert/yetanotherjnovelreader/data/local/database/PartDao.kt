@@ -32,6 +32,4 @@ interface PartDao {
 
     @Transaction @Query("SELECT * FROM Part WHERE id = :partId")
     suspend fun getParts(vararg partId: String): List<PartFull>
-    @Query("SELECT * FROM Follow WHERE serieId = :serieId")
-    suspend fun getFollows(vararg serieId: String): List<Follow>
 }

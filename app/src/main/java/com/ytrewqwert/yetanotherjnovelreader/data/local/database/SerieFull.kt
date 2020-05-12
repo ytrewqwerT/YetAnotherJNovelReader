@@ -6,11 +6,13 @@ import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 
 data class SerieFull(
     @Embedded val serie: Serie,
-    @Relation(parentColumn = "id", entityColumn = "serieId") val following: Follow?
+    @Relation(parentColumn = "id", entityColumn = "serieId") private val following: Follow?
 ) : ListItem {
+    fun isFollowed(): Boolean = following != null
+
     override fun getListItemContents(): ListItem.ListItemContents {
         var contents = serie.getListItemContents()
-        if (following != null) contents = contents.copy(isFollowing = true)
+        if (isFollowed()) contents = contents.copy(isFollowing = true)
         return contents
     }
 }
