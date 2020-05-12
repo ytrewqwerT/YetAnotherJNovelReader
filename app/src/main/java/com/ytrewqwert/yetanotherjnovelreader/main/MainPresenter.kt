@@ -1,13 +1,13 @@
 package com.ytrewqwert.yetanotherjnovelreader.main
 
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartFull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
 class MainPresenter(scope: CoroutineScope, repository: Repository) {
-    val filteredRecentParts: Flow<List<PartWithProgress>>
+    val filteredRecentParts: Flow<List<PartFull>>
 
     init {
         val isFilterFollow = repository.isFilterFollowing

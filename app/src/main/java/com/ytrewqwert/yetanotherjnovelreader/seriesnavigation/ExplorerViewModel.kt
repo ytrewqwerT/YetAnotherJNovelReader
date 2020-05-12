@@ -6,9 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.JobHolder
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Serie
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -21,12 +19,12 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
     private val volumesCollectorJob: JobHolder = JobHolder()
     private val partsCollectorJob: JobHolder = JobHolder()
 
-    private val _seriesList = MutableLiveData<List<Serie>>()
-    private val _volumesList = MutableLiveData<List<Volume>>()
-    private val _partsList = MutableLiveData<List<PartWithProgress>>()
-    val seriesList: LiveData<List<Serie>> = _seriesList
-    val volumesList: LiveData<List<Volume>> = _volumesList
-    val partsList: LiveData<List<PartWithProgress>> = _partsList
+    private val _seriesList = MutableLiveData<List<SerieFull>>()
+    private val _volumesList = MutableLiveData<List<VolumeFull>>()
+    private val _partsList = MutableLiveData<List<PartFull>>()
+    val seriesList: LiveData<List<SerieFull>> = _seriesList
+    val volumesList: LiveData<List<VolumeFull>> = _volumesList
+    val partsList: LiveData<List<PartFull>> = _partsList
 
     fun fetchSeries(onComplete: (success: Boolean) -> Unit = {}) {
         seriesCollectorJob.job = viewModelScope.launch {

@@ -15,9 +15,9 @@ import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Serie
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.SerieFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
 class ExplorerFragment : Fragment() {
@@ -88,28 +88,28 @@ class ExplorerFragment : Fragment() {
 
     private fun onListItemInteraction(item: ListItem) {
         when (item) {
-            is Serie -> onSeriesListItemInteraction(item)
-            is Volume -> onVolumesListItemInteraction(item)
-            is PartWithProgress -> onPartsListItemInteraction(item)
+            is SerieFull -> onSeriesListItemInteraction(item)
+            is VolumeFull -> onVolumesListItemInteraction(item)
+            is PartFull -> onPartsListItemInteraction(item)
             else -> Log.e(TAG, "ListItemInteraction for $item's type not handled")
         }
     }
 
-    private fun onSeriesListItemInteraction(serie: Serie) {
-        Log.d(TAG, "Series clicked: ${serie.title}")
+    private fun onSeriesListItemInteraction(serie: SerieFull) {
+        Log.d(TAG, "Series clicked: ${serie.serie.title}")
         listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
-        viewModel.curSerie = serie
+        viewModel.curSerie = serie.serie
         listItemViewModel.setIsReloading(ListTypes.VOLUMES.ordinal, true)
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
-    private fun onVolumesListItemInteraction(volume: Volume) {
-        Log.d(TAG, "Volume clicked: ${volume.title}")
+    private fun onVolumesListItemInteraction(volume: VolumeFull) {
+        Log.d(TAG, "Volume clicked: ${volume.volume.title}")
         listItemViewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
-        viewModel.curVolume = volume
+        viewModel.curVolume = volume.volume
         listItemViewModel.setIsReloading(ListTypes.PARTS.ordinal, true)
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
-    private fun onPartsListItemInteraction(part: PartWithProgress) {
+    private fun onPartsListItemInteraction(part: PartFull) {
         Log.d(TAG, "Part clicked: ${part.part.title}")
         val intent = Intent(context, PartActivity::class.java)
         intent.putExtra(PartActivity.EXTRA_PART_ID, part.part.id)

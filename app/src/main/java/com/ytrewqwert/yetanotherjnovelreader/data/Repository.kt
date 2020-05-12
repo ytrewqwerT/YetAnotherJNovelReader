@@ -41,7 +41,7 @@ class Repository private constructor(appContext: Context) {
 
     fun getSeries(
         scope: CoroutineScope, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<Serie>> {
+    ): Flow<List<SerieFull>> {
         scope.launch {
             val series = remote.getSeriesJson()
             if (series != null) local.insertSeries(*series.toTypedArray())
@@ -51,7 +51,7 @@ class Repository private constructor(appContext: Context) {
     }
     fun getSerieVolumes(
         scope: CoroutineScope, serieId: String, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<Volume>> {
+    ): Flow<List<VolumeFull>> {
         scope.launch {
             val volumes = remote.getSerieVolumesJson(serieId)
             if (volumes != null) local.insertVolumes(*volumes.toTypedArray())
@@ -61,7 +61,7 @@ class Repository private constructor(appContext: Context) {
     }
     fun getVolumeParts(
         scope: CoroutineScope, volumeId: String, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<PartWithProgress>> {
+    ): Flow<List<PartFull>> {
         scope.launch {
             val parts = remote.getVolumePartsJson(volumeId)
             if (parts != null) local.insertParts(*parts.toTypedArray())
@@ -71,7 +71,7 @@ class Repository private constructor(appContext: Context) {
     }
     fun getRecentParts(
         scope: CoroutineScope, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<PartWithProgress>> {
+    ): Flow<List<PartFull>> {
         val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
         scope.launch {
             val parts = remote.getPartsJsonAfter(oneMonthAgo)
@@ -81,9 +81,11 @@ class Repository private constructor(appContext: Context) {
         return local.getPartsSince("$oneMonthAgo")
     }
 
-    suspend fun getParts(vararg partId: String): List<PartWithProgress> = local.getParts(*partId)
+    suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
-    fun getFollowedSeries(): Flow<List<Follow>> = local.getFollows()
+    fun getFollowedSeries(): Flow<List<Follow>> = local.getAllFollows()
+    suspend fun insertFollows(vararg follow: Follow) { local.insertFollows(*follow) }
+    suspend fun deleteFollows(vararg follow: Follow) { local.deleteFollows(*follow) }
 
     fun getUsername() = prefStore.username
     fun isMember() = prefStore.isMember ?: false

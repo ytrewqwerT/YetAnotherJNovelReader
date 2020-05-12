@@ -19,20 +19,19 @@ interface PartDao {
     @Delete
     suspend fun deleteFollows(vararg follows: Follow)
 
-    @Query("SELECT * FROM Serie")
-    fun getAllSeries(): Flow<List<Serie>>
-    @Query("SELECT * FROM Volume WHERE serieId = :serieId")
-    fun getSerieVolumes(serieId: String): Flow<List<Volume>>
-    @Transaction
-    @Query("SELECT * FROM Part WHERE volumeId = :volumeId")
-    fun getVolumeParts(volumeId: String): Flow<List<PartWithProgress>>
-    @Transaction
-    @Query("SELECT * FROM Part WHERE launchDate >= :time")
-    fun getPartsSince(time: String): Flow<List<PartWithProgress>>
+    @Transaction @Query("SELECT * FROM Serie")
+    fun getAllSeries(): Flow<List<SerieFull>>
+    @Transaction @Query("SELECT * FROM Volume WHERE serieId = :serieId")
+    fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>>
+    @Transaction @Query("SELECT * FROM Part WHERE volumeId = :volumeId")
+    fun getVolumeParts(volumeId: String): Flow<List<PartFull>>
+    @Transaction @Query("SELECT * FROM Part WHERE launchDate >= :time")
+    fun getPartsSince(time: String): Flow<List<PartFull>>
     @Query("SELECT * FROM Follow")
     fun getAllFollows(): Flow<List<Follow>>
 
-    @Transaction
-    @Query("SELECT * FROM Part WHERE id = :partId")
-    suspend fun getParts(vararg partId: String): List<PartWithProgress>
+    @Transaction @Query("SELECT * FROM Part WHERE id = :partId")
+    suspend fun getParts(vararg partId: String): List<PartFull>
+    @Query("SELECT * FROM Follow WHERE serieId = :serieId")
+    suspend fun getFollows(vararg serieId: String): List<Follow>
 }

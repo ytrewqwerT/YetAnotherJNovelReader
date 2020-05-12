@@ -15,7 +15,7 @@ import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity(),
         }
 
         recentsListViewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? PartWithProgress)
+            onPartsListItemInteraction(it.item as? PartFull)
         }
         recentsListViewModel.getIsReloading(recentPartsFragId).observe(this) {
             if (it) mainViewModel.fetchRecentParts {
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun onPartsListItemInteraction(part: PartWithProgress?) {
+    private fun onPartsListItemInteraction(part: PartFull?) {
         Log.d(TAG, "Part clicked: ${part?.part?.title}")
         if (part != null) {
             val intent = Intent(this, PartActivity::class.java)

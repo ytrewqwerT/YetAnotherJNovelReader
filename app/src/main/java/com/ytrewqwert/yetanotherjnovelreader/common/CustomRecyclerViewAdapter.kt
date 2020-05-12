@@ -33,6 +33,12 @@ class CustomRecyclerViewAdapter(
                 if (url == holder.imageUrl) holder.imageView.setImageBitmap(image)
             }
         }
+        val followIcon = if (contents.isFollowing) {
+            holder.view.resources.getDrawable(R.drawable.ic_star_white_24dp, null)
+        } else {
+            holder.view.resources.getDrawable(R.drawable.ic_star_border_white_24dp, null)
+        }
+        holder.following.setImageDrawable(followIcon)
 
         if (contents.progress != null) {
             val percentage = (100 * contents.progress).toInt()
@@ -42,6 +48,7 @@ class CustomRecyclerViewAdapter(
             holder.progressBar.visibility = View.INVISIBLE
         }
 
+        holder.following.setOnClickListener { listener?.onFollowClick(items[position]) }
         if (contents.clickable) {
             holder.view.foreground = null
             holder.view.setOnClickListener { listener?.onClick(items[position]) }
@@ -69,6 +76,7 @@ class CustomRecyclerViewAdapter(
         val subText: TextView = view.subText
         val imageView: ImageView = view.image
         val progressBar: ProgressBar = view.progress
+        val following: ImageView = view.following
         var imageUrl: String? = null
     }
 }

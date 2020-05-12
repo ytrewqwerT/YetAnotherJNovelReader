@@ -22,11 +22,11 @@ class LocalRepository private constructor(appContext: Context) {
 
     suspend fun deleteFollows(vararg follows: Follow) { partDao.deleteFollows(*follows) }
 
-    fun getSeries(): Flow<List<Serie>> = partDao.getAllSeries()
-    fun getSerieVolumes(serieId: String): Flow<List<Volume>> = partDao.getSerieVolumes(serieId)
-    fun getVolumeParts(volumeId: String): Flow<List<PartWithProgress>> = partDao.getVolumeParts(volumeId)
-    fun getPartsSince(time: String): Flow<List<PartWithProgress>> = partDao.getPartsSince(time)
-    fun getFollows(): Flow<List<Follow>> = partDao.getAllFollows()
+    fun getSeries(): Flow<List<SerieFull>> = partDao.getAllSeries()
+    fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>> = partDao.getSerieVolumes(serieId)
+    fun getVolumeParts(volumeId: String): Flow<List<PartFull>> = partDao.getVolumeParts(volumeId)
+    fun getPartsSince(time: String): Flow<List<PartFull>> = partDao.getPartsSince(time)
+    fun getAllFollows(): Flow<List<Follow>> = partDao.getAllFollows()
 
-    suspend fun getParts(vararg partId: String): List<PartWithProgress> = partDao.getParts(*partId)
+    suspend fun getParts(vararg partId: String): List<PartFull> = partDao.getParts(*partId)
 }
