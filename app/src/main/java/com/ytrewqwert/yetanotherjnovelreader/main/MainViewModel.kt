@@ -8,10 +8,10 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
-
+    private val presenter = MainPresenter(viewModelScope, repository)
     val logoutEvent = SingleLiveEvent<Boolean>()
     val recentParts =
-        repository.getRecentParts(viewModelScope).asLiveData(viewModelScope.coroutineContext)
+        presenter.filteredRecentParts.asLiveData(viewModelScope.coroutineContext)
     val isFilterFollowing =
         repository.isFilterFollowing.asLiveData(viewModelScope.coroutineContext)
 
