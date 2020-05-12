@@ -43,6 +43,10 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         viewModel.listItemFragmentViewOnClick(uid, item)
     }
 
+    override fun onFollowClick(item: ListItem) {
+        viewModel.toggleFollowItem(item)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

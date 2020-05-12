@@ -1,6 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader
 
 import android.content.res.Resources
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -10,8 +11,10 @@ import android.util.TypedValue
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class PartViewModel(
@@ -32,10 +35,14 @@ class PartViewModel(
     private val _contents = MutableLiveData<Spanned>()
     val contents: LiveData<Spanned> get() = _contents
 
-    val horizontalReader get() = repository.horizontalReader
-    val fontSize get() = repository.fontSize
-    val fontStyle get() = repository.fontStyle
-    val margin get() = repository.readerMargin
+    private val _horizontalReader = MutableLiveData<Boolean>()
+    private val _fontSize = MutableLiveData<Int>()
+    private val _fontStyle = MutableLiveData<Typeface>()
+    private val _margin = MutableLiveData<PreferenceStore.Margins>()
+    val horizontalReader: LiveData<Boolean> = _horizontalReader
+    val fontSize: LiveData<Int> = _fontSize
+    val fontStyle: LiveData<Typeface> = _fontStyle
+    val margin: LiveData<PreferenceStore.Margins> = _margin
 
     private var savedProgress = 0.0
     val currentProgress = MutableLiveData(0.0)
@@ -59,6 +66,15 @@ class PartViewModel(
             currentProgress.value = savedProgress
 
             partReady.value = true
+        }
+
+        viewModelScope.launch {
+            repository.getReaderSettingsFlow().collect {
+                _horizontalReader.value = it.isHorizontal
+                _fontSize.value = it.fontSize
+                _fontStyle.value = it.fontStyle
+                _margin.value = it.margin
+            }
         }
     }
 

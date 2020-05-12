@@ -15,7 +15,7 @@ import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartWithProgress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity(),
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         appBarMenu = menu
+        menu?.findItem(R.id.following)?.isChecked = mainViewModel.isFilterFollowing.value ?: false
         updateMenu()
         return true
     }
@@ -94,6 +95,10 @@ class MainActivity : AppCompatActivity(),
             }
             true
         }
+        R.id.following -> {
+            mainViewModel.toggleFilterFollowing()
+            true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -108,9 +113,14 @@ class MainActivity : AppCompatActivity(),
         mainViewModel.recentParts.observe(this) {
             recentsListViewModel.setItemList(recentPartsFragId, it)
         }
+        mainViewModel.isFilterFollowing.observe(this) {
+            val followMenuItem = appBarMenu?.findItem(R.id.following)
+            followMenuItem?.isChecked = it
+            updateMenu()
+        }
 
         recentsListViewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? PartWithProgress)
+            onPartsListItemInteraction(it.item as? PartFull)
         }
         recentsListViewModel.getIsReloading(recentPartsFragId).observe(this) {
             if (it) mainViewModel.fetchRecentParts {
@@ -119,7 +129,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun onPartsListItemInteraction(part: PartWithProgress?) {
+    private fun onPartsListItemInteraction(part: PartFull?) {
         Log.d(TAG, "Part clicked: ${part?.part?.title}")
         if (part != null) {
             val intent = Intent(this, PartActivity::class.java)
@@ -137,6 +147,13 @@ class MainActivity : AppCompatActivity(),
         } else {
             nameHolder?.title = getString(R.string.not_logged_in)
             loginItem?.title = getString(R.string.login)
+        }
+
+        val followMenuItem = appBarMenu?.findItem(R.id.following)
+        followMenuItem?.icon = if (followMenuItem?.isChecked == true) {
+            resources.getDrawable(R.drawable.ic_star_white_24dp, null)
+        } else {
+            resources.getDrawable(R.drawable.ic_star_border_white_24dp, null)
         }
     }
 }

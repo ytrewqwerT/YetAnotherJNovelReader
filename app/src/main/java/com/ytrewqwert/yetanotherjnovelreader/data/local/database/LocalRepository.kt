@@ -18,11 +18,14 @@ class LocalRepository private constructor(appContext: Context) {
     suspend fun insertVolumes(vararg volumes: Volume) { partDao.insertVolumes(*volumes) }
     suspend fun insertParts(vararg parts: Part) { partDao.insertParts(*parts) }
     suspend fun insertProgress(vararg progress: Progress) { partDao.insertProgress(*progress) }
+    suspend fun insertFollows(vararg follows: Follow) { partDao.insertFollows(*follows) }
 
-    fun getSeries(): Flow<List<Serie>> = partDao.getAllSeries()
-    fun getSerieVolumes(serieId: String): Flow<List<Volume>> = partDao.getSerieVolumes(serieId)
-    fun getVolumeParts(volumeId: String): Flow<List<PartWithProgress>> = partDao.getVolumeParts(volumeId)
-    fun getPartsSince(time: String): Flow<List<PartWithProgress>> = partDao.getPartsSince(time)
+    suspend fun deleteFollows(vararg follows: Follow) { partDao.deleteFollows(*follows) }
 
-    suspend fun getParts(vararg partId: String): List<PartWithProgress> = partDao.getParts(*partId)
+    fun getSeries(): Flow<List<SerieFull>> = partDao.getAllSeries()
+    fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>> = partDao.getSerieVolumes(serieId)
+    fun getVolumeParts(volumeId: String): Flow<List<PartFull>> = partDao.getVolumeParts(volumeId)
+    fun getPartsSince(time: String): Flow<List<PartFull>> = partDao.getPartsSince(time)
+
+    suspend fun getParts(vararg partId: String): List<PartFull> = partDao.getParts(*partId)
 }

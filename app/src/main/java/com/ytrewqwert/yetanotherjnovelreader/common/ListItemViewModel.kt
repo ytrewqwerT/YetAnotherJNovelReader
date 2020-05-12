@@ -4,8 +4,14 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.SerieFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.VolumeFull
+import kotlinx.coroutines.launch
 
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
@@ -35,6 +41,31 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
         itemClickedEvent.value = ItemClickEvent(fragmentId, item)
+    }
+
+    fun toggleFollowItem(item: ListItem) {
+        var serieId: String
+        var following: Boolean
+        when (item) {
+            is PartFull -> {
+                serieId = item.part.serieId
+                following = item.isFollowed()
+            }
+            is VolumeFull -> {
+                serieId = item.volume.serieId
+                following = item.isFollowed()
+            }
+            is SerieFull -> {
+                serieId = item.serie.id
+                following = item.isFollowed()
+            }
+            else -> return
+        }
+        val follow = Follow(serieId)
+        viewModelScope.launch {
+            if (following) repository.deleteFollows(follow)
+            else repository.insertFollows(follow)
+        }
     }
 
     data class ItemClickEvent(
