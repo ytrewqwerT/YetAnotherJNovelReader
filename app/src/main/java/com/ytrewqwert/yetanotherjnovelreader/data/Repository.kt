@@ -27,14 +27,10 @@ class Repository private constructor(appContext: Context) {
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
-    var isFilterFollowing
-        get() = prefStore.isFilterFollowing
-        set(value) { prefStore.isFilterFollowing = value }
+    val isFilterFollowing get() = prefStore.isFilterFollowing
+    fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
-    val horizontalReader get() = prefStore.horizontalReader
-    val fontSize get() = prefStore.fontSize
-    val fontStyle get() = prefStore.fontStyle
-    val readerMargin get() = prefStore.readerMargin
+    fun getReaderSettingsFlow() = prefStore.readerSettings
 
     suspend fun getImage(source: String): Bitmap? = remote.getImage(source)
     suspend fun getPartContent(partId: String): Spanned? {
@@ -86,6 +82,8 @@ class Repository private constructor(appContext: Context) {
     }
 
     suspend fun getParts(vararg partId: String): List<PartWithProgress> = local.getParts(*partId)
+
+    fun getFollowedSeries(): Flow<List<Follow>> = local.getFollows()
 
     fun getUsername() = prefStore.username
     fun isMember() = prefStore.isMember ?: false
