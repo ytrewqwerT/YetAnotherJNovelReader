@@ -8,6 +8,7 @@ import com.ytrewqwert.yetanotherjnovelreader.JobHolder
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.*
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class ExplorerViewModel(private val repository: Repository) : ViewModel() {
@@ -28,9 +29,12 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
 
     fun fetchSeries(onComplete: (success: Boolean) -> Unit = {}) {
         seriesCollectorJob.job = viewModelScope.launch {
-            repository.getSeries(this, onComplete).collect {
-                _seriesList.value = it
-            }
+            repository.getSeries(this, onComplete)
+                .combine(repository.isFilterFollowing) { parts, filterOn ->
+                    parts.filter { !filterOn || it.isFollowed() }
+                }.collect {
+                    _seriesList.value = it
+                }
         }
     }
     fun fetchSerieVolumes(onComplete: (success: Boolean) -> Unit = {}) {
