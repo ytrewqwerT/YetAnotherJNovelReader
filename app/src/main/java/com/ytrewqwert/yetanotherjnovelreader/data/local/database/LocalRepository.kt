@@ -1,7 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.local.database
 
 import android.content.Context
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow.Follow
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress

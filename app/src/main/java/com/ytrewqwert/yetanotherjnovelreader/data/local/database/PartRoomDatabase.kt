@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow.Follow
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie

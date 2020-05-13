@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.Html
 import android.text.Spanned
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull

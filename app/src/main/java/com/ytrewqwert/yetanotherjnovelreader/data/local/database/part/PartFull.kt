@@ -3,7 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.part
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow.Follow
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
 
 data class PartFull(
