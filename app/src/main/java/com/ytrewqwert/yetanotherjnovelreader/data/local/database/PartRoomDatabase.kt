@@ -7,10 +7,15 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.FollowDao
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartDao
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.ProgressDao
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieDao
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeDao
 
 @Database(
     entities = [Serie::class, Volume::class, Part::class, Progress::class, Follow::class],
@@ -18,7 +23,11 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
     exportSchema = true
 )
 abstract class PartRoomDatabase : RoomDatabase() {
+    abstract fun serieDao(): SerieDao
+    abstract fun volumeDao(): VolumeDao
     abstract fun partDao(): PartDao
+    abstract fun followDao(): FollowDao
+    abstract fun progressDao(): ProgressDao
 
     companion object {
         @Volatile
