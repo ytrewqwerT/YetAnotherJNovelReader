@@ -11,7 +11,11 @@ import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.*
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import java.time.Instant

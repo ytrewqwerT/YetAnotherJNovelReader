@@ -6,7 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.JobHolder
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.*
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch

@@ -1,6 +1,14 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.local.database
 
 import androidx.room.*
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow.Follow
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import kotlinx.coroutines.flow.Flow
 
 @Dao

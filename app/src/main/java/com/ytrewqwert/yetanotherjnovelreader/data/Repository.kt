@@ -4,7 +4,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.text.Html
 import android.text.Spanned
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.*
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow.Follow
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import kotlinx.coroutines.CoroutineScope
@@ -119,7 +124,12 @@ class Repository private constructor(appContext: Context) {
             progress < 0.0 -> 0.0
             else -> progress
         }
-        local.upsertProgress(Progress(partId, boundedProgress))
+        local.upsertProgress(
+            Progress(
+                partId,
+                boundedProgress
+            )
+        )
 
         val userId = prefStore.userId ?: return false
         return remote.setUserPartProgress(userId, partId, boundedProgress)

@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.local.database
+package com.ytrewqwert.yetanotherjnovelreader.data.local.database.part
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -48,7 +48,11 @@ data class Part(
         }
         fun fromJson(partsJson: JSONArray): List<Part> = ArrayList<Part>().also {
             for (i in 0 until partsJson.length()) {
-                it.add(fromJson(partsJson.getJSONObject(i)))
+                it.add(
+                    fromJson(
+                        partsJson.getJSONObject(i)
+                    )
+                )
             }
         }
     }

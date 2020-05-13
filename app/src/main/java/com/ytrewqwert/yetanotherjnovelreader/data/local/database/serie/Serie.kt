@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.local.database
+package com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -8,44 +8,46 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 @Entity
-data class Volume(
+data class Serie(
     @PrimaryKey val id: String,
-    val serieId: String,
     val title: String,
     val titleslug: String,
-    val volumeNum: Int,
     val description: String,
     val descriptionShort: String,
     val coverUrl: String,
     val tags: String,
-    val created: String
+    val created: String,
+    val overrideExpiration: Boolean
 ) : ListItem {
     companion object {
-        fun fromJson(source: JSONObject): Volume {
+        fun fromJson(serieJson: JSONObject): Serie {
             // Find the value for coverThumbUrl (if it exists)
-            val attachments = source.getJSONArray("attachments")
+            val attachments = serieJson.getJSONArray("attachments")
             var coverUrl = ""
             for (i in 0 until attachments.length()) {
                 val attachUrl = attachments.getJSONObject(i).getString("fullpath")
                 if (attachUrl?.contains("cover") == true) coverUrl = attachUrl
             }
 
-            return Volume(
-                id = source.getString("id"),
-                serieId = source.getString("serieId"),
-                title = source.getString("title"),
-                titleslug = source.getString("titleslug"),
-                volumeNum = source.getInt("volumeNumber"),
-                description = source.getString("description"),
-                descriptionShort = source.getString("descriptionShort"),
+            return Serie(
+                id = serieJson.getString("id"),
+                title = serieJson.getString("title"),
+                titleslug = serieJson.getString("titleslug"),
+                description = serieJson.getString("description"),
+                descriptionShort = serieJson.getString("descriptionShort"),
                 coverUrl = coverUrl,
-                tags = source.getString("tags"),
-                created = source.getString("created")
+                tags = serieJson.getString("tags"),
+                created = serieJson.getString("created"),
+                overrideExpiration = serieJson.getBoolean("override_expiration")
             )
         }
-        fun fromJson(volumesJson: JSONArray): List<Volume> = ArrayList<Volume>().also {
-            for (i in 0 until volumesJson.length()) {
-                it.add(fromJson(volumesJson.getJSONObject(i)))
+        fun fromJson(seriesJson: JSONArray): List<Serie> = ArrayList<Serie>().also {
+            for (i in 0 until seriesJson.length()) {
+                it.add(
+                    fromJson(
+                        seriesJson.getJSONObject(i)
+                    )
+                )
             }
         }
     }

@@ -1,8 +1,9 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.local.database
+package com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie
 
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.Follow.Follow
 
 data class SerieFull(
     @Embedded val serie: Serie,

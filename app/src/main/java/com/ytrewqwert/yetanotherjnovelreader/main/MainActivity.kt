@@ -15,7 +15,7 @@ import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.PartFull
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
