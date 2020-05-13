@@ -44,7 +44,7 @@ class Repository private constructor(appContext: Context) {
     ): Flow<List<SerieFull>> {
         scope.launch {
             val series = remote.getSeriesJson()
-            if (series != null) local.insertSeries(*series.toTypedArray())
+            if (series != null) local.upsertSeries(*series.toTypedArray())
             onComplete(series != null)
         }
         return local.getSeries()
@@ -54,7 +54,7 @@ class Repository private constructor(appContext: Context) {
     ): Flow<List<VolumeFull>> {
         scope.launch {
             val volumes = remote.getSerieVolumesJson(serieId)
-            if (volumes != null) local.insertVolumes(*volumes.toTypedArray())
+            if (volumes != null) local.upsertVolumes(*volumes.toTypedArray())
             onComplete(volumes != null)
         }
         return local.getSerieVolumes(serieId)
@@ -64,7 +64,7 @@ class Repository private constructor(appContext: Context) {
     ): Flow<List<PartFull>> {
         scope.launch {
             val parts = remote.getVolumePartsJson(volumeId)
-            if (parts != null) local.insertParts(*parts.toTypedArray())
+            if (parts != null) local.upsertParts(*parts.toTypedArray())
             onComplete(parts != null)
         }
         return local.getVolumeParts(volumeId)
@@ -75,7 +75,7 @@ class Repository private constructor(appContext: Context) {
         val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
         scope.launch {
             val parts = remote.getPartsJsonAfter(oneMonthAgo)
-            if (parts != null) local.insertParts(*parts.toTypedArray())
+            if (parts != null) local.upsertParts(*parts.toTypedArray())
             onComplete(parts != null)
         }
         return local.getPartsSince("$oneMonthAgo")
@@ -119,7 +119,7 @@ class Repository private constructor(appContext: Context) {
             progress < 0.0 -> 0.0
             else -> progress
         }
-        local.insertProgress(Progress(partId, boundedProgress))
+        local.upsertProgress(Progress(partId, boundedProgress))
 
         val userId = prefStore.userId ?: return false
         return remote.setUserPartProgress(userId, partId, boundedProgress)
@@ -128,7 +128,7 @@ class Repository private constructor(appContext: Context) {
         refreshLoginIfAuthExpired()
         val userId = prefStore.userId ?: return false
         val progresses = remote.getUserPartProgressJson(userId) ?: return false
-        local.insertProgress(*progresses.toTypedArray())
+        local.upsertProgress(*progresses.toTypedArray())
         return true
     }
 

@@ -14,10 +14,10 @@ class LocalRepository private constructor(appContext: Context) {
 
     private val partDao: PartDao = PartRoomDatabase.getInstance(appContext).partDao()
 
-    suspend fun insertSeries(vararg series: Serie) { partDao.insertSeries(*series) }
-    suspend fun insertVolumes(vararg volumes: Volume) { partDao.insertVolumes(*volumes) }
-    suspend fun insertParts(vararg parts: Part) { partDao.insertParts(*parts) }
-    suspend fun insertProgress(vararg progress: Progress) { partDao.insertProgress(*progress) }
+    suspend fun upsertSeries(vararg series: Serie) { partDao.upsertSeries(*series) }
+    suspend fun upsertVolumes(vararg volumes: Volume) { partDao.upsertVolumes(*volumes) }
+    suspend fun upsertParts(vararg parts: Part) { partDao.upsertParts(*parts) }
+    suspend fun upsertProgress(vararg progress: Progress) { partDao.upsertProgress(*progress) }
     suspend fun insertFollows(vararg follows: Follow) { partDao.insertFollows(*follows) }
 
     suspend fun deleteFollows(vararg follows: Follow) { partDao.deleteFollows(*follows) }
