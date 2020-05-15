@@ -2,7 +2,6 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.text.Html
 import android.text.Spanned
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
@@ -41,7 +40,7 @@ class Repository private constructor(appContext: Context) {
     suspend fun getPartContent(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
         val partHtml = remote.getPartContentJson(partId) ?: return null
-        return Html.fromHtml(partHtml, 0)
+        return PartHtmlParser.parse(partHtml)
     }
 
     fun getSeries(
