@@ -12,7 +12,7 @@ data class UserData(
     companion object {
         fun fromJson(userJson: JSONObject): UserData {
             val user = userJson.getJSONObject("user")
-            val curSub = userJson.getJSONObject("currentSubscription")
+            val curSub = user.getJSONObject("currentSubscription")
             return UserData(
                 userId = userJson.getString("userId"),
                 authToken = userJson.getString("id"),
