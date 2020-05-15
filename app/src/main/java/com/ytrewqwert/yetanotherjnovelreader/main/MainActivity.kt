@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.viewpager.widget.ViewPager
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -50,15 +51,13 @@ class MainActivity : AppCompatActivity(),
         viewPager.adapter = viewPagerAdapter
         // Set primary navigation fragment to the focused viewpager page to allow interception
         viewPager.addOnPageSelectedListener {
-            with (supportFragmentManager.beginTransaction()) {
+            supportFragmentManager.commit {
                 val fragment = supportFragmentManager.findFragmentByTag(
                     "android:switcher:${R.id.pager}:${viewPager.currentItem}"
                 )
                 setPrimaryNavigationFragment(fragment)
-                commit()
             }
         }
-
         observeViewModels()
         recentsListViewModel.setIsReloading(recentPartsFragId, true)
     }
@@ -82,7 +81,7 @@ class MainActivity : AppCompatActivity(),
 
         // Resuming ListItemFragments force-updates them into (un)greying out non-viewable parts
         //  and ExplorerFragment propagates the onResume to its children to do the same.
-        // Not a great solution, I know.
+        // Probably shouldn't be using lifecycle functions like this, but ¯\_(ツ)_/¯
         fragment?.onResume()
     }
 

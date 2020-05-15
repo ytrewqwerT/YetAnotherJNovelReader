@@ -29,6 +29,5 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
 
     fun toggleFilterFollowing() {
         repository.setIsFilterFollowing(isFilterFollowing.value == false)
-        // TODO: Add list filtering code
     }
 }

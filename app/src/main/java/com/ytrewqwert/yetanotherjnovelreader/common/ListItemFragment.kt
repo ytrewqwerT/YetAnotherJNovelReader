@@ -30,7 +30,7 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
     )
 
     private var uid = 0
-    private var recyclerViewAdapter = CustomRecyclerViewAdapter(this, this)
+    private var recyclerViewAdapter = ListItemRecyclerViewAdapter(this, this)
 
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var recyclerView: RecyclerView

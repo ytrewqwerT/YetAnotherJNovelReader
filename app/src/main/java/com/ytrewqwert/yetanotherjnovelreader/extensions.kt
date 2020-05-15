@@ -2,6 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader
 
 import android.content.SharedPreferences
 import android.graphics.drawable.BitmapDrawable
+import androidx.core.content.edit
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 
@@ -11,16 +12,10 @@ fun BitmapDrawable.scaleToWidth(width: Int) {
 }
 
 fun SharedPreferences.setBoolean(key: String, value: Boolean) {
-    with (this.edit()) {
-        putBoolean(key, value)
-        commit()
-    }
+    edit(true) { putBoolean(key, value) }
 }
 fun SharedPreferences.setString(key: String, value: String?) {
-    with (this.edit()) {
-        putString(key, value)
-        commit()
-    }
+    edit(true) { putString(key, value) }
 }
 
 fun ViewPager.addOnPageSelectedListener(listener: (position: Int) -> Unit) {

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -21,7 +22,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFu
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
 class ExplorerFragment : Fragment() {
-
     companion object {
         private const val TAG = "NavigationFragment"
     }
@@ -117,23 +117,17 @@ class ExplorerFragment : Fragment() {
     }
 
     private fun setListItemFragment(fragmentId: Int, fragmentTag: String?) {
-        with (childFragmentManager.beginTransaction()) {
+        childFragmentManager.commit {
             val args = Bundle()
             args.putInt(ListItemFragment.ARG_ID, fragmentId)
             setCustomAnimations(
                 R.animator.slide_from_right, R.animator.slide_to_left,
                 R.animator.slide_from_left, R.animator.slide_to_right
             )
-            replace(
-                R.id.fragment_container,
-                ListItemFragment::class.java,
-                args, fragmentTag
-            )
+            replace(R.id.fragment_container, ListItemFragment::class.java, args, fragmentTag)
             if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
-                Log.d(TAG, "adding to back stack")
                 addToBackStack(null)
             }
-            commit()
         }
     }
 }

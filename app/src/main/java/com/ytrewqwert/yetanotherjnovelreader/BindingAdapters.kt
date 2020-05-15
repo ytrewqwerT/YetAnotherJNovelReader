@@ -12,34 +12,34 @@ object BindingAdapters {
 
     @BindingAdapter("android:textSize")
     @JvmStatic
-    fun textViewTextSize(textView: TextView, sizeDP: Int) {
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeDP.toFloat())
+    fun textViewTextSize(textView: TextView, sizeSP: Int) {
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSP.toFloat())
     }
 
     @BindingAdapter("readerMarginHorizontal")
     @JvmStatic
-    fun textViewReaderMarginHorizontal(textView: TextView, marginsDIP: PreferenceStore.Margins) {
+    fun textViewReaderMarginHorizontal(textView: TextView, marginsDP: PreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
-        val marginLeft = Utils.dpToPx(marginsDIP.left, displayMetrics)
-        val marginRight = Utils.dpToPx(marginsDIP.right, displayMetrics)
+        val marginLeft = Utils.dpToPx(marginsDP.left, displayMetrics)
+        val marginRight = Utils.dpToPx(marginsDP.right, displayMetrics)
         textView.setPadding(marginLeft, textView.paddingTop, marginRight, textView.paddingBottom)
     }
 
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
-    fun textViewReaderMarginVertical(textView: TextView, marginsDIP: PreferenceStore.Margins) {
+    fun textViewReaderMarginVertical(textView: TextView, marginsDP: PreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
-        val marginTop = Utils.dpToPx(marginsDIP.top, displayMetrics)
-        val marginBottom = Utils.dpToPx(marginsDIP.bottom, displayMetrics)
+        val marginTop = Utils.dpToPx(marginsDP.top, displayMetrics)
+        val marginBottom = Utils.dpToPx(marginsDP.bottom, displayMetrics)
         textView.setPadding(textView.paddingLeft, marginTop, textView.paddingRight, marginBottom)
     }
 
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
-    fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDIP: PreferenceStore.Margins) {
+    fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDP: PreferenceStore.Margins) {
         val displayMetrics = scrollView.resources.displayMetrics
-        val marginTop = Utils.dpToPx(marginsDIP.top, displayMetrics)
-        val marginBottom = Utils.dpToPx(marginsDIP.bottom, displayMetrics)
+        val marginTop = Utils.dpToPx(marginsDP.top, displayMetrics)
+        val marginBottom = Utils.dpToPx(marginsDP.bottom, displayMetrics)
         scrollView.setPadding(scrollView.paddingLeft, marginTop, scrollView.paddingRight, marginBottom)
     }
 
@@ -49,9 +49,7 @@ object BindingAdapters {
         val childHeight = scrollView.getChildAt(0).height
         val svHeight = scrollView.height
         val scrollPos = (childHeight - svHeight) * position
-        if (scrollView.scrollY != scrollPos.toInt()) {
-            scrollView.scrollTo(0, scrollPos.toInt())
-        }
+        scrollView.scrollTo(0, scrollPos.toInt())
     }
 
     @BindingAdapter("partProgress")

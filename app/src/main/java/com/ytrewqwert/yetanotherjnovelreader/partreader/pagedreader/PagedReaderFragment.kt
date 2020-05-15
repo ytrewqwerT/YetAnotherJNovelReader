@@ -18,10 +18,10 @@ import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
 class PagedReaderFragment : Fragment() {
 
-    private var binding: FragmentPagedReaderBinding? = null
     private val partViewModel by activityViewModels<PartViewModel>()
     private val pagedReaderViewModel by viewModels<PagedReaderViewModel>()
 
+    private var binding: FragmentPagedReaderBinding? = null
     private var pager: ViewPager2? = null
     private val pagerAdapter by lazy { PagedReaderAdapter(this) }
 

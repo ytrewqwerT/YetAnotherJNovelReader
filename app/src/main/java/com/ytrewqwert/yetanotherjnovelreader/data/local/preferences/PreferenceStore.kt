@@ -140,12 +140,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
         val bottom = sharedPref.getInt(PrefKeys.MARGIN_BOTTOM, PrefDefaults.MARGIN)
         val left = sharedPref.getInt(PrefKeys.MARGIN_LEFT, PrefDefaults.MARGIN)
         val right = sharedPref.getInt(PrefKeys.MARGIN_RIGHT, PrefDefaults.MARGIN)
-        return Margins(
-            top,
-            bottom,
-            left,
-            right
-        )
+        return Margins(top, bottom, left, right)
     }
 
     data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)

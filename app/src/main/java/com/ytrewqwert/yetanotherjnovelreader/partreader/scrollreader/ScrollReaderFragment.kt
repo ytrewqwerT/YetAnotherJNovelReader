@@ -15,9 +15,9 @@ import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
 class ScrollReaderFragment : Fragment() {
 
-    private var binding: FragmentScrollReaderBinding? = null
     private val viewModel by activityViewModels<PartViewModel>()
 
+    private var binding: FragmentScrollReaderBinding? = null
     private var scrollView: ScrollView? = null
     private var textView: TextView? = null
 
