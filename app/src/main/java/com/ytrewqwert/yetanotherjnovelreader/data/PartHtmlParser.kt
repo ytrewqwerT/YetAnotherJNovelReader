@@ -114,7 +114,11 @@ object PartHtmlParser {
             "img" -> {
                 // Use the built-in parser to inject a placeholder image.
                 val imgSpan = Html.fromHtml("<${tagLabelTokens.joinToString(" ")} >", 0)
-                return SpannableStringBuilder(imgSpan)
+                return SpannableStringBuilder(imgSpan).apply {
+                    // Add extra spacing between image and surrounding content
+                    insert(0, "\n")
+                    append("\n\n")
+                }
             }
             else -> {
                 Log.w(TAG, "Unhandled html tag: <${tagLabelTokens.joinToString(" ")} >")

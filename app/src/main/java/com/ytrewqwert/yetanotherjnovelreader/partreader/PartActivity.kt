@@ -31,7 +31,7 @@ class PartActivity : AppCompatActivity() {
         const val EXTRA_PART_ID = "PART_ID"
     }
 
-    private val partId: String = intent.getStringExtra(EXTRA_PART_ID)
+    private val partId: String by lazy { intent.getStringExtra(EXTRA_PART_ID) }
     private var statusBarHeight = 0
 
     private lateinit var binding: ActivityPartBinding
