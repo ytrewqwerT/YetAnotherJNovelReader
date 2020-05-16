@@ -10,7 +10,9 @@ class PagedReaderViewModel : ViewModel() {
     private val pages = ArrayList<MutableLiveData<CharSequence>>()
 
     var pageWidth = 0
+        set(value) { field = if (value < 0) 0 else value }
     var pageHeight = 0
+        set(value) { field = if (value < 0) 0 else value }
     var paint: TextPaint? = null
 
     /**

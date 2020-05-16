@@ -20,6 +20,8 @@ class Paginator(
     }
 
     fun paginateText(): List<CharSequence> {
+        if (width == 0 || height == 0) return emptyList()
+
         val spans = split(text)
         for (span in spans) {
             val layout = StaticLayout.Builder.obtain(
