@@ -5,10 +5,19 @@ import android.graphics.drawable.BitmapDrawable
 import androidx.core.content.edit
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import org.json.JSONArray
+import org.json.JSONObject
 
 fun BitmapDrawable.scaleToWidth(width: Int) {
     val height = width * intrinsicHeight / intrinsicWidth
     setBounds(0, 0, width, height)
+}
+
+inline fun <reified T> JSONArray.forEach(block: (T) -> Unit) {
+    for (i in 0 until length()) {
+        val item = get(i)
+        if (item is T) { block(item) }
+    }
 }
 
 fun SharedPreferences.setBoolean(key: String, value: Boolean) {

@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
+import com.ytrewqwert.yetanotherjnovelreader.forEach
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -20,13 +21,13 @@ data class Serie(
     val overrideExpiration: Boolean
 ) : ListItem {
     companion object {
-        fun fromJson(serieJson: JSONObject): Serie {
+        private fun fromJson(serieJson: JSONObject): Serie {
             // Find the value for coverThumbUrl (if it exists)
             val attachments = serieJson.getJSONArray("attachments")
             var coverUrl = ""
-            for (i in 0 until attachments.length()) {
-                val attachUrl = attachments.getJSONObject(i).getString("fullpath")
-                if (attachUrl?.contains("cover") == true) coverUrl = attachUrl
+            attachments.forEach<JSONObject> {
+                val attachUrl = it.getString("fullpath")
+                if (attachUrl.contains("cover")) coverUrl = attachUrl
             }
 
             return Serie(
@@ -41,14 +42,8 @@ data class Serie(
                 overrideExpiration = serieJson.getBoolean("override_expiration")
             )
         }
-        fun fromJson(seriesJson: JSONArray): List<Serie> = ArrayList<Serie>().also {
-            for (i in 0 until seriesJson.length()) {
-                it.add(
-                    fromJson(
-                        seriesJson.getJSONObject(i)
-                    )
-                )
-            }
+        fun fromJson(seriesJson: JSONArray): List<Serie> = ArrayList<Serie>().apply {
+            seriesJson.forEach<JSONObject> { add(fromJson(it)) }
         }
     }
 

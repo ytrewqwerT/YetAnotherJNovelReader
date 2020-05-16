@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
+import com.ytrewqwert.yetanotherjnovelreader.forEach
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -23,7 +24,7 @@ data class Part(
     val preview: Boolean
 ) : ListItem {
     companion object {
-        fun fromJson(partJson: JSONObject): Part {
+        private fun fromJson(partJson: JSONObject): Part {
             // Find the value for coverThumbUrl (if it exists)
             val attachments = partJson.getJSONArray("attachments")
             var coverUrl = ""
@@ -46,14 +47,8 @@ data class Part(
                 preview = partJson.getBoolean("preview")
             )
         }
-        fun fromJson(partsJson: JSONArray): List<Part> = ArrayList<Part>().also {
-            for (i in 0 until partsJson.length()) {
-                it.add(
-                    fromJson(
-                        partsJson.getJSONObject(i)
-                    )
-                )
-            }
+        fun fromJson(partsJson: JSONArray): List<Part> = ArrayList<Part>().apply {
+            partsJson.forEach<JSONObject> { add(fromJson(it)) }
         }
     }
 

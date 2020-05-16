@@ -9,11 +9,13 @@ import androidx.security.crypto.MasterKeys
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
 import com.ytrewqwert.yetanotherjnovelreader.setBoolean
 import com.ytrewqwert.yetanotherjnovelreader.setString
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.channelFlow
 import java.time.Instant
 import java.time.Period
 
+@ExperimentalCoroutinesApi
 class PreferenceStore private constructor(private val appContext: Context) {
 
     companion object {
@@ -51,7 +53,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
     var authToken: String?
         get() = sharedPref.getString(PrefKeys.AUTH_TOKEN, null)
         set(value) = sharedPref.setString(PrefKeys.AUTH_TOKEN, value)
-    var authDate: String?
+    private var authDate: String?
         get() = sharedPref.getString(PrefKeys.AUTH_DATE, null)
         set(value) = sharedPref.setString(PrefKeys.AUTH_DATE, value)
     var username: String?
@@ -126,10 +128,8 @@ class PreferenceStore private constructor(private val appContext: Context) {
     }
 
     private fun getTypeface(): Typeface {
-        val styleString = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!
-        return when (styleString) {
+        return when (val styleString = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!) {
             "default" -> Typeface.defaultFromStyle(Typeface.NORMAL)
-
             // Recreating every time the style is requested is probably a bad idea
             else -> Typeface.createFromAsset(appContext.assets, "fonts/$styleString")
         }

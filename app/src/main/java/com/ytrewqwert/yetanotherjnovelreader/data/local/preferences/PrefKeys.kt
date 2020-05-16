@@ -15,7 +15,6 @@ object PrefKeys {
     const val IS_HORIZONTAL = "HORIZONTAL_READER"
     const val FONT_STYLE = "FONT_STYLE"
     const val FONT_SIZE = "FONT_SIZE"
-    const val MARGIN = "READER_MARGIN"
 
     const val MARGIN_TOP = "READER_MARGIN_TOP"
     const val MARGIN_BOTTOM = "READER_MARGIN_BOTTOM"

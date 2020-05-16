@@ -45,7 +45,7 @@ class RemoteRepository private constructor(
     private val imageLoader = ImageLoader(requestQueue, DiskImageLoader(appContext))
 
     suspend fun getImage(source: String) =
-        suspendCancellableCoroutine<Bitmap?>{ cont ->
+        suspendCancellableCoroutine<Bitmap?> { cont ->
         imageLoader.get(source, object : ImageLoader.ImageListener {
             override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
                 Log.d(TAG, "ImageSuccess: Source = $source")
