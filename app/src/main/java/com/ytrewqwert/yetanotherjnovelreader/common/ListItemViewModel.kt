@@ -19,7 +19,9 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
     private val isReloading = ArrayList<MutableLiveData< Boolean >>()
     val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
 
-    suspend fun getImage(source: String): Bitmap? = repository.getImage(source)
+    fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
+        viewModelScope.launch { callback(source, repository.getImage(source)) }
+    }
 
     fun getItemList(fragmentId: Int): LiveData< List<ListItem>? > {
         while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
