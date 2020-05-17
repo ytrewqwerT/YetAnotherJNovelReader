@@ -9,7 +9,9 @@
             type="com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel" />
     </data>
 
-    <FrameLayout
+    <ScrollView
+        android:scrollbars="none"
+        android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".partreader.pagedreader.PagedReaderPageFragment">
@@ -21,9 +23,9 @@
             android:hyphenationFrequency="full"
             android:justificationMode="inter_word"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:readerMarginHorizontal="@{viewModel.margin}"
             app:readerMarginVertical="@{viewModel.margin}" />
 
-    </FrameLayout>
+    </ScrollView>
 </layout>

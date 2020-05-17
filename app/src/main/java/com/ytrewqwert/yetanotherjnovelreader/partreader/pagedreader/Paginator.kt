@@ -60,7 +60,8 @@ class Paginator(
     }
 
     private fun addPage(text: CharSequence) {
-        if (text.isNotBlank()) pages.add(text)
+        // Ignore leading/trailing whitespace
+        if (text.isNotBlank()) pages.add(text.trim())
     }
 
     private fun paragraphOverflowed(text: CharSequence, lineStartPos: Int): Boolean {
