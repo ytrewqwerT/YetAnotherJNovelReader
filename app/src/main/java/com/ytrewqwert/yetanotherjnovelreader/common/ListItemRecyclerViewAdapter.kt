@@ -34,9 +34,9 @@ class ListItemRecyclerViewAdapter(
             }
         }
         val followIcon = if (contents.isFollowing) {
-            holder.view.resources.getDrawable(R.drawable.ic_star_white_24dp, null)
+            holder.view.resources.getDrawable(R.drawable.ic_star_gold_24dp, null)
         } else {
-            holder.view.resources.getDrawable(R.drawable.ic_star_border_white_24dp, null)
+            holder.view.resources.getDrawable(R.drawable.ic_star_border_gold_24dp, null)
         }
         holder.following.setImageDrawable(followIcon)
 
