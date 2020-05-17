@@ -5,15 +5,19 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
     val logoutEvent = SingleLiveEvent<Boolean>()
+
+    @ExperimentalCoroutinesApi
     val recentParts = repository.getRecentParts(viewModelScope)
         .combine(repository.isFilterFollowing) { parts, filterOn ->
             parts.filter { !filterOn || it.isFollowed() }
         }.asLiveData(viewModelScope.coroutineContext)
+
     val isFilterFollowing =
         repository.isFilterFollowing.asLiveData(viewModelScope.coroutineContext)
 

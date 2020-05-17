@@ -20,6 +20,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ExplorerFragment : Fragment() {
     companion object {
@@ -35,10 +36,9 @@ class ExplorerFragment : Fragment() {
         ListItemViewModelFactory(Repository.getInstance(requireContext()))
     }
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel.fetchSeries()
         setListItemFragment(ListTypes.SERIES.ordinal, ListTypes.SERIES.name)
         observeViewModels()
     }
@@ -57,6 +57,7 @@ class ExplorerFragment : Fragment() {
         curFragment?.onResume()
     }
 
+    @ExperimentalCoroutinesApi
     private fun observeViewModels() {
         viewModel.seriesList.observe(this) {
             listItemViewModel.setItemList(ListTypes.SERIES.ordinal, it)

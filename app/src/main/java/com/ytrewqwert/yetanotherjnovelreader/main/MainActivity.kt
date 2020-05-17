@@ -20,11 +20,10 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
-class MainActivity : AppCompatActivity(),
-    LoginResultListener {
-
+class MainActivity : AppCompatActivity(), LoginResultListener {
     companion object {
         private const val TAG = "MainActivity"
     }
@@ -41,6 +40,7 @@ class MainActivity : AppCompatActivity(),
 
     private val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -59,7 +59,6 @@ class MainActivity : AppCompatActivity(),
             }
         }
         observeViewModels()
-        recentsListViewModel.setIsReloading(recentPartsFragId, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -101,6 +100,7 @@ class MainActivity : AppCompatActivity(),
         else -> super.onOptionsItemSelected(item)
     }
 
+    @ExperimentalCoroutinesApi
     private fun observeViewModels() {
         mainViewModel.logoutEvent.observe(this) { loggedOut ->
             if (loggedOut) onLoginResult(false)

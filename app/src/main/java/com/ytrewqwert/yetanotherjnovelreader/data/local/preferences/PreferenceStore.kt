@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.channelFlow
 import java.time.Instant
 import java.time.Period
 
-@ExperimentalCoroutinesApi
 class PreferenceStore private constructor(private val appContext: Context) {
 
     companion object {
@@ -64,6 +63,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
         set(value) = sharedPref.setBoolean(PrefKeys.IS_MEMBER, value ?: false)
 
     // Non-reader settings
+    @ExperimentalCoroutinesApi
     val isFilterFollowing = channelFlow {
         offer(sharedPref.getBoolean(PrefKeys.IS_FOLLOW, false))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -79,6 +79,8 @@ class PreferenceStore private constructor(private val appContext: Context) {
     private var fontSize = sharedPref.getInt(PrefKeys.FONT_SIZE, PrefDefaults.FONT_SIZE)
     private var fontStyle = getTypeface()
     private var readerMargins = getMargins()
+
+    @ExperimentalCoroutinesApi
     val readerSettings = channelFlow {
         offer(ReaderPreferences(paginated, fontSize, fontStyle, readerMargins))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->

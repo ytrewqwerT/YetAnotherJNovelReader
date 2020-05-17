@@ -28,7 +28,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         return itemLists[fragmentId]
     }
     fun getIsReloading(fragmentId: Int): LiveData<Boolean> {
-        while (fragmentId >= isReloading.size) isReloading.add(MutableLiveData(false))
+        while (fragmentId >= isReloading.size) isReloading.add(MutableLiveData(true))
         return isReloading[fragmentId]
     }
 

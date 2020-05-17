@@ -32,7 +32,13 @@ class PartActivity : AppCompatActivity() {
     }
 
     private val partId: String by lazy { intent.getStringExtra(EXTRA_PART_ID) }
-    private var statusBarHeight = 0
+    private val statusBarHeight by lazy {
+        with(resources) {
+            val resId = getIdentifier("status_bar_height", "dimen", "android")
+            if (resId > 0) getDimensionPixelSize(resId)
+            else getDimensionPixelSize(R.dimen.default_status_bar_height)
+        }
+    }
 
     private lateinit var binding: ActivityPartBinding
     private val viewModel by viewModels<PartViewModel> {
@@ -64,7 +70,7 @@ class PartActivity : AppCompatActivity() {
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
-        initialiseStatusBarHeight()
+        initialiseSystemBars()
         initialiseObserversListeners()
         setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
         if (viewModel.partReady.value == true) transitionToContent()
@@ -132,16 +138,14 @@ class PartActivity : AppCompatActivity() {
         }
     }
 
-    private fun initialiseStatusBarHeight() {
+    private fun initialiseSystemBars() {
+        // Make the activity fullscreen
         layoutRoot.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
-
-        statusBarHeight = resources.getDimensionPixelSize(R.dimen.default_status_bar_height)
-        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        if (resourceId > 0) statusBarHeight = resources.getDimensionPixelSize(resourceId)
-
+        // Prevent content from being shown under the status bar via statusBackground
         statusBackground.layoutParams.height = statusBarHeight
+        // Extend the app bar such that it's colour extends to under the status bar when shown
         toolbar.setPadding(0, statusBarHeight, 0, 0)
         toolbar.layoutParams.height += statusBarHeight
     }
