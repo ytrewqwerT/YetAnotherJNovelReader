@@ -28,16 +28,19 @@ class Paginator(
                 .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL)
                 .setJustificationMode(StaticLayout.JUSTIFICATION_MODE_INTER_WORD)
                 .build()
-            var adjustedHeight = height
+
             var curLine = 0
             while (curLine < layout.lineCount && lineIsBlank(layout, curLine)) curLine++
+            var processedHeight = layout.getLineTop(curLine)
             var nextChar = layout.getLineStart(curLine)
+
             while (curLine < layout.lineCount) {
-                if (adjustedHeight < layout.getLineBottom(curLine)) {
+                if (layout.getLineBottom(curLine) - processedHeight > height) {
                     addPage(span.subSequence(nextChar, layout.getLineStart(curLine)))
+
                     while (curLine < layout.lineCount && lineIsBlank(layout, curLine)) curLine++
+                    processedHeight = layout.getLineTop(curLine)
                     nextChar = layout.getLineStart(curLine)
-                    adjustedHeight = height + layout.getLineTop(curLine)
                 }
                 curLine++
             }
