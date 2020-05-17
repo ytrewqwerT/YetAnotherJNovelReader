@@ -11,10 +11,12 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.Utils
@@ -29,8 +31,14 @@ class PartActivity : AppCompatActivity() {
         const val EXTRA_PART_ID = "PART_ID"
     }
 
-    private var partId: String = ""
-    private var statusBarHeight = 0
+    private val partId: String by lazy { intent.getStringExtra(EXTRA_PART_ID) }
+    private val statusBarHeight by lazy {
+        with(resources) {
+            val resId = getIdentifier("status_bar_height", "dimen", "android")
+            if (resId > 0) getDimensionPixelSize(resId)
+            else getDimensionPixelSize(R.dimen.default_status_bar_height)
+        }
+    }
 
     private lateinit var binding: ActivityPartBinding
     private val viewModel by viewModels<PartViewModel> {
@@ -50,8 +58,6 @@ class PartActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_part)
         binding.lifecycleOwner = this
-
-        partId = intent.getStringExtra(EXTRA_PART_ID)
         binding.viewModel = viewModel
 
         toolbar = findViewById(R.id.toolbar)
@@ -64,7 +70,7 @@ class PartActivity : AppCompatActivity() {
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
-        initialiseStatusBarHeight()
+        initialiseSystemBars()
         initialiseObserversListeners()
         setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
         if (viewModel.partReady.value == true) transitionToContent()
@@ -132,26 +138,24 @@ class PartActivity : AppCompatActivity() {
         }
     }
 
-    private fun initialiseStatusBarHeight() {
+    private fun initialiseSystemBars() {
+        // Make the activity fullscreen
         layoutRoot.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
-
-        statusBarHeight = resources.getDimensionPixelSize(R.dimen.default_status_bar_height)
-        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        if (resourceId > 0) statusBarHeight = resources.getDimensionPixelSize(resourceId)
+        // Prevent content from being shown under the status bar via statusBackground
         statusBackground.layoutParams.height = statusBarHeight
+        // Extend the app bar such that it's colour extends to under the status bar when shown
         toolbar.setPadding(0, statusBarHeight, 0, 0)
         toolbar.layoutParams.height += statusBarHeight
     }
 
     private fun setNavigationBarVisibility(visible: Boolean) {
+        val visFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         window.decorView.systemUiVisibility = if (visible) {
-            (window.decorView.systemUiVisibility
-                    and (View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION).inv())
+            (window.decorView.systemUiVisibility and visFlags.inv())
         } else {
-            (window.decorView.systemUiVisibility
-                    or (View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION))
+            (window.decorView.systemUiVisibility or visFlags)
         }
     }
     private fun setStatusBarTextColor(isLight: Boolean) {
@@ -172,14 +176,14 @@ class PartActivity : AppCompatActivity() {
                 setStatusBarTextColor(false)
                 val animator = AnimatorInflater.loadAnimator(this, R.animator.show_top_app_bar)
                 animator.setTarget(toolbar)
-                animator.addListener(onStart = { toolbar.visibility = View.VISIBLE })
+                animator.doOnStart { toolbar.visibility = View.VISIBLE }
                 animator.start()
             }
             else -> {
                 setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
                 val animator = AnimatorInflater.loadAnimator(this, R.animator.hide_top_app_bar)
                 animator.setTarget(toolbar)
-                animator.addListener(onEnd = { toolbar.visibility = View.GONE })
+                animator.doOnEnd { toolbar.visibility = View.GONE }
                 animator.start()
             }
         }
@@ -190,20 +194,17 @@ class PartActivity : AppCompatActivity() {
 
         val loadBarAnimator = AnimatorInflater.loadAnimator(this, android.R.animator.fade_out)
         loadBarAnimator.setTarget(loadBar)
-        loadBarAnimator.addListener(onEnd = { loadBar.visibility = View.GONE })
+        loadBarAnimator.doOnEnd { loadBar.visibility = View.GONE }
         loadBarAnimator.start()
 
         val contentAnimator = AnimatorInflater.loadAnimator(this, R.animator.slide_from_bottom)
         contentAnimator.setTarget(readerContainer)
-        contentAnimator.addListener(onStart = { readerContainer.visibility = View.VISIBLE })
+        contentAnimator.doOnStart { readerContainer.visibility = View.VISIBLE }
         contentAnimator.start()
     }
 
     private fun setReaderFragment(frag: Fragment) {
-        with (supportFragmentManager.beginTransaction()) {
-            replace(R.id.reader_container, frag)
-            commit()
-        }
+        supportFragmentManager.commit { replace(R.id.reader_container, frag) }
     }
 
     private fun updatePageDimens() {

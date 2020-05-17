@@ -19,12 +19,13 @@ class PagedReaderPageFragment : Fragment() {
         const val ARG_PAGE_NUM = "PAGED_READER_PAGE_NUM"
     }
 
-    private var textView: TextView? = null
     private val partViewModel by activityViewModels<PartViewModel>()
     private val pagedReaderViewModel by viewModels<PagedReaderViewModel>(
         ownerProducer = { requireParentFragment() }
     )
+
     private var binding: FragmentPagedReaderPageBinding? = null
+    private var textView: TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,9 +36,9 @@ class PagedReaderPageFragment : Fragment() {
         )
         binding?.lifecycleOwner = viewLifecycleOwner
         binding?.viewModel = partViewModel
+
         val view = binding?.root
         textView = view?.findViewById(R.id.page_contents)
-
         textView?.setOnClickListener {
             partViewModel.toggleAppBarVisibility()
         }

@@ -8,7 +8,7 @@ class PagedReaderAdapter(
     frag: Fragment
 ) : FragmentStateAdapter(frag) {
 
-    private var numPages = 1
+    private var numPages = 1 // Initially a single empty page
     override fun getItemCount(): Int = numPages
 
     override fun createFragment(position: Int): Fragment {

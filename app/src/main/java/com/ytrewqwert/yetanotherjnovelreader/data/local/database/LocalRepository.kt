@@ -14,7 +14,9 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeDao
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class LocalRepository private constructor(appContext: Context) {
     companion object {
@@ -32,26 +34,43 @@ class LocalRepository private constructor(appContext: Context) {
     private val progressDao: ProgressDao
 
     init {
-        val db = PartRoomDatabase.getInstance(appContext)
-        serieDao = db.serieDao()
-        volumeDao = db.volumeDao()
-        partDao = db.partDao()
-        followDao = db.followDao()
-        progressDao = db.progressDao()
+        with(PartRoomDatabase.getInstance(appContext)) {
+            serieDao = serieDao()
+            volumeDao = volumeDao()
+            partDao = partDao()
+            followDao = followDao()
+            progressDao = progressDao()
+
+        }
     }
 
-    suspend fun upsertSeries(vararg series: Serie) { serieDao.upsert(*series) }
-    suspend fun upsertVolumes(vararg volumes: Volume) { volumeDao.upsert(*volumes) }
-    suspend fun upsertParts(vararg parts: Part) { partDao.upsert(*parts) }
-    suspend fun upsertProgress(vararg progress: Progress) { progressDao.upsert(*progress) }
-    suspend fun insertFollows(vararg follows: Follow) { followDao.insert(*follows) }
+    suspend fun insertFollows(vararg follows: Follow) {
+        withContext(Dispatchers.IO) { followDao.insert(*follows) }
+    }
 
-    suspend fun deleteFollows(vararg follows: Follow) { followDao.delete(*follows) }
+    suspend fun upsertSeries(vararg series: Serie) {
+        withContext(Dispatchers.IO) { serieDao.upsert(*series) }
+    }
+    suspend fun upsertVolumes(vararg volumes: Volume) {
+        withContext(Dispatchers.IO) { volumeDao.upsert(*volumes) }
+    }
+    suspend fun upsertParts(vararg parts: Part) {
+        withContext(Dispatchers.IO) { partDao.upsert(*parts) }
+    }
+    suspend fun upsertProgress(vararg progress: Progress) {
+        withContext(Dispatchers.IO) { progressDao.upsert(*progress) }
+    }
+
+    suspend fun deleteFollows(vararg follows: Follow) {
+        withContext(Dispatchers.IO) { followDao.delete(*follows) }
+    }
 
     fun getSeries(): Flow<List<SerieFull>> = serieDao.getAllSeries()
     fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>> = volumeDao.getSerieVolumes(serieId)
     fun getVolumeParts(volumeId: String): Flow<List<PartFull>> = partDao.getVolumeParts(volumeId)
     fun getPartsSince(time: String): Flow<List<PartFull>> = partDao.getPartsSince(time)
 
-    suspend fun getParts(vararg partId: String): List<PartFull> = partDao.getParts(*partId)
+    suspend fun getParts(vararg partId: String): List<PartFull> = withContext(Dispatchers.IO) {
+        partDao.getParts(*partId)
+    }
 }

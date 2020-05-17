@@ -11,6 +11,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -31,6 +32,7 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
     val volumesList: LiveData<List<VolumeFull>> = _volumesList
     val partsList: LiveData<List<PartFull>> = _partsList
 
+    @ExperimentalCoroutinesApi
     fun fetchSeries(onComplete: (success: Boolean) -> Unit = {}) {
         seriesCollectorJob.job = viewModelScope.launch {
             repository.getSeries(this, onComplete)
@@ -42,15 +44,23 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
         }
     }
     fun fetchSerieVolumes(onComplete: (success: Boolean) -> Unit = {}) {
-        val series = curSerie ?: return
+        val serie = curSerie
+        if (serie == null) {
+            onComplete(true)
+            return
+        }
         volumesCollectorJob.job = viewModelScope.launch {
-            repository.getSerieVolumes(this, series.id, onComplete).collect {
+            repository.getSerieVolumes(this, serie.id, onComplete).collect {
                 _volumesList.value = it
             }
         }
     }
     fun fetchVolumeParts(onComplete: (success: Boolean) -> Unit = {}) {
-        val volume = curVolume ?: return
+        val volume = curVolume
+        if (volume == null) {
+            onComplete(true)
+            return
+        }
         partsCollectorJob.job = viewModelScope.launch {
             repository.getVolumeParts(this, volume.id, onComplete).collect {
                 _partsList.value = it

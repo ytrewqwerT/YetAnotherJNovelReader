@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
+import com.ytrewqwert.yetanotherjnovelreader.forEach
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -21,13 +22,13 @@ data class Volume(
     val created: String
 ) : ListItem {
     companion object {
-        fun fromJson(source: JSONObject): Volume {
+        private fun fromJson(source: JSONObject): Volume {
             // Find the value for coverThumbUrl (if it exists)
             val attachments = source.getJSONArray("attachments")
             var coverUrl = ""
-            for (i in 0 until attachments.length()) {
-                val attachUrl = attachments.getJSONObject(i).getString("fullpath")
-                if (attachUrl?.contains("cover") == true) coverUrl = attachUrl
+            attachments.forEach<JSONObject> {
+                val attachUrl = it.getString("fullpath")
+                if (attachUrl.contains("cover")) coverUrl = attachUrl
             }
 
             return Volume(
@@ -43,14 +44,8 @@ data class Volume(
                 created = source.getString("created")
             )
         }
-        fun fromJson(volumesJson: JSONArray): List<Volume> = ArrayList<Volume>().also {
-            for (i in 0 until volumesJson.length()) {
-                it.add(
-                    fromJson(
-                        volumesJson.getJSONObject(i)
-                    )
-                )
-            }
+        fun fromJson(volumesJson: JSONArray): List<Volume> = ArrayList<Volume>().apply {
+            volumesJson.forEach<JSONObject> { add(fromJson(it)) }
         }
     }
 

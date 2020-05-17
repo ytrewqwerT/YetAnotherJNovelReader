@@ -7,9 +7,9 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
-import android.util.TypedValue
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
+import com.ytrewqwert.yetanotherjnovelreader.Utils
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
@@ -56,15 +56,12 @@ class PartViewModel(
 
         val displayMetrics = resources.displayMetrics
         val fontSizeSp = fontSize.value ?: 15
-        fontSizePx = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP, fontSizeSp.toFloat(), displayMetrics
-        ).toInt()
+        fontSizePx = Utils.spToPx(fontSizeSp, displayMetrics)
 
         viewModelScope.launch {
             getPartData()
             savedProgress = repository.getParts(partId).getOrNull(0)?.progress?.progress ?: 0.0
             currentProgress.value = savedProgress
-
             partReady.value = true
         }
 
@@ -108,7 +105,6 @@ class PartViewModel(
 
     private suspend fun replaceTempImages(spanned: Spanned): Spanned {
         val spanBuilder = SpannableStringBuilder(spanned)
-
         coroutineScope {
             for (img in spanBuilder.getSpans(0, spanned.length, ImageSpan::class.java)) {
                 launch { replaceTempImage(img, spanBuilder) }

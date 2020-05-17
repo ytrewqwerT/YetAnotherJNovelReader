@@ -18,7 +18,7 @@ object PartHtmlParser {
         val noNewLine = html.replace("\n", "")
         val tagRegex = Regex("<[^>]*>")
         val tagStack = ArrayDeque<IncompleteTag>()
-        tagStack.addFirst(IncompleteTag(emptyList())) // Dummy tag to store processed contents
+        tagStack.addFirst(IncompleteTag(listOf(""))) // Dummy tag to store processed contents
 
         var searchStartIndex = 0
         var match = tagRegex.find(noNewLine, searchStartIndex)
@@ -30,9 +30,15 @@ object PartHtmlParser {
             when {
                 noNewLine[match.range.first + 1] == '/' -> {
                     // Closing tag
-                    val openTag = tagStack.removeFirst()
-                    processTagPair(openTag.tagLabelTokens, openTag.contents)
-                    tagStack.first.contents.append(openTag.contents)
+                    val openTag = tagStack.first
+                    if (openTag.tagLabelTokens[0] == tagLabelTokens[0]) {
+                        tagStack.removeFirst()
+                        processTagPair(openTag.tagLabelTokens, openTag.contents)
+                        tagStack.first.contents.append(openTag.contents)
+                    } else {
+                        // Out-of-sequence closing tag? Treat as self-closing tag
+                        tagStack.first.contents.append(processLoneTag(tagLabelTokens))
+                    }
                 }
                 noNewLine[match.range.last - 1] == '/' -> {
                     // Self-closing tag
@@ -114,7 +120,11 @@ object PartHtmlParser {
             "img" -> {
                 // Use the built-in parser to inject a placeholder image.
                 val imgSpan = Html.fromHtml("<${tagLabelTokens.joinToString(" ")} >", 0)
-                return SpannableStringBuilder(imgSpan)
+                return SpannableStringBuilder(imgSpan).apply {
+                    // Add extra spacing between image and surrounding content
+                    insert(0, "\n")
+                    append("\n\n")
+                }
             }
             else -> {
                 Log.w(TAG, "Unhandled html tag: <${tagLabelTokens.joinToString(" ")} >")

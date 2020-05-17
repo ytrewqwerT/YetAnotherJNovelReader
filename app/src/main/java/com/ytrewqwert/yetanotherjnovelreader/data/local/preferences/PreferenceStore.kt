@@ -9,6 +9,7 @@ import androidx.security.crypto.MasterKeys
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
 import com.ytrewqwert.yetanotherjnovelreader.setBoolean
 import com.ytrewqwert.yetanotherjnovelreader.setString
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.channelFlow
 import java.time.Instant
@@ -51,7 +52,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
     var authToken: String?
         get() = sharedPref.getString(PrefKeys.AUTH_TOKEN, null)
         set(value) = sharedPref.setString(PrefKeys.AUTH_TOKEN, value)
-    var authDate: String?
+    private var authDate: String?
         get() = sharedPref.getString(PrefKeys.AUTH_DATE, null)
         set(value) = sharedPref.setString(PrefKeys.AUTH_DATE, value)
     var username: String?
@@ -62,6 +63,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
         set(value) = sharedPref.setBoolean(PrefKeys.IS_MEMBER, value ?: false)
 
     // Non-reader settings
+    @ExperimentalCoroutinesApi
     val isFilterFollowing = channelFlow {
         offer(sharedPref.getBoolean(PrefKeys.IS_FOLLOW, false))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -77,6 +79,8 @@ class PreferenceStore private constructor(private val appContext: Context) {
     private var fontSize = sharedPref.getInt(PrefKeys.FONT_SIZE, PrefDefaults.FONT_SIZE)
     private var fontStyle = getTypeface()
     private var readerMargins = getMargins()
+
+    @ExperimentalCoroutinesApi
     val readerSettings = channelFlow {
         offer(ReaderPreferences(paginated, fontSize, fontStyle, readerMargins))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
@@ -126,10 +130,8 @@ class PreferenceStore private constructor(private val appContext: Context) {
     }
 
     private fun getTypeface(): Typeface {
-        val styleString = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!
-        return when (styleString) {
+        return when (val styleString = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!) {
             "default" -> Typeface.defaultFromStyle(Typeface.NORMAL)
-
             // Recreating every time the style is requested is probably a bad idea
             else -> Typeface.createFromAsset(appContext.assets, "fonts/$styleString")
         }
@@ -140,12 +142,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
         val bottom = sharedPref.getInt(PrefKeys.MARGIN_BOTTOM, PrefDefaults.MARGIN)
         val left = sharedPref.getInt(PrefKeys.MARGIN_LEFT, PrefDefaults.MARGIN)
         val right = sharedPref.getInt(PrefKeys.MARGIN_RIGHT, PrefDefaults.MARGIN)
-        return Margins(
-            top,
-            bottom,
-            left,
-            right
-        )
+        return Margins(top, bottom, left, right)
     }
 
     data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)

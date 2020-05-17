@@ -15,9 +15,9 @@ import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
 class ScrollReaderFragment : Fragment() {
 
-    private var binding: FragmentScrollReaderBinding? = null
     private val viewModel by activityViewModels<PartViewModel>()
 
+    private var binding: FragmentScrollReaderBinding? = null
     private var scrollView: ScrollView? = null
     private var textView: TextView? = null
 
@@ -34,8 +34,13 @@ class ScrollReaderFragment : Fragment() {
         val view = binding?.root
         scrollView = view?.findViewById(R.id.content_scroll_container)
         textView = view?.findViewById(R.id.content_view)
-        initialiseObserversListeners()
 
+        scrollView?.setOnScrollChangeListener { _, _, _, _, _ ->
+            viewModel.currentProgress.value = getScrollPercentage()
+        }
+        textView?.setOnClickListener {
+            viewModel.toggleAppBarVisibility()
+        }
         // Indirectly notify scrollView to update its position when textView's layout changes
         textView?.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             viewModel.currentProgress.value = viewModel.currentProgress.value
@@ -60,15 +65,6 @@ class ScrollReaderFragment : Fragment() {
             scrollY.toDouble() / (tvHeight - svHeight)
         } else {
             1.0
-        }
-    }
-
-    private fun initialiseObserversListeners() {
-        scrollView?.setOnScrollChangeListener { _, _, _, _, _ ->
-            viewModel.currentProgress.value = getScrollPercentage()
-        }
-        textView?.setOnClickListener {
-            viewModel.toggleAppBarVisibility()
         }
     }
 }

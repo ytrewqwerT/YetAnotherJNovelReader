@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
 import kotlinx.android.synthetic.main.recycler_item.view.*
 
-class CustomRecyclerViewAdapter(
+class ListItemRecyclerViewAdapter(
     private val listener: ListItem.InteractionListener? = null,
     private val imageSource: ImageSource? = null
-) : RecyclerView.Adapter<CustomRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ListItemRecyclerViewAdapter.ViewHolder>() {
 
     private var items: List<ListItem> = emptyList()
 

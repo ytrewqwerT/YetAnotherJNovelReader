@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,10 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import kotlinx.coroutines.launch
 
-class ListItemFragment : Fragment(), ListItem.InteractionListener,
-    ImageSource {
+class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
     companion object {
         private const val TAG = "ListItemFragment"
         const val ARG_ID = "${TAG}_ID"
@@ -29,30 +26,16 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         factoryProducer = { ListItemViewModelFactory(Repository.getInstance(requireContext())) }
     )
 
-    private var uid = 0
-    private var recyclerViewAdapter = CustomRecyclerViewAdapter(this, this)
+    private val uid by lazy { requireArguments().getInt(ARG_ID, 0) }
+    private val recyclerViewAdapter = ListItemRecyclerViewAdapter(this, this)
 
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var recyclerView: RecyclerView
-
-    override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
-        lifecycleScope.launch { callback(source, viewModel.getImage(source)) }
-    }
-
-    override fun onClick(item: ListItem) {
-        viewModel.listItemFragmentViewOnClick(uid, item)
-    }
-
-    override fun onFollowClick(item: ListItem) {
-        viewModel.toggleFollowItem(item)
-    }
+    private var swipeRefreshLayout: SwipeRefreshLayout? = null
+    private var recyclerView: RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        uid = requireArguments().getInt(ARG_ID, 0)
-
-        viewModel.getIsReloading(uid).observe(this) { swipeRefreshLayout.isRefreshing = it }
+        viewModel.getIsReloading(uid).observe(this) { swipeRefreshLayout?.isRefreshing = it }
         viewModel.getItemList(uid).observe(this) {
             if (it != null) recyclerViewAdapter.setItems(it)
         }
@@ -66,11 +49,9 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         recyclerView = view.findViewById(R.id.list)
 
-        swipeRefreshLayout.setOnRefreshListener {
-            viewModel.setIsReloading(uid, true)
-        }
+        swipeRefreshLayout?.setOnRefreshListener { viewModel.setIsReloading(uid, true) }
 
-        with (recyclerView) {
+        recyclerView?.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recyclerViewAdapter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
@@ -79,9 +60,29 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener,
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        swipeRefreshLayout = null
+        recyclerView = null
+    }
+
     override fun onResume() {
         super.onResume()
         // Force redraw for potentially updated recycler_item progress values
         recyclerViewAdapter.notifyDataSetChanged()
+    }
+
+
+    override fun onClick(item: ListItem) {
+        viewModel.listItemFragmentViewOnClick(uid, item)
+    }
+
+    override fun onFollowClick(item: ListItem) {
+        viewModel.toggleFollowItem(item)
+    }
+
+
+    override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
+        viewModel.getImage(source, callback)
     }
 }
