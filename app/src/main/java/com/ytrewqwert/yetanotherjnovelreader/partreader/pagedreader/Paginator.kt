@@ -24,36 +24,30 @@ class Paginator(
 
         val spans = split(text)
         for (span in spans) {
-            val layout = StaticLayout.Builder.obtain(
-                span,
-                0,
-                span.length,
-                paint,
-                width
-            )
+            val layout = StaticLayout.Builder.obtain(span, 0, span.length, paint, width)
                 .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL)
                 .setJustificationMode(StaticLayout.JUSTIFICATION_MODE_INTER_WORD)
                 .build()
             var adjustedHeight = height
-            var offset = 0
-
-            var i = 0
-            while (i < layout.lineCount) {
-                if (adjustedHeight < layout.getLineBottom(i)) {
-                    addPage(span.subSequence(offset, layout.getLineStart(i)))
-                    while (i < layout.lineCount && lineIsBlank(layout, i)) i++
-                    offset = layout.getLineStart(i)
-                    adjustedHeight = height + layout.getLineTop(i)
+            var curLine = 0
+            while (curLine < layout.lineCount && lineIsBlank(layout, curLine)) curLine++
+            var nextChar = layout.getLineStart(curLine)
+            while (curLine < layout.lineCount) {
+                if (adjustedHeight < layout.getLineBottom(curLine)) {
+                    addPage(span.subSequence(nextChar, layout.getLineStart(curLine)))
+                    while (curLine < layout.lineCount && lineIsBlank(layout, curLine)) curLine++
+                    nextChar = layout.getLineStart(curLine)
+                    adjustedHeight = height + layout.getLineTop(curLine)
                 }
-                i++
+                curLine++
             }
-            addPage(span.subSequence(offset, span.length))
+            addPage(span.subSequence(nextChar, span.length))
         }
         return pages
     }
 
     private fun addPage(text: CharSequence) {
-        if (text.isNotEmpty()) pages.add(text)
+        if (text.isNotBlank()) pages.add(text)
     }
 
     private fun lineIsBlank(layout: StaticLayout, lineNo: Int): Boolean {
