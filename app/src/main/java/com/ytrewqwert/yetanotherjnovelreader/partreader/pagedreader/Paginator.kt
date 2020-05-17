@@ -1,10 +1,8 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader
 
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.StaticLayout
-import android.text.TextPaint
+import android.text.*
 import android.text.style.ImageSpan
+import android.text.style.LeadingMarginSpan
 import android.util.Log
 
 class Paginator(
@@ -24,27 +22,36 @@ class Paginator(
 
         val spans = split(text)
         for (span in spans) {
-            val layout = StaticLayout.Builder.obtain(span, 0, span.length, paint, width)
-                .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL)
-                .setJustificationMode(StaticLayout.JUSTIFICATION_MODE_INTER_WORD)
-                .build()
+            var remainingSpan = span.trim()
+            do {
+                val layout = StaticLayout.Builder.obtain(
+                    remainingSpan, 0, remainingSpan.length, paint, width
+                )
+                    .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL)
+                    .setJustificationMode(StaticLayout.JUSTIFICATION_MODE_INTER_WORD)
+                    .build()
 
-            var curLine = 0
-            while (curLine < layout.lineCount && lineIsBlank(layout, curLine)) curLine++
-            var processedHeight = layout.getLineTop(curLine)
-            var nextChar = layout.getLineStart(curLine)
+                var lineNum = 0
+                while (
+                    lineNum < layout.lineCount && layout.getLineBottom(lineNum) < height
+                ) lineNum++
 
-            while (curLine < layout.lineCount) {
-                if (layout.getLineBottom(curLine) - processedHeight > height) {
-                    addPage(span.subSequence(nextChar, layout.getLineStart(curLine)))
+                addPage(remainingSpan.subSequence(0, layout.getLineStart(lineNum)))
 
-                    while (curLine < layout.lineCount && lineIsBlank(layout, curLine)) curLine++
-                    processedHeight = layout.getLineTop(curLine)
-                    nextChar = layout.getLineStart(curLine)
+                while (lineNum < layout.lineCount && lineIsBlank(layout, lineNum)) lineNum++
+                val nextStart = layout.getLineStart(lineNum)
+                val overflowed = paragraphOverflowed(remainingSpan, nextStart)
+                remainingSpan = SpannableString(
+                    remainingSpan.subSequence(nextStart, remainingSpan.length)
+                )
+                if (overflowed) {
+                    val paragraphEnd = remainingSpan.indexOf('\n')
+                    val leadingMarginSpan = remainingSpan.getSpans(
+                        0, paragraphEnd, LeadingMarginSpan::class.java
+                    ).firstOrNull()
+                    if (leadingMarginSpan != null) remainingSpan.removeSpan(leadingMarginSpan)
                 }
-                curLine++
-            }
-            addPage(span.subSequence(nextChar, span.length))
+            } while (remainingSpan.isNotEmpty())
         }
         return pages
     }
@@ -60,6 +67,11 @@ class Paginator(
         return line.isBlank()
     }
 
+    private fun paragraphOverflowed(text: CharSequence, lineStartPos: Int): Boolean {
+        if (lineStartPos == 0) return false
+        return text[lineStartPos - 1] != '\n'
+    }
+
     // Separates images from the text
     // Returns the split Spanned objects in the order they occurred in the original Spanned
     private fun split(spanned: Spanned): List<Spanned> {
@@ -68,14 +80,7 @@ class Paginator(
         var textSpanEnd = 0
         while (textSpanEnd < spanned.length) {
             textSpanEnd = spanned.nextSpanTransition(textSpanStart, spanned.length, ImageSpan::class.java)
-            resultList.add(
-                SpannableString(
-                    spanned.subSequence(
-                        textSpanStart,
-                        textSpanEnd
-                    )
-                )
-            )
+            resultList.add(SpannableString(spanned.subSequence(textSpanStart, textSpanEnd)))
             textSpanStart = textSpanEnd
         }
         return resultList
