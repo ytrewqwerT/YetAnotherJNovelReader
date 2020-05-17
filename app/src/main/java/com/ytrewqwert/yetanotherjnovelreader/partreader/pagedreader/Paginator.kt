@@ -35,14 +35,17 @@ class Paginator(
                 while (
                     lineNum < layout.lineCount && layout.getLineBottom(lineNum) < height
                 ) lineNum++
+                // Ensure at least one "line" is displayed.
+                // This is more a stop-gap measure to allow images that cannot fit on the page
+                // to still be at least partially displayed and not cause an infinite loop.
+                if (lineNum == 0) lineNum = 1
 
                 addPage(remainingSpan.subSequence(0, layout.getLineStart(lineNum)))
 
-                while (lineNum < layout.lineCount && lineIsBlank(layout, lineNum)) lineNum++
                 val nextStart = layout.getLineStart(lineNum)
                 val overflowed = paragraphOverflowed(remainingSpan, nextStart)
                 remainingSpan = SpannableString(
-                    remainingSpan.subSequence(nextStart, remainingSpan.length)
+                    remainingSpan.subSequence(nextStart, remainingSpan.length).trim()
                 )
                 if (overflowed) {
                     val paragraphEnd = remainingSpan.indexOf('\n')
@@ -58,13 +61,6 @@ class Paginator(
 
     private fun addPage(text: CharSequence) {
         if (text.isNotBlank()) pages.add(text)
-    }
-
-    private fun lineIsBlank(layout: StaticLayout, lineNo: Int): Boolean {
-        val start = layout.getLineStart(lineNo)
-        val end = layout.getLineEnd(lineNo)
-        val line = layout.text.subSequence(start, end)
-        return line.isBlank()
     }
 
     private fun paragraphOverflowed(text: CharSequence, lineStartPos: Int): Boolean {
