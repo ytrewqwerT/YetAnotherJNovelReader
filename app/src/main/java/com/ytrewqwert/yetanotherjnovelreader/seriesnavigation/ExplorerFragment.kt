@@ -11,7 +11,7 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
-import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
+import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
@@ -100,6 +100,7 @@ class ExplorerFragment : Fragment() {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
         listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
         viewModel.curSerie = serie.serie
+        listItemViewModel.setHeaderList(ListTypes.VOLUMES.ordinal, listOf(serie))
         listItemViewModel.setIsReloading(ListTypes.VOLUMES.ordinal, true)
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
@@ -107,6 +108,7 @@ class ExplorerFragment : Fragment() {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
         listItemViewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
         viewModel.curVolume = volume.volume
+        listItemViewModel.setHeaderList(ListTypes.PARTS.ordinal, listOf(volume))
         listItemViewModel.setIsReloading(ListTypes.PARTS.ordinal, true)
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }

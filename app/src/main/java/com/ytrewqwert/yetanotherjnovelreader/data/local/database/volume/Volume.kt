@@ -2,7 +2,8 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
+import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
+import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.forEach
 import org.json.JSONArray
@@ -20,7 +21,7 @@ data class Volume(
     val coverUrl: String,
     val tags: String,
     val created: String
-) : ListItem {
+) : ListItem, ListHeader {
     companion object {
         private fun fromJson(source: JSONObject): Volume {
             // Find the value for coverThumbUrl (if it exists)
@@ -49,9 +50,15 @@ data class Volume(
         }
     }
 
-    override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
+    override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
         title, descriptionShort,
         "${RemoteRepository.IMG_ADDR}/$coverUrl",
         null, true
+    )
+
+    override fun getListHeaderContents(): ListHeader.Contents = ListHeader.Contents(
+        "${RemoteRepository.IMG_ADDR}/$coverUrl",
+        title,
+        description
     )
 }

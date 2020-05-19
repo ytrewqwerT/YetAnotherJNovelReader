@@ -2,7 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.part
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ytrewqwert.yetanotherjnovelreader.common.ListItem
+import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.forEach
@@ -52,7 +52,7 @@ data class Part(
         }
     }
 
-    override fun getListItemContents(): ListItem.ListItemContents = ListItem.ListItemContents(
+    override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
         title, null,
         "${RemoteRepository.IMG_ADDR}/$coverUrl",
         null, readable()

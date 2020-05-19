@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.common
+package com.ytrewqwert.yetanotherjnovelreader.common.listitem
 
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
@@ -9,7 +9,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
-import kotlinx.android.synthetic.main.recycler_item.view.*
+import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
+import kotlinx.android.synthetic.main.list_item.view.*
 
 class ListItemRecyclerViewAdapter(
     private val listener: ListItem.InteractionListener? = null,
@@ -57,12 +58,11 @@ class ListItemRecyclerViewAdapter(
             holder.view.foreground = ColorDrawable(disabledColor)
             holder.view.isClickable = false
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =LayoutInflater.from(parent.context)
-            .inflate(R.layout.recycler_item, parent, false)
+            .inflate(R.layout.list_item, parent, false)
         return ViewHolder(view)
     }
 

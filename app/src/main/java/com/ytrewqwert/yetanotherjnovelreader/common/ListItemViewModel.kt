@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
+import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
+import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
@@ -15,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
+    private val headerLists = ArrayList<MutableLiveData< List<ListHeader>? >>()
     private val itemLists = ArrayList<MutableLiveData< List<ListItem>? >>()
     private val isReloading = ArrayList<MutableLiveData< Boolean >>()
     val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
@@ -23,6 +26,10 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch { callback(source, repository.getImage(source)) }
     }
 
+    fun getHeaderList(fragmentId: Int): LiveData< List<ListHeader>? > {
+        while (fragmentId >= headerLists.size) headerLists.add(MutableLiveData())
+        return headerLists[fragmentId]
+    }
     fun getItemList(fragmentId: Int): LiveData< List<ListItem>? > {
         while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
         return itemLists[fragmentId]
@@ -32,6 +39,10 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         return isReloading[fragmentId]
     }
 
+    fun setHeaderList(fragmentId: Int, list: List<ListHeader>?) {
+        while (fragmentId >= headerLists.size) headerLists.add(MutableLiveData())
+        headerLists[fragmentId].value = list
+    }
     fun setItemList(fragmentId: Int, list: List<ListItem>?) {
         while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
         itemLists[fragmentId].value = list

@@ -1,9 +1,9 @@
-package com.ytrewqwert.yetanotherjnovelreader.common
+package com.ytrewqwert.yetanotherjnovelreader.common.listitem
 
 interface ListItem {
-    fun getListItemContents(): ListItemContents
+    fun getListItemContents(): Contents
 
-    data class ListItemContents(
+    data class Contents(
         val mTitle: String? = null,
         val mText: String? = null,
         val mImageUrl: String? = null,

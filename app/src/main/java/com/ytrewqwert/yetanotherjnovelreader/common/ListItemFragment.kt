@@ -10,9 +10,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.MergeAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecyclerViewAdapter
+import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
+import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItemRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 
 class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
@@ -27,7 +31,10 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
     )
 
     private val uid by lazy { requireArguments().getInt(ARG_ID, 0) }
-    private val recyclerViewAdapter = ListItemRecyclerViewAdapter(this, this)
+
+    private val listHeaderAdapter = ListHeaderRecyclerViewAdapter(this)
+    private val listItemAdapter = ListItemRecyclerViewAdapter(this, this)
+    private val recyclerViewAdapter = MergeAdapter(listHeaderAdapter, listItemAdapter)
 
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null
@@ -36,8 +43,11 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
         super.onCreate(savedInstanceState)
 
         viewModel.getIsReloading(uid).observe(this) { swipeRefreshLayout?.isRefreshing = it }
+        viewModel.getHeaderList(uid).observe(this) {
+            if (it != null) listHeaderAdapter.setItems(it)
+        }
         viewModel.getItemList(uid).observe(this) {
-            if (it != null) recyclerViewAdapter.setItems(it)
+            if (it != null) listItemAdapter.setItems(it)
         }
     }
 
@@ -68,7 +78,7 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
 
     override fun onResume() {
         super.onResume()
-        // Force redraw for potentially updated recycler_item progress values
+        // Force redraw for potentially updated list_item progress values
         recyclerViewAdapter.notifyDataSetChanged()
     }
 
