@@ -1,7 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
 import android.graphics.Bitmap
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,40 +16,25 @@ import kotlinx.coroutines.launch
 
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
-    private val headerLists = ArrayList<MutableLiveData< List<ListHeader>? >>()
-    private val itemLists = ArrayList<MutableLiveData< List<ListItem>? >>()
-    private val isReloading = ArrayList<MutableLiveData< Boolean >>()
+    data class ContentLiveData(
+        val header: MutableLiveData<List<ListHeader>?> = MutableLiveData(emptyList()),
+        val item: MutableLiveData<List<ListItem>?> = MutableLiveData(emptyList()),
+        val reloading: MutableLiveData<Boolean> = MutableLiveData(true)
+    )
+    private val lists = ArrayList<ContentLiveData>()
+
     val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
 
     fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
         viewModelScope.launch { callback(source, repository.getImage(source)) }
     }
 
-    fun getHeaderList(fragmentId: Int): LiveData< List<ListHeader>? > {
-        while (fragmentId >= headerLists.size) headerLists.add(MutableLiveData())
-        return headerLists[fragmentId]
+    fun getContentLiveData(fragId: Int): ContentLiveData {
+        padListsToSize(fragId + 1)
+        return lists[fragId]
     }
-    fun getItemList(fragmentId: Int): LiveData< List<ListItem>? > {
-        while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
-        return itemLists[fragmentId]
-    }
-    fun getIsReloading(fragmentId: Int): LiveData<Boolean> {
-        while (fragmentId >= isReloading.size) isReloading.add(MutableLiveData(true))
-        return isReloading[fragmentId]
-    }
-
-    fun setHeaderList(fragmentId: Int, list: List<ListHeader>?) {
-        while (fragmentId >= headerLists.size) headerLists.add(MutableLiveData())
-        headerLists[fragmentId].value = list
-    }
-    fun setItemList(fragmentId: Int, list: List<ListItem>?) {
-        while (fragmentId >= itemLists.size) itemLists.add(MutableLiveData())
-        itemLists[fragmentId].value = list
-    }
-    fun setIsReloading(fragmentId: Int, reloading: Boolean) {
-        while (fragmentId >= isReloading.size) isReloading.add(MutableLiveData())
-        isReloading[fragmentId].value = reloading
-    }
+    fun getItemList(fragId: Int): MutableLiveData<List<ListItem>?> = getContentLiveData(fragId).item
+    fun getIsReloading(fragId: Int): MutableLiveData<Boolean> = getContentLiveData(fragId).reloading
 
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
         itemClickedEvent.value = ItemClickEvent(fragmentId, item)
@@ -59,6 +43,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
     fun toggleFollowItem(item: ListItem) {
         val serieId: String
         val following: Boolean
+        // Ugh
         when (item) {
             is PartFull -> {
                 serieId = item.part.serieId
@@ -82,6 +67,10 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             if (following) repository.deleteFollows(follow)
             else repository.insertFollows(follow)
         }
+    }
+
+    private fun padListsToSize(size: Int) {
+        while (lists.size < size) lists.add(ContentLiveData())
     }
 
     data class ItemClickEvent(

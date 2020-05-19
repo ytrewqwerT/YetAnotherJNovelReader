@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             }
         }
         mainViewModel.recentParts.observe(this) {
-            recentsListViewModel.setItemList(recentPartsFragId, it)
+            recentsListViewModel.getItemList(recentPartsFragId).value = it
         }
         mainViewModel.isFilterFollowing.observe(this) {
             val followMenuItem = appBarMenu?.findItem(R.id.following)
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         }
         recentsListViewModel.getIsReloading(recentPartsFragId).observe(this) {
             if (it) mainViewModel.fetchRecentParts {
-                recentsListViewModel.setIsReloading(recentPartsFragId, false)
+                recentsListViewModel.getIsReloading(recentPartsFragId).value = false
             }
         }
     }

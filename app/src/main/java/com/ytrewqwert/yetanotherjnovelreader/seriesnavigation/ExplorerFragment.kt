@@ -60,29 +60,29 @@ class ExplorerFragment : Fragment() {
     @ExperimentalCoroutinesApi
     private fun observeViewModels() {
         viewModel.seriesList.observe(this) {
-            listItemViewModel.setItemList(ListTypes.SERIES.ordinal, it)
+            listItemViewModel.getItemList(ListTypes.SERIES.ordinal).value = it
         }
         viewModel.volumesList.observe(this) {
-            listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, it)
+            listItemViewModel.getItemList(ListTypes.VOLUMES.ordinal).value = it
         }
         viewModel.partsList.observe(this) {
-            listItemViewModel.setItemList(ListTypes.PARTS.ordinal, it)
+            listItemViewModel.getItemList(ListTypes.PARTS.ordinal).value = it
         }
 
         listItemViewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
         listItemViewModel.getIsReloading(ListTypes.SERIES.ordinal).observe(this) {
             if (it) viewModel.fetchSeries {
-                listItemViewModel.setIsReloading(ListTypes.SERIES.ordinal, false)
+                listItemViewModel.getIsReloading(ListTypes.SERIES.ordinal).value = false
             }
         }
         listItemViewModel.getIsReloading(ListTypes.VOLUMES.ordinal).observe(this) {
             if (it) viewModel.fetchSerieVolumes {
-                listItemViewModel.setIsReloading(ListTypes.VOLUMES.ordinal, false)
+                listItemViewModel.getIsReloading(ListTypes.VOLUMES.ordinal).value = false
             }
         }
         listItemViewModel.getIsReloading(ListTypes.PARTS.ordinal).observe(this) {
             if (it) viewModel.fetchVolumeParts {
-                listItemViewModel.setIsReloading(ListTypes.PARTS.ordinal, false)
+                listItemViewModel.getIsReloading(ListTypes.PARTS.ordinal).value = false
             }
         }
     }
@@ -98,18 +98,22 @@ class ExplorerFragment : Fragment() {
 
     private fun onSeriesListItemInteraction(serie: SerieFull) {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
-        listItemViewModel.setItemList(ListTypes.VOLUMES.ordinal, emptyList())
+        val volumeFragContents = listItemViewModel.getContentLiveData(ListTypes.VOLUMES.ordinal)
+        volumeFragContents.item.value = emptyList()
+        volumeFragContents.header.value = listOf(serie)
+        volumeFragContents.reloading.value = true
+
         viewModel.curSerie = serie.serie
-        listItemViewModel.setHeaderList(ListTypes.VOLUMES.ordinal, listOf(serie))
-        listItemViewModel.setIsReloading(ListTypes.VOLUMES.ordinal, true)
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
     private fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
-        listItemViewModel.setItemList(ListTypes.PARTS.ordinal, emptyList())
+        val partFragContents = listItemViewModel.getContentLiveData(ListTypes.PARTS.ordinal)
+        partFragContents.item.value = emptyList()
+        partFragContents.header.value = listOf(volume)
+        partFragContents.reloading.value = true
+
         viewModel.curVolume = volume.volume
-        listItemViewModel.setHeaderList(ListTypes.PARTS.ordinal, listOf(volume))
-        listItemViewModel.setIsReloading(ListTypes.PARTS.ordinal, true)
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
     private fun onPartsListItemInteraction(part: PartFull) {

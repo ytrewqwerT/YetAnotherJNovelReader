@@ -42,11 +42,12 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.getIsReloading(uid).observe(this) { swipeRefreshLayout?.isRefreshing = it }
-        viewModel.getHeaderList(uid).observe(this) {
+        val lists = viewModel.getContentLiveData(uid)
+        lists.reloading.observe(this) { swipeRefreshLayout?.isRefreshing = it }
+        lists.header.observe(this) {
             if (it != null) listHeaderAdapter.setItems(it)
         }
-        viewModel.getItemList(uid).observe(this) {
+        lists.item.observe(this) {
             if (it != null) listItemAdapter.setItems(it)
         }
     }
@@ -59,7 +60,7 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         recyclerView = view.findViewById(R.id.list)
 
-        swipeRefreshLayout?.setOnRefreshListener { viewModel.setIsReloading(uid, true) }
+        swipeRefreshLayout?.setOnRefreshListener { viewModel.getIsReloading(uid).value = true }
 
         recyclerView?.apply {
             layoutManager = LinearLayoutManager(context)
