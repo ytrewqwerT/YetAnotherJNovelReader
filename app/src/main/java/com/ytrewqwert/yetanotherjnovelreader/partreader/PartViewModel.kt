@@ -24,7 +24,7 @@ class PartViewModel(
 ) : ViewModel() {
     var pageWidthPx: Int private set
     var pageHeightPx: Int private set
-    val fontSizePx: Int
+    var fontSizePx: Int
 
     val errorEvent = SingleLiveEvent<String>()
     val partReady = SingleLiveEvent<Boolean>()
@@ -68,6 +68,7 @@ class PartViewModel(
         viewModelScope.launch {
             repository.getReaderSettingsFlow().collect {
                 _horizontalReader.value = it.isHorizontal
+                fontSizePx = Utils.spToPx(it.fontSize, displayMetrics)
                 _fontSize.value = it.fontSize
                 _fontStyle.value = it.fontStyle
                 _margin.value = it.margin

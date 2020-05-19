@@ -121,8 +121,8 @@ class PartActivity : AppCompatActivity() {
         }
         viewModel.horizontalReader.observe(this) { isHorizontal ->
             when (isHorizontal) {
-                true ->  setReaderFragment(PagedReaderFragment())
-                false -> setReaderFragment(ScrollReaderFragment())
+                true ->  setReaderFragment(PagedReaderFragment::class.java, "PagedReader")
+                false -> setReaderFragment(ScrollReaderFragment::class.java, "ScrollReader")
             }
         }
 
@@ -203,8 +203,10 @@ class PartActivity : AppCompatActivity() {
         contentAnimator.start()
     }
 
-    private fun setReaderFragment(frag: Fragment) {
-        supportFragmentManager.commit { replace(R.id.reader_container, frag) }
+    private fun <T : Fragment> setReaderFragment(fragClass: Class<T>, tag: String) {
+        val frag =
+            supportFragmentManager.findFragmentByTag(tag) ?: fragClass.newInstance()
+        supportFragmentManager.commit { replace(R.id.reader_container, frag, tag) }
     }
 
     private fun updatePageDimens() {
