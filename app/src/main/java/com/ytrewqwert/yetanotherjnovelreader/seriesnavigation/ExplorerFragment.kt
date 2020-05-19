@@ -98,22 +98,24 @@ class ExplorerFragment : Fragment() {
 
     private fun onSeriesListItemInteraction(serie: SerieFull) {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
+        viewModel.curSerie = serie.serie
+
         val volumeFragContents = listItemViewModel.getContentLiveData(ListTypes.VOLUMES.ordinal)
         volumeFragContents.item.value = emptyList()
         volumeFragContents.header.value = listOf(serie)
         volumeFragContents.reloading.value = true
 
-        viewModel.curSerie = serie.serie
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
     private fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
+        viewModel.curVolume = volume.volume
+
         val partFragContents = listItemViewModel.getContentLiveData(ListTypes.PARTS.ordinal)
         partFragContents.item.value = emptyList()
         partFragContents.header.value = listOf(volume)
         partFragContents.reloading.value = true
 
-        viewModel.curVolume = volume.volume
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
     private fun onPartsListItemInteraction(part: PartFull) {
