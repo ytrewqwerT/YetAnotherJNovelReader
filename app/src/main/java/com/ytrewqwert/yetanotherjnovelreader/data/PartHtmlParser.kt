@@ -62,8 +62,6 @@ object PartHtmlParser {
     private fun processTagPair(
         tagLabelTokens: List<CharSequence>, tagContents: SpannableStringBuilder
     ) {
-        var appendNewLine = false
-
         val label = tagLabelTokens[0]
         val args = tagLabelTokens.subList(1, tagLabelTokens.size)
 
@@ -71,7 +69,8 @@ object PartHtmlParser {
             "h1", "h2", "h3", "h4", "h5", "h6" -> {
                 warnIfArgsNotEmpty(label, args)
                 applyHeaderSpans(tagContents, label[1] - '0')
-                appendNewLine = true
+                tagContents.insert(0, "\n")
+                tagContents.append("\n")
             }
             "p" -> {
                 var centered = false
@@ -89,7 +88,7 @@ object PartHtmlParser {
                 if (!centered) {
                     applySpans(tagContents, LeadingMarginSpan.Standard(100, 0))
                 }
-                appendNewLine = true
+                tagContents.append("\n")
             }
             "b" -> {
                 warnIfArgsNotEmpty(label, args)
@@ -104,7 +103,6 @@ object PartHtmlParser {
                 warnIfArgsNotEmpty(label, args)
             }
         }
-        if (appendNewLine) tagContents.append("\n")
     }
 
     private fun processLoneTag(
