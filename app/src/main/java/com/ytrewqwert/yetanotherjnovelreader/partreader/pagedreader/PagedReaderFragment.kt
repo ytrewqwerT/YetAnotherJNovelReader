@@ -12,7 +12,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.viewpager2.widget.ViewPager2
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.Utils
 import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PrefDefaults
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
@@ -52,8 +54,10 @@ class PagedReaderFragment : Fragment() {
         partViewModel.contents.observe(viewLifecycleOwner) {
             pagedReaderViewModel.pageWidth = partViewModel.pageWidthPx
             pagedReaderViewModel.pageHeight = partViewModel.pageHeightPx
+            val fontSize = partViewModel.fontSize.value ?: PrefDefaults.FONT_SIZE
+            val fontPx = Utils.spToPx(fontSize, resources.displayMetrics)
             pagedReaderViewModel.paint = TextPaint().apply {
-                textSize = partViewModel.fontSizePx.toFloat()
+                textSize = fontPx.toFloat()
                 typeface = partViewModel.fontStyle.value
             }
             val numPages = pagedReaderViewModel.setContents(it)

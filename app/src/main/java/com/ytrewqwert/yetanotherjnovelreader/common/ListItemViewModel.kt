@@ -59,10 +59,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             }
             else -> return
         }
-        val follow =
-            Follow(
-                serieId
-            )
+        val follow = Follow(serieId)
         viewModelScope.launch {
             if (following) repository.deleteFollows(follow)
             else repository.insertFollows(follow)

@@ -9,7 +9,6 @@ import android.text.Spanned
 import android.text.style.ImageSpan
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
-import com.ytrewqwert.yetanotherjnovelreader.Utils
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
@@ -24,7 +23,6 @@ class PartViewModel(
 ) : ViewModel() {
     var pageWidthPx: Int private set
     var pageHeightPx: Int private set
-    var fontSizePx: Int
 
     val errorEvent = SingleLiveEvent<String>()
     val partReady = SingleLiveEvent<Boolean>()
@@ -54,10 +52,6 @@ class PartViewModel(
         pageWidthPx = 0
         pageHeightPx = 0
 
-        val displayMetrics = resources.displayMetrics
-        val fontSizeSp = fontSize.value ?: 15
-        fontSizePx = Utils.spToPx(fontSizeSp, displayMetrics)
-
         viewModelScope.launch {
             getPartData()
             savedProgress = repository.getParts(partId).getOrNull(0)?.progress?.progress ?: 0.0
@@ -68,7 +62,6 @@ class PartViewModel(
         viewModelScope.launch {
             repository.getReaderSettingsFlow().collect {
                 _horizontalReader.value = it.isHorizontal
-                fontSizePx = Utils.spToPx(it.fontSize, displayMetrics)
                 _fontSize.value = it.fontSize
                 _fontStyle.value = it.fontStyle
                 _margin.value = it.margin
