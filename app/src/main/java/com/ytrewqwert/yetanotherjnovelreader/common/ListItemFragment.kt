@@ -14,12 +14,14 @@ import androidx.recyclerview.widget.MergeAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooter
+import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooterRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItemRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 
-class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
+class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource, ListFooter.InteractionListener {
     companion object {
         private const val TAG = "ListItemFragment"
         const val ARG_ID = "${TAG}_ID"
@@ -34,7 +36,8 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
 
     private val listHeaderAdapter = ListHeaderRecyclerViewAdapter(this)
     private val listItemAdapter = ListItemRecyclerViewAdapter(this, this)
-    private val recyclerViewAdapter = MergeAdapter(listHeaderAdapter, listItemAdapter)
+    private val listFooterAdapter = ListFooterRecyclerViewAdapter(this)
+    private val recyclerViewAdapter = MergeAdapter(listHeaderAdapter, listItemAdapter, listFooterAdapter)
 
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null
@@ -42,12 +45,11 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val lists = viewModel.getContentLiveData(uid)
-        lists.reloading.observe(this) { swipeRefreshLayout?.isRefreshing = it }
-        lists.header.observe(this) {
+        viewModel.getIsReloading(uid).observe(this) { swipeRefreshLayout?.isRefreshing = it }
+        viewModel.getHeaderList(uid).observe(this) {
             if (it != null) listHeaderAdapter.setItems(it)
         }
-        lists.item.observe(this) {
+        viewModel.getItemList(uid).observe(this) {
             if (it != null) listItemAdapter.setItems(it)
         }
     }
@@ -96,4 +98,6 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource {
     override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
         viewModel.getImage(source, callback)
     }
+
+    override fun onFooterReached() { viewModel.fetchNextPage(uid) }
 }

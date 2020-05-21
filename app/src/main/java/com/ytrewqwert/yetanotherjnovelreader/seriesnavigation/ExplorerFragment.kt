@@ -100,10 +100,11 @@ class ExplorerFragment : Fragment() {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
         viewModel.curSerie = serie.serie
 
-        val volumeFragContents = listItemViewModel.getContentLiveData(ListTypes.VOLUMES.ordinal)
-        volumeFragContents.item.value = emptyList()
-        volumeFragContents.header.value = listOf(serie)
-        volumeFragContents.reloading.value = true
+        listItemViewModel.let {
+            it.getItemList(ListTypes.VOLUMES.ordinal).value = emptyList()
+            it.getHeaderList(ListTypes.VOLUMES.ordinal).value = listOf(serie)
+            it.getIsReloading(ListTypes.VOLUMES.ordinal).value = true
+        }
 
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
@@ -111,10 +112,11 @@ class ExplorerFragment : Fragment() {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
         viewModel.curVolume = volume.volume
 
-        val partFragContents = listItemViewModel.getContentLiveData(ListTypes.PARTS.ordinal)
-        partFragContents.item.value = emptyList()
-        partFragContents.header.value = listOf(volume)
-        partFragContents.reloading.value = true
+        listItemViewModel.let {
+            it.getItemList(ListTypes.PARTS.ordinal).value = emptyList()
+            it.getHeaderList(ListTypes.PARTS.ordinal).value = listOf(volume)
+            it.getIsReloading(ListTypes.PARTS.ordinal).value = true
+        }
 
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
