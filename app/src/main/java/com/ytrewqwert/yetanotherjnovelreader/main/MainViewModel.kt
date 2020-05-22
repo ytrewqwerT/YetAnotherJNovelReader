@@ -4,19 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
+import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
     val logoutEvent = SingleLiveEvent<Boolean>()
-
-    @ExperimentalCoroutinesApi
-    val recentParts = repository.getRecentParts(viewModelScope)
-        .combine(repository.isFilterFollowing) { parts, filterOn ->
-            parts.filter { !filterOn || it.isFollowed() }
-        }.asLiveData(viewModelScope.coroutineContext)
 
     @ExperimentalCoroutinesApi
     val isFilterFollowing =
@@ -26,9 +20,14 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch { logoutEvent.value = repository.logout() }
     }
 
-    fun fetchRecentParts(onComplete: (success: Boolean) -> Unit = {}) {
-        viewModelScope.launch { repository.getRecentParts(viewModelScope, onComplete) }
+    fun getRecentPartsSource(): ListItemViewModel.ListItemSource {
+        return ListItemViewModel.ListItemSource(
+            repository.getRecentPartsFlow()
+        ) { _, amount, offset ->
+            repository.fetchRecentParts(amount, offset)
+        }
     }
+
     fun loggedIn() = repository.loggedIn()
     fun getUsername() = repository.getUsername()
 

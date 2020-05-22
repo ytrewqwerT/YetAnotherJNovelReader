@@ -100,10 +100,12 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
-    suspend fun getSerieVolumesJson(serieId: String) =
+    suspend fun getSerieVolumesJson(serieId: String, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Volume>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/volumes")
                 .addFilter("serieId", serieId)
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,
@@ -118,10 +120,12 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
-    suspend fun getVolumePartsJson(volumeId: String) =
+    suspend fun getVolumePartsJson(volumeId: String, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
                 .addFilter("volumeId", volumeId)
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,
@@ -136,11 +140,13 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
-    suspend fun getPartsJsonAfter(time: Instant) =
+    suspend fun getPartsJsonAfter(time: Instant, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
                 .addFilter("launchDate", "{\"gt\":\"${time}\"}")
                 .addBaseFilter("order", "launchDate+DESC")
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,

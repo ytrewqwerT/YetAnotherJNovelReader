@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         observeViewModels()
     }
 
+    @ExperimentalCoroutinesApi
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         appBarMenu = menu
@@ -84,6 +85,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         fragment?.onResume()
     }
 
+    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
         R.id.account_login -> {
             if (mainViewModel.loggedIn()) {
@@ -109,9 +111,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
                     .show()
             }
         }
-        mainViewModel.recentParts.observe(this) {
-            recentsListViewModel.getItemList(recentPartsFragId).value = it
-        }
+        recentsListViewModel.setSource(recentPartsFragId, mainViewModel.getRecentPartsSource())
         mainViewModel.isFilterFollowing.observe(this) {
             val followMenuItem = appBarMenu?.findItem(R.id.following)
             followMenuItem?.isChecked = it
@@ -120,11 +120,6 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
 
         recentsListViewModel.itemClickedEvent.observe(this) {
             onPartsListItemInteraction(it.item as? PartFull)
-        }
-        recentsListViewModel.getIsReloading(recentPartsFragId).observe(this) {
-            if (it) mainViewModel.fetchRecentParts {
-                recentsListViewModel.getIsReloading(recentPartsFragId).value = false
-            }
         }
     }
 

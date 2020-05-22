@@ -35,8 +35,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
     }
 
     fun getHeaderList(fragId: Int): LiveData<List<ListHeader>?> = getHandler(fragId).header
-    fun getItemList(fragId: Int): MutableLiveData<List<ListItem>?> = getHandler(fragId).items
-    fun getIsReloading(fragId: Int): MutableLiveData<Boolean> = getHandler(fragId).reloading
+    fun getItemList(fragId: Int): LiveData<List<ListItem>?> = getHandler(fragId).items
 
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
         itemClickedEvent.value = ItemClickEvent(fragmentId, item)
@@ -77,9 +76,10 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         return lists[fragId]
     }
 
+
     fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
     fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
-    fun reload(fragId: Int) { getHandler(fragId).reload() }
+    fun reload(fragId: Int, onComplete: () -> Unit) { getHandler(fragId).reload(onComplete) }
     fun fetchNextPage(fragId: Int, onComplete: (morePages: Boolean) -> Unit = {}) {
         getHandler(fragId).fetchNextPage(onComplete)
     }
@@ -102,7 +102,6 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
         val header = MutableLiveData<List<ListHeader>?>(emptyList())
         val items = MutableLiveData<List<ListItem>?>(emptyList())
-        val reloading = MutableLiveData(true)
 
         private var itemsCap = PAGE_SIZE
             set(value) {
@@ -123,11 +122,11 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             }
         }
 
-        fun reload() {
+        fun reload(onComplete: () -> Unit) {
             itemsCap = 0
             listItemFetcher?.cancel()
             listItemFetcher = null
-            fetchNextPage()
+            fetchNextPage { onComplete() }
         }
 
         fun fetchNextPage(onComplete: (morePages: Boolean) -> Unit = {}) {
@@ -135,6 +134,8 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
             itemsCap += PAGE_SIZE
             listItemFetcher = viewModelScope.launch {
+                if (listItemSource == null) return@launch
+
                 val result = listItemSource?.fetchItems?.invoke(
                     this, PAGE_SIZE, itemsCap - PAGE_SIZE
                 )

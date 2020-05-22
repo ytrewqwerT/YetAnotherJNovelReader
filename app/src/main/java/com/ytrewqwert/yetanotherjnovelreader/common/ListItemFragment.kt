@@ -21,7 +21,9 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItemRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 
-class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource, ListFooter.InteractionListener {
+class ListItemFragment : Fragment(),
+    ListItem.InteractionListener, ImageSource, ListFooter.InteractionListener {
+
     companion object {
         private const val TAG = "ListItemFragment"
         const val ARG_ID = "${TAG}_ID"
@@ -45,7 +47,6 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource, 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.getIsReloading(uid).observe(this) { swipeRefreshLayout?.isRefreshing = it }
         viewModel.getHeaderList(uid).observe(this) {
             if (it != null) listHeaderAdapter.setItems(it)
         }
@@ -62,7 +63,9 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource, 
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         recyclerView = view.findViewById(R.id.list)
 
-        swipeRefreshLayout?.setOnRefreshListener { viewModel.getIsReloading(uid).value = true }
+        swipeRefreshLayout?.setOnRefreshListener {
+            viewModel.reload(uid) { swipeRefreshLayout?.isRefreshing = false }
+        }
 
         recyclerView?.apply {
             layoutManager = LinearLayoutManager(context)
@@ -100,8 +103,6 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource, 
     }
 
     override fun onFooterReached() {
-        // TODO: Temporary workaround to avoid recyclerview update amidst an update...
-        if (viewModel.getItemList(uid).value.isNullOrEmpty()) return
         viewModel.fetchNextPage(uid) {
             if (it) listFooterAdapter.show()
             else listFooterAdapter.hide()
