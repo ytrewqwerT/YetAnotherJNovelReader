@@ -12,7 +12,7 @@ class ParameterizedUrlBuilderTests {
                 "{\"where\":{\"launchDate\":{\"gt\":\"now\"}},\"order\":\"launchDate+DESC\"}"
         var actualUrl = ParameterizedURLBuilder("")
             .addFilter("launchDate", "{\"gt\":\"now\"}")
-            .addOrder("launchDate+DESC")
+            .addBaseFilter("order", "launchDate+DESC")
             .build()
         assertEquals(expectedUrl, actualUrl)
 

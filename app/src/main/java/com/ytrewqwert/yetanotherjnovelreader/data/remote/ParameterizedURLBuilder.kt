@@ -10,7 +10,7 @@ class ParameterizedURLBuilder(
 
     private val filters = HashMap<String, String>()
     private val includes = ArrayList<String>()
-    private var order: String? = null
+    private val baseFilters = ArrayList<Pair<String, String>>()
 
     fun addFilter(key: String, value: String): ParameterizedURLBuilder {
         filters[key] = value
@@ -20,8 +20,8 @@ class ParameterizedURLBuilder(
         includes.add(value)
         return this
     }
-    fun addOrder(value: String): ParameterizedURLBuilder {
-        order = value
+    fun addBaseFilter(type: String, value: String): ParameterizedURLBuilder {
+        baseFilters.add(Pair(type, value))
         return this
     }
 
@@ -31,7 +31,7 @@ class ParameterizedURLBuilder(
         val filteredUrl = StringJoiner(",", "${baseUrl}?filter={", "}")
         if (filters.isNotEmpty()) filteredUrl.add(generateFilterString())
         if (includes.isNotEmpty()) filteredUrl.add(generateIncludeString())
-        if (order != null) filteredUrl.add(generateOrderString())
+        if (baseFilters.isNotEmpty()) filteredUrl.add(generateBaseFiltersString())
 
         return filteredUrl.toString()
     }
@@ -52,7 +52,11 @@ class ParameterizedURLBuilder(
         for (includeVal in includes) includeString.add("\"${includeVal}\"")
         return includeString.toString()
     }
-    private fun generateOrderString(): String {
-        return "\"order\":\"${order}\""
+    private fun generateBaseFiltersString(): String {
+        val filterString = StringJoiner(",")
+        for (f in baseFilters) {
+            filterString.add("\"${f.first}\":\"${f.second}\"")
+        }
+        return filterString.toString()
     }
 }

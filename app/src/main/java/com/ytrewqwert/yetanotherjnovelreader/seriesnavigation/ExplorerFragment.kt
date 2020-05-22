@@ -59,9 +59,8 @@ class ExplorerFragment : Fragment() {
 
     @ExperimentalCoroutinesApi
     private fun observeViewModels() {
-        viewModel.seriesList.observe(this) {
-            listItemViewModel.getItemList(ListTypes.SERIES.ordinal).value = it
-        }
+        listItemViewModel.setSource(ListTypes.SERIES.ordinal, viewModel.getSeriesSource())
+
         viewModel.volumesList.observe(this) {
             listItemViewModel.getItemList(ListTypes.VOLUMES.ordinal).value = it
         }
@@ -70,11 +69,6 @@ class ExplorerFragment : Fragment() {
         }
 
         listItemViewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
-        listItemViewModel.getIsReloading(ListTypes.SERIES.ordinal).observe(this) {
-            if (it) viewModel.fetchSeries {
-                listItemViewModel.getIsReloading(ListTypes.SERIES.ordinal).value = false
-            }
-        }
         listItemViewModel.getIsReloading(ListTypes.VOLUMES.ordinal).observe(this) {
             if (it) viewModel.fetchSerieVolumes {
                 listItemViewModel.getIsReloading(ListTypes.VOLUMES.ordinal).value = false
@@ -102,7 +96,7 @@ class ExplorerFragment : Fragment() {
 
         listItemViewModel.let {
             it.getItemList(ListTypes.VOLUMES.ordinal).value = emptyList()
-            it.getHeaderList(ListTypes.VOLUMES.ordinal).value = listOf(serie)
+            it.setHeader(ListTypes.VOLUMES.ordinal, serie)
             it.getIsReloading(ListTypes.VOLUMES.ordinal).value = true
         }
 
@@ -114,7 +108,7 @@ class ExplorerFragment : Fragment() {
 
         listItemViewModel.let {
             it.getItemList(ListTypes.PARTS.ordinal).value = emptyList()
-            it.getHeaderList(ListTypes.PARTS.ordinal).value = listOf(volume)
+            it.setHeader(ListTypes.PARTS.ordinal, volume)
             it.getIsReloading(ListTypes.PARTS.ordinal).value = true
         }
 

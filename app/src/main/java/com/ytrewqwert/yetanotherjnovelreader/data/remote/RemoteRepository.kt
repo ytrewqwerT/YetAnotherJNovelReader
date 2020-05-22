@@ -80,23 +80,26 @@ class RemoteRepository private constructor(
             requestQueue.add(request)
         }
 
-    suspend fun getSeriesJson() =
+    suspend fun getSeriesJson(amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Serie>?> { cont ->
-        val url = "$API_ADDR/series"
-        val request = JsonArrayRequest(
-            Request.Method.GET, url, null,
-            Response.Listener {
-                Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
-                Log.v(TAG, it.toString(4))
-                cont.resume(Serie.fromJson(it))
-            },
-            Response.ErrorListener {
-                Log.w(TAG, "SeriesFailure: $it")
-                cont.resume(null)
-            }
-        )
-        requestQueue.add(request)
-    }
+            val url = ParameterizedURLBuilder("$API_ADDR/series")
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
+                .build()
+            val request = JsonArrayRequest(
+                Request.Method.GET, url, null,
+                Response.Listener {
+                    Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
+                    Log.v(TAG, it.toString(4))
+                    cont.resume(Serie.fromJson(it))
+                },
+                Response.ErrorListener {
+                    Log.w(TAG, "SeriesFailure: $it")
+                    cont.resume(null)
+                }
+            )
+            requestQueue.add(request)
+        }
     suspend fun getSerieVolumesJson(serieId: String) =
         suspendCancellableCoroutine<List<Volume>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/volumes")
@@ -137,7 +140,7 @@ class RemoteRepository private constructor(
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
                 .addFilter("launchDate", "{\"gt\":\"${time}\"}")
-                .addOrder("launchDate+DESC")
+                .addBaseFilter("order", "launchDate+DESC")
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,

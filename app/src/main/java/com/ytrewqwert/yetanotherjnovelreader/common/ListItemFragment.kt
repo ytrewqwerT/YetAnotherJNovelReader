@@ -99,5 +99,12 @@ class ListItemFragment : Fragment(), ListItem.InteractionListener, ImageSource, 
         viewModel.getImage(source, callback)
     }
 
-    override fun onFooterReached() { viewModel.fetchNextPage(uid) }
+    override fun onFooterReached() {
+        // TODO: Temporary workaround to avoid recyclerview update amidst an update...
+        if (viewModel.getItemList(uid).value.isNullOrEmpty()) return
+        viewModel.fetchNextPage(uid) {
+            if (it) listFooterAdapter.show()
+            else listFooterAdapter.hide()
+        }
+    }
 }

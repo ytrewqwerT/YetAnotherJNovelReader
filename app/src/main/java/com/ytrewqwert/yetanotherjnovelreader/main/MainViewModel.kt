@@ -18,6 +18,7 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
             parts.filter { !filterOn || it.isFollowed() }
         }.asLiveData(viewModelScope.coroutineContext)
 
+    @ExperimentalCoroutinesApi
     val isFilterFollowing =
         repository.isFilterFollowing.asLiveData(viewModelScope.coroutineContext)
 
@@ -31,6 +32,7 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     fun loggedIn() = repository.loggedIn()
     fun getUsername() = repository.getUsername()
 
+    @ExperimentalCoroutinesApi
     fun toggleFilterFollowing() {
         repository.setIsFilterFollowing(isFilterFollowing.value == false)
     }
