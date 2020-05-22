@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.Spanned
+import android.util.Log
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
@@ -12,6 +13,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFu
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -31,9 +33,11 @@ class Repository private constructor(appContext: Context) {
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
+    @ExperimentalCoroutinesApi
     val isFilterFollowing get() = prefStore.isFilterFollowing
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
+    @ExperimentalCoroutinesApi
     fun getReaderSettingsFlow() = prefStore.readerSettings
 
     suspend fun getImage(source: String): Bitmap? = remote.getImage(source)
@@ -44,14 +48,25 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getSeries(
-        scope: CoroutineScope, onComplete: (success: Boolean) -> Unit = {}
+        scope: CoroutineScope, amount: Int, offset: Int, onComplete: (result: FetchResult?) -> Unit
     ): Flow<List<SerieFull>> {
         scope.launch {
-            val series = remote.getSeriesJson()
-            if (series != null) local.upsertSeries(*series.toTypedArray())
-            onComplete(series != null)
+            val series = remote.getSeriesJson(amount, offset)
+            if (series != null) {
+                local.upsertSeries(*series.toTypedArray())
+                if (series.size == amount) onComplete(FetchResult.FULL_PAGE)
+                else onComplete(FetchResult.PART_PAGE)
+            } else {
+                onComplete(null)
+            }
+            Log.d("Repository", "getSeries result: $series")
         }
         return local.getSeries()
+    }
+    fun getSeries(
+        scope: CoroutineScope, onComplete: (result: FetchResult?) -> Unit = {}
+    ): Flow<List<SerieFull>> {
+        return getSeries(scope, 20, 0, onComplete)
     }
     fun getSerieVolumes(
         scope: CoroutineScope, serieId: String, onComplete: (success: Boolean) -> Unit = {}
