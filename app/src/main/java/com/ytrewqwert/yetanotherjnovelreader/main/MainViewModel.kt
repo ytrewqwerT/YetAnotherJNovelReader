@@ -7,6 +7,8 @@ import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
@@ -20,9 +22,14 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch { logoutEvent.value = repository.logout() }
     }
 
+    @ExperimentalCoroutinesApi
     fun getRecentPartsSource(): ListItemViewModel.ListItemSource {
+        val filteredPartsFlow = repository.getRecentPartsFlow()
+            .combine(repository.isFilterFollowing) { series, filterOn ->
+                series.filter { !filterOn || it.isFollowed() }
+            }.distinctUntilChanged()
         return ListItemViewModel.ListItemSource(
-            repository.getRecentPartsFlow()
+            filteredPartsFlow
         ) { _, amount, offset ->
             repository.fetchRecentParts(amount, offset)
         }
