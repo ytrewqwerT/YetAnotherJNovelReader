@@ -64,6 +64,7 @@ class ListItemFragment : Fragment(),
         recyclerView = view.findViewById(R.id.list)
 
         swipeRefreshLayout?.setOnRefreshListener {
+            listFooterAdapter.show()
             viewModel.reload(uid) { swipeRefreshLayout?.isRefreshing = false }
         }
 
