@@ -11,12 +11,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.Period
 
 class Repository private constructor(appContext: Context) {
     companion object {
@@ -70,10 +66,9 @@ class Repository private constructor(appContext: Context) {
         else FetchResult.PART_PAGE
     }
 
-    fun getRecentPartsFlow(): Flow<List<PartFull>> = local.getPartsSince(Instant.now().minus(Period.ofDays(30)).toString())
+    fun getRecentPartsFlow(): Flow<List<PartFull>> = local.getRecentParts()
     suspend fun fetchRecentParts(amount: Int, offset: Int): FetchResult? {
-        val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
-        val parts = remote.getPartsJsonAfter(oneMonthAgo, amount, offset) ?: return null
+        val parts = remote.getRecentParts(amount, offset) ?: return null
         local.upsertParts(*parts.toTypedArray())
         return if (parts.size == amount) FetchResult.FULL_PAGE
         else FetchResult.PART_PAGE

@@ -18,7 +18,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
-import java.time.Instant
 import kotlin.coroutines.resume
 
 class RemoteRepository private constructor(
@@ -140,10 +139,9 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
-    suspend fun getPartsJsonAfter(time: Instant, amount: Int, offset: Int) =
+    suspend fun getRecentParts(amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
-                .addFilter("launchDate", "{\"gt\":\"${time}\"}")
                 .addBaseFilter("order", "launchDate+DESC")
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")

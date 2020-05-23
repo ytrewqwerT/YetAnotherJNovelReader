@@ -13,8 +13,8 @@ abstract class PartDao : BaseDao<Part>() {
     abstract suspend fun getParts(vararg partId: String): List<PartFull>
 
     @Transaction
-    @Query("SELECT * FROM Part WHERE launchDate >= :time ORDER BY launchDate DESC")
-    abstract fun getPartsSince(time: String): Flow<List<PartFull>>
+    @Query("SELECT * FROM Part ORDER BY launchDate DESC")
+    abstract fun getRecentParts(): Flow<List<PartFull>>
 
     @Transaction
     @Query("SELECT * FROM Part WHERE volumeId = :volumeId ORDER BY seriesPartNum ASC")
