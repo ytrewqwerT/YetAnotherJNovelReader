@@ -27,7 +27,7 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         val filteredPartsFlow = repository.getRecentPartsFlow()
             .combine(repository.isFilterFollowing) { series, filterOn ->
                 series.filter { !filterOn || it.isFollowed() }
-            }.distinctUntilChanged()
+            }
         return ListItemViewModel.ListItemSource(
             filteredPartsFlow
         ) { _, amount, offset ->

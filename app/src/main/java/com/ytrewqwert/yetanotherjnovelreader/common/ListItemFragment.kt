@@ -2,6 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.common
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,12 @@ class ListItemFragment : Fragment(),
             if (it != null) listHeaderAdapter.setItems(it)
         }
         viewModel.getItemList(uid).observe(this) {
+            Log.d("ListItemFragment", "$uid's Items updated to length ${it?.size}")
             if (it != null) listItemAdapter.setItems(it)
+        }
+        viewModel.getIsReloading(uid).observe(this) {
+            swipeRefreshLayout?.isRefreshing = it
+            if (it) listFooterAdapter.show()
         }
     }
 
@@ -64,8 +70,7 @@ class ListItemFragment : Fragment(),
         recyclerView = view.findViewById(R.id.list)
 
         swipeRefreshLayout?.setOnRefreshListener {
-            listFooterAdapter.show()
-            viewModel.reload(uid) { swipeRefreshLayout?.isRefreshing = false }
+            viewModel.reload(uid)
         }
 
         recyclerView?.apply {

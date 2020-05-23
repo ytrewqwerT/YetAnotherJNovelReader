@@ -36,6 +36,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     fun getHeaderList(fragId: Int): LiveData<List<ListHeader>?> = getHandler(fragId).header
     fun getItemList(fragId: Int): LiveData<List<ListItem>?> = getHandler(fragId).items
+    fun getIsReloading(fragId: Int): LiveData<Boolean> = getHandler(fragId).reloading
 
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
         itemClickedEvent.value = ItemClickEvent(fragmentId, item)
@@ -79,7 +80,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
     fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
-    fun reload(fragId: Int, onComplete: () -> Unit) { getHandler(fragId).reload(onComplete) }
+    fun reload(fragId: Int) { getHandler(fragId).reload() }
     fun fetchNextPage(fragId: Int, onComplete: (morePages: Boolean) -> Unit = {}) {
         getHandler(fragId).fetchNextPage(onComplete)
     }
@@ -102,6 +103,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
         val header = MutableLiveData<List<ListHeader>?>(emptyList())
         val items = MutableLiveData<List<ListItem>?>(emptyList())
+        val reloading = MutableLiveData(false)
 
         private var itemsCap = PAGE_SIZE
             set(value) {
@@ -120,13 +122,15 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
                     items.value = it.subList(0, it.size.coerceAtMost(itemsCap))
                 }
             }
+            reload()
         }
 
-        fun reload(onComplete: () -> Unit) {
+        fun reload() {
+            reloading.value = true
             itemsCap = 0
             listItemFetcher?.cancel()
             listItemFetcher = null
-            fetchNextPage { onComplete() }
+            fetchNextPage { reloading.value = false }
         }
 
         fun fetchNextPage(onComplete: (morePages: Boolean) -> Unit = {}) {

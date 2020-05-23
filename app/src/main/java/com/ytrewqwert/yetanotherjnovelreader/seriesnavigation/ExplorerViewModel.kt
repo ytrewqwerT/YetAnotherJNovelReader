@@ -16,7 +16,7 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
         val filteredSeriesFlow = repository.getSeriesFlow()
             .combine(repository.isFilterFollowing) { series, filterOn ->
                 series.filter { !filterOn || it.isFollowed() }
-            }.distinctUntilChanged()
+            }
         return ListItemViewModel.ListItemSource(filteredSeriesFlow) { _, amount, offset ->
             repository.fetchSeries(amount, offset)
         }
