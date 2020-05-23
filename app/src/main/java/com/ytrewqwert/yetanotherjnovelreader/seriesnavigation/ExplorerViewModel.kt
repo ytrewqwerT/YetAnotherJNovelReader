@@ -13,11 +13,9 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
 
     @ExperimentalCoroutinesApi
     fun getSeriesSource(): ListItemViewModel.ListItemSource {
-        val filteredSeriesFlow = repository.getSeriesFlow()
-            .combine(repository.isFilterFollowing) { series, filterOn ->
-                series.filter { !filterOn || it.isFollowed() }
-            }
-        return ListItemViewModel.ListItemSource(filteredSeriesFlow) { _, amount, offset ->
+        return ListItemViewModel.ListItemSource(
+            repository.getSeriesFlow()
+        ) { _, amount, offset ->
             repository.fetchSeries(amount, offset)
         }
     }

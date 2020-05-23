@@ -10,7 +10,7 @@ data class VolumeFull(
     @Embedded val volume: Volume,
     @Relation(parentColumn = "serieId", entityColumn = "serieId") private val following: Follow?
 ) : ListItem, ListHeader {
-    fun isFollowed(): Boolean = following != null
+    override fun isFollowed(): Boolean = following != null
 
     override fun getListItemContents(): ListItem.Contents {
         var contents = volume.getListItemContents()

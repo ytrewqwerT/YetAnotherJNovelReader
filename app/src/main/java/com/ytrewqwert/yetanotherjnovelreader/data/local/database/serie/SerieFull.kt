@@ -10,7 +10,7 @@ data class SerieFull(
     @Embedded val serie: Serie,
     @Relation(parentColumn = "id", entityColumn = "serieId") private val following: Follow?
 ) : ListItem, ListHeader {
-    fun isFollowed(): Boolean = following != null
+    override fun isFollowed(): Boolean = following != null
 
     override fun getListItemContents(): ListItem.Contents {
         var contents = serie.getListItemContents()

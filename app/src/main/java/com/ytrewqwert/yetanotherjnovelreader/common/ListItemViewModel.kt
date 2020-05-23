@@ -17,9 +17,9 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
@@ -79,6 +79,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
 
     fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
+    @ExperimentalCoroutinesApi
     fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
     fun reload(fragId: Int) { getHandler(fragId).reload() }
     fun fetchNextPage(fragId: Int, onComplete: (morePages: Boolean) -> Unit = {}) {
@@ -112,15 +113,19 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             }
 
         fun setHeader(value: ListHeader) { header.value = listOf(value) }
+        @ExperimentalCoroutinesApi
         fun setDataSource(newSource: ListItemSource) {
             listItemSource = newSource
             listItemFlowCollector.job = viewModelScope.launch {
-                newSource.sourceFlow.collect {
-                    latestItems = it
-                    // Since the fetching from remote is paginated, cap the shown list to ensure
-                    // that the items are properly updated with remote as the user scrolls down.
-                    items.value = it.subList(0, it.size.coerceAtMost(itemsCap))
-                }
+                newSource.sourceFlow.map { it.subList(0, it.size.coerceAtMost(itemsCap)) }
+                    .combine(repository.isFilterFollowing) { items, filterOn ->
+                        items.filter { !filterOn || it.isFollowed() }
+                    }.collect {
+                        latestItems = it
+                        // Since the fetching from remote is paginated, cap the shown list to ensure
+                        // that the items are properly updated with remote as the user scrolls down.
+                        items.value = it.subList(0, it.size.coerceAtMost(itemsCap))
+                    }
             }
             reload()
         }

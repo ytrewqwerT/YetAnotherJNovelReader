@@ -11,7 +11,7 @@ data class PartFull(
     @Relation(parentColumn = "id", entityColumn = "partId") val progress: Progress?,
     @Relation(parentColumn = "serieId", entityColumn = "serieId") private val following: Follow?
 ) : ListItem {
-    fun isFollowed(): Boolean = following != null
+    override fun isFollowed(): Boolean = following != null
 
     override fun getListItemContents(): ListItem.Contents {
         var contents = part.getListItemContents()
