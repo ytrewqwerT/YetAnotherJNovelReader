@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
     companion object {
-        private const val PAGE_SIZE = 20
+        private const val PAGE_SIZE = 50
     }
 
     private val lists = ArrayList<SingleListHandler>()
