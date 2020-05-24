@@ -43,14 +43,8 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
-    suspend fun fetchSeries(amount: Int, offset: Int): FetchResult? {
-        val series = remote.getSeriesJson(amount, offset) ?: return null
-        local.upsertSeries(*series.toTypedArray())
-        return if (series.size == amount) FetchResult.FULL_PAGE
-        else FetchResult.PART_PAGE
-    }
-    suspend fun fetchSeriesFollowed(amount: Int, offset: Int): FetchResult? {
-        val follows = local.getAllFollows().map { it.serieId }
+    suspend fun fetchSeries(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
+        val follows = if (followedOnly) local.getAllFollows().map { it.serieId} else null
         val series = remote.getSeriesJson(amount, offset, follows) ?: return null
         local.upsertSeries(*series.toTypedArray())
         return if (series.size == amount) FetchResult.FULL_PAGE
@@ -74,14 +68,8 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getRecentPartsFlow(): Flow<List<PartFull>> = local.getRecentParts()
-    suspend fun fetchRecentParts(amount: Int, offset: Int): FetchResult? {
-        val parts = remote.getRecentParts(amount, offset) ?: return null
-        local.upsertParts(*parts.toTypedArray())
-        return if (parts.size == amount) FetchResult.FULL_PAGE
-        else FetchResult.PART_PAGE
-    }
-    suspend fun fetchRecentPartsFollowed(amount: Int, offset: Int): FetchResult? {
-        val follows = local.getAllFollows().map { it.serieId }
+    suspend fun fetchRecentParts(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
+        val follows = if (followedOnly) local.getAllFollows().map { it.serieId} else null
         val parts = remote.getRecentParts(amount, offset, follows) ?: return null
         local.upsertParts(*parts.toTypedArray())
         return if (parts.size == amount) FetchResult.FULL_PAGE

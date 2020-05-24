@@ -16,17 +16,15 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     val isFilterFollowing =
         repository.isFilterFollowing.asLiveData(viewModelScope.coroutineContext)
 
-    fun logout() {
-        viewModelScope.launch { logoutEvent.value = repository.logout() }
-    }
+    fun logout() { viewModelScope.launch { logoutEvent.value = repository.logout() } }
 
     @ExperimentalCoroutinesApi
     fun getRecentPartsSource(): ListItemViewModel.ListItemSource {
         return ListItemViewModel.ListItemSource(
             repository.getRecentPartsFlow()
         ) { amount, offset, followedOnly ->
-            if (followedOnly) repository.fetchRecentPartsFollowed(amount, offset)
-            else repository.fetchRecentParts(amount, offset)
+            if (followedOnly) repository.fetchRecentParts(amount, offset, true)
+            else repository.fetchRecentParts(amount, offset, false)
         }
     }
 

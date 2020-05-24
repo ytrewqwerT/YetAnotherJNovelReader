@@ -10,23 +10,14 @@ class ListFooterRecyclerViewAdapter(
     private val listener: ListFooter.InteractionListener? = null
 ) : RecyclerView.Adapter<ListFooterRecyclerViewAdapter.ViewHolder>() {
 
-    private var isHidden = false
+    var isVisible = false
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
-    fun show() {
-        isHidden = false
-        notifyDataSetChanged()
-    }
-    fun hide() {
-        isHidden = true
-        notifyDataSetChanged()
-    }
-
-    override fun getItemCount(): Int = if (isHidden) 0 else 1
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        listener?.onFooterReached()
-    }
-
+    override fun getItemCount(): Int = if (isVisible) 1 else 0
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) { listener?.onFooterReached() }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_footer, parent, false)

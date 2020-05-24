@@ -15,8 +15,8 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
         return ListItemViewModel.ListItemSource(
             repository.getSeriesFlow()
         ) { amount, offset, followedOnly ->
-            if (followedOnly) repository.fetchSeriesFollowed(amount, offset)
-            else repository.fetchSeries(amount, offset)
+            if (followedOnly) repository.fetchSeries(amount, offset, true)
+            else repository.fetchSeries(amount, offset, false)
         }
     }
 

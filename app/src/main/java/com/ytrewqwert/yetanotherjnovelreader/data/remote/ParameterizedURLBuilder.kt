@@ -8,13 +8,13 @@ class ParameterizedURLBuilder(
     private val baseUrl: String
 ) {
 
-    private val filters = HashMap<String, String>()
     private var seriesFilters: List<String>? = null
-    private val includes = ArrayList<String>()
+    private val whereFilters = HashMap<String, String>()
     private val baseFilters = ArrayList<Pair<String, String>>()
+    private val includes = ArrayList<String>()
 
     fun addFilter(key: String, value: String): ParameterizedURLBuilder {
-        filters[key] = value
+        whereFilters[key] = value
         return this
     }
     fun setSeriesFilters(seriesIds: List<String>?): ParameterizedURLBuilder {
@@ -34,39 +34,43 @@ class ParameterizedURLBuilder(
 
     override fun toString(): String {
         val filteredUrl = StringJoiner(",", "${baseUrl}?filter={", "}")
-        if (filters.isNotEmpty()) filteredUrl.add(generateFilterString())
+        val filterString = generateBaseFiltersString()
+        if (filterString.isNotBlank()) filteredUrl.add(filterString)
         if (includes.isNotEmpty()) filteredUrl.add(generateIncludeString())
-        if (baseFilters.isNotEmpty()) filteredUrl.add(generateBaseFiltersString())
 
         return filteredUrl.toString()
     }
 
-    private fun generateFilterString(): String {
-        generateSeriesFilterString()
-        val filterString = StringJoiner(",", "\"where\":{", "}")
-        for (key in filters.keys) {
-            if (filters[key]!![0] == '{' || filters[key]!![0] == '[') {
-                filterString.add("\"${key}\":${filters[key]}")
-            } else {
-                filterString.add("\"${key}\":\"${filters[key]}\"")
-            }
-        }
-        return filterString.toString()
-    }
-    private fun generateSeriesFilterString() {
-        val result = seriesFilters?.map { "{\"id\":\"$it\"}" } ?: return
-        filters["or"] = result.joinToString(",", "[", "]")
-    }
-    private fun generateIncludeString(): String {
-        val includeString = StringJoiner(",", "\"include\":[", "]")
-        for (includeVal in includes) includeString.add("\"${includeVal}\"")
-        return includeString.toString()
-    }
     private fun generateBaseFiltersString(): String {
+        generateWhereFilterString()
+        if (baseFilters.isEmpty()) return ""
         val filterString = StringJoiner(",")
         for (f in baseFilters) {
             filterString.add("\"${f.first}\":\"${f.second}\"")
         }
         return filterString.toString()
+    }
+    private fun generateWhereFilterString() {
+        generateSeriesFilterString()
+        if (whereFilters.keys.isEmpty()) return
+        val filterString = StringJoiner(",", "\"where\":{", "}")
+        for (key in whereFilters.keys) {
+            if (whereFilters[key]!![0] == '{' || whereFilters[key]!![0] == '[') {
+                filterString.add("\"${key}\":${whereFilters[key]}")
+            } else {
+                filterString.add("\"${key}\":\"${whereFilters[key]}\"")
+            }
+        }
+        baseFilters.add(Pair("where", filterString.toString()))
+    }
+    private fun generateSeriesFilterString() {
+        val result = seriesFilters?.map { "{\"id\":\"$it\"}" } ?: return
+        whereFilters["or"] = result.joinToString(",", "[", "]")
+    }
+
+    private fun generateIncludeString(): String {
+        val includeString = StringJoiner(",", "\"include\":[", "]")
+        for (includeVal in includes) includeString.add("\"${includeVal}\"")
+        return includeString.toString()
     }
 }

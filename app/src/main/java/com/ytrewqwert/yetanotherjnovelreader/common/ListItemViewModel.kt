@@ -1,7 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,6 +26,15 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         private const val PAGE_SIZE = 50
     }
 
+    data class ItemClickEvent(
+        val fragmentId: Int,
+        val item: ListItem
+    )
+    data class ListItemSource(
+        val sourceFlow: Flow<List<ListItem>>,
+        val fetchItems: suspend (amount: Int, offset: Int, followedOnly: Boolean) -> FetchResult?
+    )
+
     private val lists = ArrayList<SingleListHandler>()
     val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
 
@@ -46,29 +54,27 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
     fun getItemList(fragId: Int): LiveData<List<ListItem>?> = getHandler(fragId).items
     fun getIsReloading(fragId: Int): LiveData<Boolean> = getHandler(fragId).reloading
 
+    fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
+    @ExperimentalCoroutinesApi
+    fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
+    fun reload(fragId: Int) { getHandler(fragId).reload() }
+    fun fetchNextPage(fragId: Int, onComplete: (morePages: Boolean) -> Unit = {}) {
+        getHandler(fragId).fetchNextPage(onComplete)
+    }
+
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
         itemClickedEvent.value = ItemClickEvent(fragmentId, item)
     }
 
     fun toggleFollowItem(item: ListItem) {
-        val serieId: String
-        val following: Boolean
-        // Ugh
-        when (item) {
-            is PartFull -> {
-                serieId = item.part.serieId
-                following = item.isFollowed()
-            }
-            is VolumeFull -> {
-                serieId = item.volume.serieId
-                following = item.isFollowed()
-            }
-            is SerieFull -> {
-                serieId = item.serie.id
-                following = item.isFollowed()
-            }
+        val following: Boolean = item.isFollowed()
+        val serieId: String = when (item) {
+            is PartFull -> item.part.serieId
+            is VolumeFull -> item.volume.serieId
+            is SerieFull -> item.serie.id
             else -> return
         }
+
         val follow = Follow(serieId)
         viewModelScope.launch {
             if (following) repository.deleteFollows(follow)
@@ -85,25 +91,6 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         return lists[fragId]
     }
 
-
-    fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
-    @ExperimentalCoroutinesApi
-    fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
-    fun reload(fragId: Int) { getHandler(fragId).reload() }
-    fun fetchNextPage(fragId: Int, onComplete: (morePages: Boolean) -> Unit = {}) {
-        getHandler(fragId).fetchNextPage(onComplete)
-    }
-
-    data class ItemClickEvent(
-        val fragmentId: Int,
-        val item: ListItem
-    )
-
-    data class ListItemSource(
-        val sourceFlow: Flow<List<ListItem>>,
-        val fetchItems: suspend (amount: Int, offset: Int, followedOnly: Boolean) -> FetchResult?
-    )
-
     private inner class SingleListHandler {
         private var listItemSource: ListItemSource? = null
         private val listItemFlowCollector = JobHolder()
@@ -115,10 +102,6 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         val reloading = MutableLiveData(false)
 
         private var itemsCap = PAGE_SIZE
-            set(value) {
-                field = value
-                Log.d("SingleListHandler", "Length set to $value")
-            }
 
         fun setHeader(value: ListHeader) { header.value = listOf(value) }
         @ExperimentalCoroutinesApi
@@ -151,24 +134,28 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
             itemsCap += PAGE_SIZE
             listItemFetcher = viewModelScope.launch {
-                if (listItemSource == null) return@launch
+                onComplete(performFetch() ?: return@launch)
+            }
+        }
 
-                val result = listItemSource?.fetchItems?.invoke(
-                    PAGE_SIZE, itemsCap - PAGE_SIZE, false
-                )
-                // Note that when the fetch succeeds, the result is automatically propagated to the
-                // flow via a DB upsertion.
-                when (result) {
-                    FetchResult.FULL_PAGE -> onComplete(true)
-                    FetchResult.PART_PAGE -> onComplete(false)
-                    null -> {
-                        // Fetch failed; show next cached page from DB.
-                        items.value = latestItems.subList(
-                            0, latestItems.size.coerceAtMost(itemsCap)
-                        )
-                    }
+        private suspend fun performFetch(): Boolean? {
+            if (listItemSource == null) return null
+
+            val result = listItemSource?.fetchItems?.invoke(
+                PAGE_SIZE, itemsCap - PAGE_SIZE, false
+            )
+            // Note that when the fetch succeeds, the result is automatically propagated to the
+            // flow via a DB upsertion.
+            return when (result) {
+                FetchResult.FULL_PAGE -> true
+                FetchResult.PART_PAGE -> false
+                null -> {
+                    // Fetch failed; show next cached page from DB.
+                    items.value = latestItems.subList(0, latestItems.size.coerceAtMost(itemsCap))
+                    null
                 }
             }
         }
     }
+
 }

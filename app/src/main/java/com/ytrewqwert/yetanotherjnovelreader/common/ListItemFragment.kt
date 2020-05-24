@@ -2,7 +2,6 @@ package com.ytrewqwert.yetanotherjnovelreader.common
 
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,9 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecycle
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItemRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ListItemFragment : Fragment(),
     ListItem.InteractionListener, ImageSource, ListFooter.InteractionListener {
 
@@ -52,12 +53,11 @@ class ListItemFragment : Fragment(),
             if (it != null) listHeaderAdapter.setItems(it)
         }
         viewModel.getItemList(uid).observe(this) {
-            Log.d("ListItemFragment", "$uid's Items updated to length ${it?.size}")
             if (it != null) listItemAdapter.setItems(it)
         }
         viewModel.getIsReloading(uid).observe(this) {
             swipeRefreshLayout?.isRefreshing = it
-            if (it) listFooterAdapter.show()
+            if (it) listFooterAdapter.isVisible = it
         }
     }
 
@@ -69,10 +69,7 @@ class ListItemFragment : Fragment(),
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         recyclerView = view.findViewById(R.id.list)
 
-        swipeRefreshLayout?.setOnRefreshListener {
-            viewModel.reload(uid)
-        }
-
+        swipeRefreshLayout?.setOnRefreshListener { viewModel.reload(uid) }
         recyclerView?.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recyclerViewAdapter
@@ -90,10 +87,10 @@ class ListItemFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
-        // Force redraw for potentially updated list_item progress values
+        // Force redraw for potentially updated list_item progress values, possible when resuming
+        // after the user returns from PartActivity
         recyclerViewAdapter.notifyDataSetChanged()
     }
-
 
     override fun onClick(item: ListItem) {
         viewModel.listItemFragmentViewOnClick(uid, item)
@@ -103,15 +100,11 @@ class ListItemFragment : Fragment(),
         viewModel.toggleFollowItem(item)
     }
 
-
     override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
         viewModel.getImage(source, callback)
     }
 
     override fun onFooterReached() {
-        viewModel.fetchNextPage(uid) {
-            if (it) listFooterAdapter.show()
-            else listFooterAdapter.hide()
-        }
+        viewModel.fetchNextPage(uid) { listFooterAdapter.isVisible = it }
     }
 }
