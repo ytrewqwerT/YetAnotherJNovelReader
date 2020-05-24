@@ -11,11 +11,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.Period
 
 class Repository private constructor(appContext: Context) {
     companion object {
@@ -31,9 +28,11 @@ class Repository private constructor(appContext: Context) {
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
+    @ExperimentalCoroutinesApi
     val isFilterFollowing get() = prefStore.isFilterFollowing
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
+    @ExperimentalCoroutinesApi
     fun getReaderSettingsFlow() = prefStore.readerSettings
 
     suspend fun getImage(source: String): Bitmap? = remote.getImage(source)
@@ -43,46 +42,38 @@ class Repository private constructor(appContext: Context) {
         return PartHtmlParser.parse(partHtml)
     }
 
-    fun getSeries(
-        scope: CoroutineScope, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<SerieFull>> {
-        scope.launch {
-            val series = remote.getSeriesJson()
-            if (series != null) local.upsertSeries(*series.toTypedArray())
-            onComplete(series != null)
-        }
-        return local.getSeries()
+    fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
+    suspend fun fetchSeries(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
+        val follows = if (followedOnly) local.getAllFollows().map { it.serieId} else null
+        val series = remote.getSeriesJson(amount, offset, follows) ?: return null
+        local.upsertSeries(*series.toTypedArray())
+        return if (series.size == amount) FetchResult.FULL_PAGE
+        else FetchResult.PART_PAGE
     }
-    fun getSerieVolumes(
-        scope: CoroutineScope, serieId: String, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<VolumeFull>> {
-        scope.launch {
-            val volumes = remote.getSerieVolumesJson(serieId)
-            if (volumes != null) local.upsertVolumes(*volumes.toTypedArray())
-            onComplete(volumes != null)
-        }
-        return local.getSerieVolumes(serieId)
+
+    fun getSerieVolumesFlow(serieId: String): Flow<List<VolumeFull>> = local.getSerieVolumes(serieId)
+    suspend fun fetchSerieVolumes(serieId: String, amount: Int, offset: Int): FetchResult? {
+        val volumes = remote.getSerieVolumesJson(serieId, amount, offset) ?: return null
+        local.upsertVolumes(*volumes.toTypedArray())
+        return if (volumes.size == amount) FetchResult.FULL_PAGE
+        else FetchResult.PART_PAGE
     }
-    fun getVolumeParts(
-        scope: CoroutineScope, volumeId: String, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<PartFull>> {
-        scope.launch {
-            val parts = remote.getVolumePartsJson(volumeId)
-            if (parts != null) local.upsertParts(*parts.toTypedArray())
-            onComplete(parts != null)
-        }
-        return local.getVolumeParts(volumeId)
+
+    fun getVolumePartsFlow(volumeId: String): Flow<List<PartFull>> = local.getVolumeParts(volumeId)
+    suspend fun fetchVolumeParts(volumeId: String, amount: Int, offset: Int): FetchResult? {
+        val parts = remote.getVolumePartsJson(volumeId, amount, offset) ?: return null
+        local.upsertParts(*parts.toTypedArray())
+        return if (parts.size == amount) FetchResult.FULL_PAGE
+        else FetchResult.PART_PAGE
     }
-    fun getRecentParts(
-        scope: CoroutineScope, onComplete: (success: Boolean) -> Unit = {}
-    ): Flow<List<PartFull>> {
-        val oneMonthAgo = Instant.now().minus(Period.ofDays(30))
-        scope.launch {
-            val parts = remote.getPartsJsonAfter(oneMonthAgo)
-            if (parts != null) local.upsertParts(*parts.toTypedArray())
-            onComplete(parts != null)
-        }
-        return local.getPartsSince("$oneMonthAgo")
+
+    fun getRecentPartsFlow(): Flow<List<PartFull>> = local.getRecentParts()
+    suspend fun fetchRecentParts(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
+        val follows = if (followedOnly) local.getAllFollows().map { it.serieId} else null
+        val parts = remote.getRecentParts(amount, offset, follows) ?: return null
+        local.upsertParts(*parts.toTypedArray())
+        return if (parts.size == amount) FetchResult.FULL_PAGE
+        else FetchResult.PART_PAGE
     }
 
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)

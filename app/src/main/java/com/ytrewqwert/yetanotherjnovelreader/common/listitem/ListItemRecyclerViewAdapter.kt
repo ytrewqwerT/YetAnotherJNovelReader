@@ -34,11 +34,12 @@ class ListItemRecyclerViewAdapter(
                 if (url == holder.imageUrl) holder.imageView.setImageBitmap(image)
             }
         }
-        val followIcon = if (contents.isFollowing) {
-            holder.view.resources.getDrawable(R.drawable.ic_star_gold_24dp, null)
-        } else {
-            holder.view.resources.getDrawable(R.drawable.ic_star_border_gold_24dp, null)
+
+        val followIconId = when (contents.isFollowing) {
+            true -> R.drawable.ic_star_gold_24dp
+            false -> R.drawable.ic_star_border_gold_24dp
         }
+        val followIcon = holder.view.resources.getDrawable(followIconId, null)
         holder.following.setImageDrawable(followIcon)
 
         if (contents.progress != null) {

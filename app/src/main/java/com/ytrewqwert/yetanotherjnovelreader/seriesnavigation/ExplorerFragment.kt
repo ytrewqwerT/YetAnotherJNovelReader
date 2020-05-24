@@ -59,32 +59,9 @@ class ExplorerFragment : Fragment() {
 
     @ExperimentalCoroutinesApi
     private fun observeViewModels() {
-        viewModel.seriesList.observe(this) {
-            listItemViewModel.getItemList(ListTypes.SERIES.ordinal).value = it
-        }
-        viewModel.volumesList.observe(this) {
-            listItemViewModel.getItemList(ListTypes.VOLUMES.ordinal).value = it
-        }
-        viewModel.partsList.observe(this) {
-            listItemViewModel.getItemList(ListTypes.PARTS.ordinal).value = it
-        }
+        listItemViewModel.setSource(ListTypes.SERIES.ordinal, viewModel.getSeriesSource())
 
         listItemViewModel.itemClickedEvent.observe(this) { onListItemInteraction(it.item) }
-        listItemViewModel.getIsReloading(ListTypes.SERIES.ordinal).observe(this) {
-            if (it) viewModel.fetchSeries {
-                listItemViewModel.getIsReloading(ListTypes.SERIES.ordinal).value = false
-            }
-        }
-        listItemViewModel.getIsReloading(ListTypes.VOLUMES.ordinal).observe(this) {
-            if (it) viewModel.fetchSerieVolumes {
-                listItemViewModel.getIsReloading(ListTypes.VOLUMES.ordinal).value = false
-            }
-        }
-        listItemViewModel.getIsReloading(ListTypes.PARTS.ordinal).observe(this) {
-            if (it) viewModel.fetchVolumeParts {
-                listItemViewModel.getIsReloading(ListTypes.PARTS.ordinal).value = false
-            }
-        }
     }
 
     private fun onListItemInteraction(item: ListItem) {
@@ -98,24 +75,16 @@ class ExplorerFragment : Fragment() {
 
     private fun onSeriesListItemInteraction(serie: SerieFull) {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
-        viewModel.curSerie = serie.serie
 
-        val volumeFragContents = listItemViewModel.getContentLiveData(ListTypes.VOLUMES.ordinal)
-        volumeFragContents.item.value = emptyList()
-        volumeFragContents.header.value = listOf(serie)
-        volumeFragContents.reloading.value = true
-
+        listItemViewModel.setSource(ListTypes.VOLUMES.ordinal, viewModel.getSerieVolumesSource(serie))
+        listItemViewModel.setHeader(ListTypes.VOLUMES.ordinal, serie)
         setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
     }
     private fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
-        viewModel.curVolume = volume.volume
 
-        val partFragContents = listItemViewModel.getContentLiveData(ListTypes.PARTS.ordinal)
-        partFragContents.item.value = emptyList()
-        partFragContents.header.value = listOf(volume)
-        partFragContents.reloading.value = true
-
+        listItemViewModel.setSource(ListTypes.PARTS.ordinal, viewModel.getVolumePartsSource(volume))
+        listItemViewModel.setHeader(ListTypes.PARTS.ordinal, volume)
         setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
     }
     private fun onPartsListItemInteraction(part: PartFull) {

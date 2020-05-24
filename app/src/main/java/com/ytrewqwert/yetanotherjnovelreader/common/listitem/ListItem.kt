@@ -2,6 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.common.listitem
 
 interface ListItem {
     fun getListItemContents(): Contents
+    fun isFollowed(): Boolean = false
 
     data class Contents(
         val mTitle: String? = null,

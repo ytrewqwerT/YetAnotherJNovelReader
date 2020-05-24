@@ -18,7 +18,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
-import java.time.Instant
 import kotlin.coroutines.resume
 
 class RemoteRepository private constructor(
@@ -80,27 +79,33 @@ class RemoteRepository private constructor(
             requestQueue.add(request)
         }
 
-    suspend fun getSeriesJson() =
+    suspend fun getSeriesJson(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
         suspendCancellableCoroutine<List<Serie>?> { cont ->
-        val url = "$API_ADDR/series"
-        val request = JsonArrayRequest(
-            Request.Method.GET, url, null,
-            Response.Listener {
-                Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
-                Log.v(TAG, it.toString(4))
-                cont.resume(Serie.fromJson(it))
-            },
-            Response.ErrorListener {
-                Log.w(TAG, "SeriesFailure: $it")
-                cont.resume(null)
-            }
-        )
-        requestQueue.add(request)
-    }
-    suspend fun getSerieVolumesJson(serieId: String) =
+            val url = ParameterizedURLBuilder("$API_ADDR/series")
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
+                .setSeriesFilters(seriesFilters)
+                .build()
+            val request = JsonArrayRequest(
+                Request.Method.GET, url, null,
+                Response.Listener {
+                    Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
+                    Log.v(TAG, it.toString(4))
+                    cont.resume(Serie.fromJson(it))
+                },
+                Response.ErrorListener {
+                    Log.w(TAG, "SeriesFailure: $it")
+                    cont.resume(null)
+                }
+            )
+            requestQueue.add(request)
+        }
+    suspend fun getSerieVolumesJson(serieId: String, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Volume>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/volumes")
                 .addFilter("serieId", serieId)
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,
@@ -115,10 +120,12 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
-    suspend fun getVolumePartsJson(volumeId: String) =
+    suspend fun getVolumePartsJson(volumeId: String, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
                 .addFilter("volumeId", volumeId)
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,
@@ -133,11 +140,13 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
-    suspend fun getPartsJsonAfter(time: Instant) =
+    suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
-                .addFilter("launchDate", "{\"gt\":\"${time}\"}")
-                .addOrder("launchDate+DESC")
+                .addBaseFilter("order", "launchDate+DESC")
+                .addBaseFilter("limit", "$amount")
+                .addBaseFilter("offset", "$offset")
+                .setSeriesFilters(seriesFilters)
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,
