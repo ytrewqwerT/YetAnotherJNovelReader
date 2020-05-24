@@ -6,24 +6,24 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 
+@ExperimentalCoroutinesApi
 class ExplorerViewModel(private val repository: Repository) : ViewModel() {
 
     @ExperimentalCoroutinesApi
     fun getSeriesSource(): ListItemViewModel.ListItemSource {
         return ListItemViewModel.ListItemSource(
             repository.getSeriesFlow()
-        ) { _, amount, offset ->
-            repository.fetchSeries(amount, offset)
+        ) { amount, offset, followedOnly ->
+            if (followedOnly) repository.fetchSeriesFollowed(amount, offset)
+            else repository.fetchSeries(amount, offset)
         }
     }
 
     fun getSerieVolumesSource(serie: SerieFull): ListItemViewModel.ListItemSource {
         return ListItemViewModel.ListItemSource(
             repository.getSerieVolumesFlow(serie.serie.id)
-        ) { _, amount, offset ->
+        ) { amount, offset, _ ->
             repository.fetchSerieVolumes(serie.serie.id, amount, offset)
         }
     }
@@ -31,7 +31,7 @@ class ExplorerViewModel(private val repository: Repository) : ViewModel() {
     fun getVolumePartsSource(volume: VolumeFull): ListItemViewModel.ListItemSource {
         return ListItemViewModel.ListItemSource(
             repository.getVolumePartsFlow(volume.volume.id)
-        ) { _, amount, offset ->
+        ) { amount, offset, _ ->
             repository.fetchVolumeParts(volume.volume.id, amount, offset)
         }
     }

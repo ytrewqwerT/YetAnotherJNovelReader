@@ -24,8 +24,9 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     fun getRecentPartsSource(): ListItemViewModel.ListItemSource {
         return ListItemViewModel.ListItemSource(
             repository.getRecentPartsFlow()
-        ) { _, amount, offset ->
-            repository.fetchRecentParts(amount, offset)
+        ) { amount, offset, followedOnly ->
+            if (followedOnly) repository.fetchRecentPartsFollowed(amount, offset)
+            else repository.fetchRecentParts(amount, offset)
         }
     }
 

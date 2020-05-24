@@ -73,4 +73,7 @@ class LocalRepository private constructor(appContext: Context) {
     suspend fun getParts(vararg partId: String): List<PartFull> = withContext(Dispatchers.IO) {
         partDao.getParts(*partId)
     }
+    suspend fun getAllFollows(): List<Follow> = withContext(Dispatchers.IO) {
+        followDao.getAllFollows()
+    }
 }

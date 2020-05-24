@@ -79,11 +79,12 @@ class RemoteRepository private constructor(
             requestQueue.add(request)
         }
 
-    suspend fun getSeriesJson(amount: Int, offset: Int) =
+    suspend fun getSeriesJson(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
         suspendCancellableCoroutine<List<Serie>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/series")
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
+                .setSeriesFilters(seriesFilters)
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,
@@ -139,12 +140,13 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
-    suspend fun getRecentParts(amount: Int, offset: Int) =
+    suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
                 .addBaseFilter("order", "launchDate+DESC")
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
+                .setSeriesFilters(seriesFilters)
                 .build()
             val request = JsonArrayRequest(
                 Request.Method.GET, url, null,

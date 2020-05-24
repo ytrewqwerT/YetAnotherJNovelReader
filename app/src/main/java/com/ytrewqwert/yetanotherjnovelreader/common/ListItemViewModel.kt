@@ -16,12 +16,12 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
     companion object {
         private const val PAGE_SIZE = 50
@@ -29,6 +29,14 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     private val lists = ArrayList<SingleListHandler>()
     val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
+
+    init {
+        viewModelScope.launch {
+            repository.isFilterFollowing.collect {
+                for (handler in lists) handler.reload()
+            }
+        }
+    }
 
     fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
         viewModelScope.launch { callback(source, repository.getImage(source)) }
@@ -93,7 +101,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     data class ListItemSource(
         val sourceFlow: Flow<List<ListItem>>,
-        val fetchItems: suspend (scope: CoroutineScope, amount: Int, offset: Int) -> FetchResult?
+        val fetchItems: suspend (amount: Int, offset: Int, followedOnly: Boolean) -> FetchResult?
     )
 
     private inner class SingleListHandler {
@@ -117,7 +125,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         fun setDataSource(newSource: ListItemSource) {
             listItemSource = newSource
             listItemFlowCollector.job = viewModelScope.launch {
-                newSource.sourceFlow.map { it.subList(0, it.size.coerceAtMost(itemsCap)) }
+                newSource.sourceFlow
                     .combine(repository.isFilterFollowing) { items, filterOn ->
                         items.filter { !filterOn || it.isFollowed() }
                     }.collect {
@@ -146,7 +154,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
                 if (listItemSource == null) return@launch
 
                 val result = listItemSource?.fetchItems?.invoke(
-                    this, PAGE_SIZE, itemsCap - PAGE_SIZE
+                    PAGE_SIZE, itemsCap - PAGE_SIZE, false
                 )
                 // Note that when the fetch succeeds, the result is automatically propagated to the
                 // flow via a DB upsertion.

@@ -49,6 +49,13 @@ class Repository private constructor(appContext: Context) {
         return if (series.size == amount) FetchResult.FULL_PAGE
         else FetchResult.PART_PAGE
     }
+    suspend fun fetchSeriesFollowed(amount: Int, offset: Int): FetchResult? {
+        val follows = local.getAllFollows().map { it.serieId }
+        val series = remote.getSeriesJson(amount, offset, follows) ?: return null
+        local.upsertSeries(*series.toTypedArray())
+        return if (series.size == amount) FetchResult.FULL_PAGE
+        else FetchResult.PART_PAGE
+    }
 
     fun getSerieVolumesFlow(serieId: String): Flow<List<VolumeFull>> = local.getSerieVolumes(serieId)
     suspend fun fetchSerieVolumes(serieId: String, amount: Int, offset: Int): FetchResult? {
@@ -69,6 +76,13 @@ class Repository private constructor(appContext: Context) {
     fun getRecentPartsFlow(): Flow<List<PartFull>> = local.getRecentParts()
     suspend fun fetchRecentParts(amount: Int, offset: Int): FetchResult? {
         val parts = remote.getRecentParts(amount, offset) ?: return null
+        local.upsertParts(*parts.toTypedArray())
+        return if (parts.size == amount) FetchResult.FULL_PAGE
+        else FetchResult.PART_PAGE
+    }
+    suspend fun fetchRecentPartsFollowed(amount: Int, offset: Int): FetchResult? {
+        val follows = local.getAllFollows().map { it.serieId }
+        val parts = remote.getRecentParts(amount, offset, follows) ?: return null
         local.upsertParts(*parts.toTypedArray())
         return if (parts.size == amount) FetchResult.FULL_PAGE
         else FetchResult.PART_PAGE

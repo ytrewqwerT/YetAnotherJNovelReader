@@ -8,10 +8,10 @@ class ParameterizedUrlBuilderTests {
     @Test
     fun test_ParameterizedUrlBuilder() {
 
-        var expectedUrl = "?filter=" +
-                "{\"where\":{\"launchDate\":{\"gt\":\"now\"}},\"order\":\"launchDate+DESC\"}"
+        var expectedUrl = """?filter={"where":{"launchDate":{"gt":"now"},"or":[{"id":"a"},{"id":"b"}]},"order":"launchDate+DESC"}"""
         var actualUrl = ParameterizedURLBuilder("")
-            .addFilter("launchDate", "{\"gt\":\"now\"}")
+            .addFilter("launchDate", """{"gt":"now"}""")
+            .setSeriesFilters(listOf("a", "b"))
             .addBaseFilter("order", "launchDate+DESC")
             .build()
         assertEquals(expectedUrl, actualUrl)
