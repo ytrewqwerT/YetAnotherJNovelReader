@@ -46,14 +46,18 @@ class ParameterizedURLBuilder(
         if (baseFilters.isEmpty()) return ""
         val filterString = StringJoiner(",")
         for (f in baseFilters) {
-            filterString.add("\"${f.first}\":\"${f.second}\"")
+            if (f.second[0] == '{' || f.second[0] == '[') {
+                filterString.add("\"${f.first}\":${f.second}")
+            } else {
+                filterString.add("\"${f.first}\":\"${f.second}\"")
+            }
         }
         return filterString.toString()
     }
     private fun generateWhereFilterString() {
         generateSeriesFilterString()
         if (whereFilters.keys.isEmpty()) return
-        val filterString = StringJoiner(",", "\"where\":{", "}")
+        val filterString = StringJoiner(",", "{", "}")
         for (key in whereFilters.keys) {
             if (whereFilters[key]!![0] == '{' || whereFilters[key]!![0] == '[') {
                 filterString.add("\"${key}\":${whereFilters[key]}")
