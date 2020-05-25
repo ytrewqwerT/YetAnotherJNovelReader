@@ -11,7 +11,7 @@ On top of having most of the features included in the official app (less importa
  - More complete day/night theme support
 The UI is also (subjectively) cleaner and more pleasant to interact with while also being much faster than the official app.
 
-## Getting Started
+## Installation
 
 There are currently no plans for the app to be (un)officially released.
 
