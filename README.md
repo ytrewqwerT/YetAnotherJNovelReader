@@ -9,6 +9,7 @@ An (unofficial) alternative to [J-Novel Club](https://j-novel.club/about)'s [off
 On top of having most of the features included in the official app (less important features such as links for purchasing ebooks and the series search functionality are missing):
  - Tag series that you follow and filter new parts to those parts in those series
  - More complete day/night theme support
+
 The UI is also (subjectively) cleaner and more pleasant to interact with while also being much faster than the official app.
 
 ## Installation
