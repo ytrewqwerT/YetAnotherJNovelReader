@@ -16,4 +16,4 @@ The UI is also (subjectively) cleaner and more pleasant to interact with while a
 
 There are currently no plans for the app to be (un)officially released.
 
-If you would like to use the app, you will need to build and install the app onto your device manually using an appropriate IDE (such as Android Studio).
+If you would like to use the app, you will need to build and install the app onto your device manually using an appropriate IDE (such as Android Studio). Note that the app requires Android 8.1 (Oreo) or higher.
