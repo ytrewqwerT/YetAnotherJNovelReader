@@ -8,24 +8,21 @@ object FirestoreDataInterface {
     private val db = Firebase.firestore
 
     fun insertUnhandledHtmlTag(srcPartId: String, tag: String) {
-        val docRef = db.document("data/unhandled_html/tags/$tag")
-        addToPartIdList(docRef, srcPartId)
+        val docPath = "data/unhandled_html/tags/$tag/part_ids/$srcPartId"
+        val docRef = db.document(docPath)
+        createDocIfNotExists(docRef)
     }
 
     fun insertUnhandledHtmlArg(srcPartId: String, tag: String, arg: String) {
-        val docRef = db.document("data/unhandled_html/tags/$tag/args/$arg")
-        addToPartIdList(docRef, srcPartId)
+        val docPath = "data/unhandled_html/tags/$tag/args/$arg/part_ids/$srcPartId"
+        val docRef = db.document(docPath)
+        createDocIfNotExists(docRef)
     }
 
-    private fun addToPartIdList(docRef: DocumentReference, partId: String) {
+    private fun createDocIfNotExists(docRef: DocumentReference) {
         docRef.get().addOnSuccessListener { docSnap ->
-            val docData = docSnap.data ?: HashMap<String, Any>()
-            val partIds = docData["part_ids"] as? ArrayList<Any> ?: ArrayList()
-            if (partIds.contains(partId)) return@addOnSuccessListener
-
-            partIds.add(partId)
-            docData["part_ids"] = partIds // In case a new list was created
-            docRef.set(docData)
+            if (docSnap.exists()) return@addOnSuccessListener
+            docRef.set(HashMap<String, Any>())
         }
     }
 }
