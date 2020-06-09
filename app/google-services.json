@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "625050768149",
+    "firebase_url": "https://yetanotherjnovelreader.firebaseio.com",
+    "project_id": "yetanotherjnovelreader",
+    "storage_bucket": "yetanotherjnovelreader.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:625050768149:android:96b3f9c1ba970a54774f1c",
+        "android_client_info": {
+          "package_name": "com.ytrewqwert.yetanotherjnovelreader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "625050768149-c5usk7jl5l7qa072858h48bmlks4f14i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvGiqS1L8KDY0IOaQGOJPH_1N-6vYflWQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "625050768149-c5usk7jl5l7qa072858h48bmlks4f14i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

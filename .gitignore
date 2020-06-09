@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 /.idea/dictionaries
+.project
+.settings

@@ -7,12 +7,14 @@ import android.text.style.LeadingMarginSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.util.Log
+import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterface
 import java.util.*
 
-object PartHtmlParser {
-    private const val TAG = "PartHtmlParser"
-
-    private val HEADING_SIZES = arrayOf(1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f)
+class PartHtmlParser(private val partId: String) {
+    companion object {
+        private const val TAG = "PartHtmlParser"
+        private val HEADING_SIZES = arrayOf(1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f)
+    }
 
     fun parse(html: String): Spanned {
         val noNewLine = html.replace("\n", "")
@@ -82,6 +84,7 @@ object PartHtmlParser {
                         }
                         else -> {
                             Log.w(TAG, "Unhandled arg for tag \"p\": $arg")
+                            FirestoreDataInterface.insertUnhandledHtmlArg(partId, "p", "$arg")
                         }
                     }
                 }
@@ -100,6 +103,7 @@ object PartHtmlParser {
             }
             else -> {
                 Log.w(TAG, "Unhandled html tag: $label")
+                FirestoreDataInterface.insertUnhandledHtmlTag(partId, "$label")
                 warnIfArgsNotEmpty(label, args)
             }
         }
@@ -112,7 +116,7 @@ object PartHtmlParser {
         val args = tagLabelTokens.subList(1, tagLabelTokens.size)
         return when (label) {
             "br" -> {
-                if (args.isNotEmpty()) Log.w(TAG, "Unhandled args for html tag \"br\": $args")
+                warnIfArgsNotEmpty(label, args)
                 SpannableStringBuilder("\n")
             }
             "img" -> {
@@ -126,6 +130,8 @@ object PartHtmlParser {
             }
             else -> {
                 Log.w(TAG, "Unhandled html tag: <${tagLabelTokens.joinToString(" ")} >")
+                FirestoreDataInterface.insertUnhandledHtmlTag(partId, "$label")
+                warnIfArgsNotEmpty(label, args)
                 SpannableStringBuilder(label)
             }
         }
@@ -149,6 +155,9 @@ object PartHtmlParser {
     private fun warnIfArgsNotEmpty(label: CharSequence, args: List<CharSequence>) {
         if (args.isEmpty()) return
         Log.w(TAG, "Unhandled args for tag \"$label\": $args")
+        for (arg in args) {
+            FirestoreDataInterface.insertUnhandledHtmlArg(partId, "$label", "$arg")
+        }
     }
 
     private data class IncompleteTag(

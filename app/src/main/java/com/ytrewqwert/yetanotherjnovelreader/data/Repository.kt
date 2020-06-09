@@ -39,7 +39,7 @@ class Repository private constructor(appContext: Context) {
     suspend fun getPartContent(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
         val partHtml = remote.getPartContentJson(partId) ?: return null
-        return PartHtmlParser.parse(partHtml)
+        return PartHtmlParser(partId).parse(partHtml)
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
