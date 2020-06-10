@@ -85,7 +85,7 @@ class RemoteRepository private constructor(
             val url = ParameterizedURLBuilder("$API_ADDR/series")
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
-                .setSeriesFilters(seriesFilters)
+                .addFieldInListFilter("id", seriesFilters)
                 .build()
             val request = createListRequest(url) {
                 Log.d(TAG, "SeriesRequest: Found ${it?.length()} series")
@@ -128,7 +128,7 @@ class RemoteRepository private constructor(
                 .addBaseFilter("order", "launchDate+DESC")
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
-                .setSeriesFilters(seriesFilters)
+                .addFieldInListFilter("serieId", seriesFilters)
                 .build()
             val request = createListRequest(url) {
                 Log.d(TAG, "RecentPartsRequest: Found ${it?.length()} parts")

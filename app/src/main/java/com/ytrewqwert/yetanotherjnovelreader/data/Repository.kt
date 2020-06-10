@@ -69,7 +69,7 @@ class Repository private constructor(appContext: Context) {
 
     fun getRecentPartsFlow(): Flow<List<PartFull>> = local.getRecentParts()
     suspend fun fetchRecentParts(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
-        val follows = if (followedOnly) local.getAllFollows().map { it.serieId} else null
+        val follows = if (followedOnly) local.getAllFollows().map { it.serieId } else null
         val parts = remote.getRecentParts(amount, offset, follows) ?: return null
         local.upsertParts(*parts.toTypedArray())
         return if (parts.size == amount) FetchResult.FULL_PAGE
