@@ -12,7 +12,8 @@ class MainPagerAdapter(fm: FragmentManager)
 
     enum class ChildFragments {
         RECENT_PARTS,
-        EXPLORER
+        EXPLORER,
+        UP_NEXT_PARTS
     }
 
     private val recentPartsFragment by lazy {
@@ -23,6 +24,13 @@ class MainPagerAdapter(fm: FragmentManager)
         fragment
     }
     private val explorerFragment by lazy { ExplorerFragment() }
+    private val upNextPartsFragment by lazy {
+        val fragment = ListItemFragment()
+        val args = Bundle()
+        args.putInt(ListItemFragment.ARG_ID, ChildFragments.UP_NEXT_PARTS.ordinal)
+        fragment.arguments = args
+        fragment
+    }
 
     override fun getCount(): Int = ChildFragments.values().size
 
@@ -30,6 +38,7 @@ class MainPagerAdapter(fm: FragmentManager)
         return when (ChildFragments.values()[position]) {
             ChildFragments.RECENT_PARTS -> recentPartsFragment
             ChildFragments.EXPLORER -> explorerFragment
+            ChildFragments.UP_NEXT_PARTS -> upNextPartsFragment
         }
     }
 
@@ -37,6 +46,7 @@ class MainPagerAdapter(fm: FragmentManager)
         return when (ChildFragments.values()[position]) {
             ChildFragments.RECENT_PARTS -> "Recent"
             ChildFragments.EXPLORER -> "Explore"
+            ChildFragments.UP_NEXT_PARTS -> "Up Next"
         }
     }
 }

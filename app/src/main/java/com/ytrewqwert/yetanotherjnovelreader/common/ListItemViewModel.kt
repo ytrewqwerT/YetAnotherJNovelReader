@@ -37,10 +37,11 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
 
     private val lists = ArrayList<SingleListHandler>()
     val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
-
+    private var isFilterFollowing = false
     init {
         viewModelScope.launch {
             repository.isFilterFollowing.collect {
+                isFilterFollowing = it
                 for (handler in lists) handler.reload()
             }
         }
@@ -75,10 +76,9 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             else -> return
         }
 
-        val follow = Follow(serieId)
         viewModelScope.launch {
-            if (following) repository.deleteFollows(follow)
-            else repository.insertFollows(follow)
+            if (following) repository.unfollowSeries(serieId)
+            else repository.followSeries(serieId)
         }
     }
 
@@ -142,7 +142,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             if (listItemSource == null) return null
 
             val result = listItemSource?.fetchItems?.invoke(
-                PAGE_SIZE, itemsCap - PAGE_SIZE, false
+                PAGE_SIZE, itemsCap - PAGE_SIZE, isFilterFollowing
             )
             // Note that when the fetch succeeds, the result is automatically propagated to the
             // flow via a DB upsertion.

@@ -44,8 +44,8 @@ class LocalRepository private constructor(appContext: Context) {
         }
     }
 
-    suspend fun insertFollows(vararg follows: Follow) {
-        withContext(Dispatchers.IO) { followDao.insert(*follows) }
+    suspend fun updateFollows(vararg follows: Follow) {
+        withContext(Dispatchers.IO) { followDao.update(*follows) }
     }
 
     suspend fun upsertSeries(vararg series: Serie) {
@@ -60,6 +60,9 @@ class LocalRepository private constructor(appContext: Context) {
     suspend fun upsertProgress(vararg progress: Progress) {
         withContext(Dispatchers.IO) { progressDao.upsert(*progress) }
     }
+    suspend fun upsertFollows(vararg follows: Follow) {
+        withContext(Dispatchers.IO) { followDao.upsert(*follows) }
+    }
 
     suspend fun deleteFollows(vararg follows: Follow) {
         withContext(Dispatchers.IO) { followDao.delete(*follows) }
@@ -69,9 +72,13 @@ class LocalRepository private constructor(appContext: Context) {
     fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>> = volumeDao.getSerieVolumes(serieId)
     fun getVolumeParts(volumeId: String): Flow<List<PartFull>> = partDao.getVolumeParts(volumeId)
     fun getRecentParts(): Flow<List<PartFull>> = partDao.getRecentParts()
+    fun getUpNextParts(): Flow<List<PartFull>> = partDao.getUpNextParts()
 
     suspend fun getParts(vararg partId: String): List<PartFull> = withContext(Dispatchers.IO) {
         partDao.getParts(*partId)
+    }
+    suspend fun getLatestFinishedPart(serieId: String): PartFull? = withContext(Dispatchers.IO) {
+        partDao.getLatestFinishedPart(serieId)
     }
     suspend fun getAllFollows(): List<Follow> = withContext(Dispatchers.IO) {
         followDao.getAllFollows()

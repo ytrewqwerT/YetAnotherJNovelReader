@@ -8,7 +8,7 @@ class ParameterizedURLBuilder(
     private val baseUrl: String
 ) {
 
-    private var seriesFilters: List<String>? = null
+    private val fieldInListFilters = ArrayList<Pair<String, List<String>>>()
     private val whereFilters = HashMap<String, String>()
     private val baseFilters = ArrayList<Pair<String, String>>()
     private val includes = ArrayList<String>()
@@ -17,8 +17,9 @@ class ParameterizedURLBuilder(
         whereFilters[key] = value
         return this
     }
-    fun setSeriesFilters(seriesIds: List<String>?): ParameterizedURLBuilder {
-        seriesFilters = seriesIds
+    fun addFieldInListFilter(field: String, values: List<String>?): ParameterizedURLBuilder {
+        if (values == null) return this
+        fieldInListFilters.add(Pair(field, values))
         return this
     }
     fun addInclude(value: String): ParameterizedURLBuilder {
@@ -55,7 +56,7 @@ class ParameterizedURLBuilder(
         return filterString.toString()
     }
     private fun generateWhereFilterString() {
-        generateSeriesFilterString()
+        generateFieldInListString()
         if (whereFilters.keys.isEmpty()) return
         val filterString = StringJoiner(",", "{", "}")
         for (key in whereFilters.keys) {
@@ -67,14 +68,19 @@ class ParameterizedURLBuilder(
         }
         baseFilters.add(Pair("where", filterString.toString()))
     }
-    private fun generateSeriesFilterString() {
-        val result = seriesFilters?.map { "{\"id\":\"$it\"}" } ?: return
-        whereFilters["or"] = result.joinToString(",", "[", "]")
-    }
 
     private fun generateIncludeString(): String {
         val includeString = StringJoiner(",", "\"include\":[", "]")
         for (includeVal in includes) includeString.add("\"${includeVal}\"")
         return includeString.toString()
+    }
+
+    private fun generateFieldInListString() {
+        fieldInListFilters.forEach { filter ->
+            val matchArray = filter.second.joinToString(",","{\"inq\":[","]}") {
+                "\"$it\""
+            }
+            whereFilters[filter.first] = matchArray
+        }
     }
 }

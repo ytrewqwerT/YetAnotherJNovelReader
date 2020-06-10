@@ -19,7 +19,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeDa
 
 @Database(
     entities = [Serie::class, Volume::class, Part::class, Progress::class, Follow::class],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 abstract class PartRoomDatabase : RoomDatabase() {
@@ -37,13 +37,21 @@ abstract class PartRoomDatabase : RoomDatabase() {
                 context.applicationContext,
                 PartRoomDatabase::class.java,
                 "part_database"
-            ).addMigrations(MIGRATION_1_2).build().also { INSTANCE = it }
+            ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { INSTANCE = it }
         }
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE 'Follow' ('serieId' TEXT NOT NULL, PRIMARY KEY('serieId'))"
+                )
+            }
+        }
+
+        private val MIGRATION_2_3 = object : Migration(2,3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE Follow ADD COLUMN nextPartNum INTEGER NOT NULL DEFAULT 1"
                 )
             }
         }

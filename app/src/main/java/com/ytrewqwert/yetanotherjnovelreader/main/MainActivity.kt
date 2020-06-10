@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
     private lateinit var viewPager: ViewPager
 
     private val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
+    private val upNextPartsFragId = MainPagerAdapter.ChildFragments.UP_NEXT_PARTS.ordinal
 
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,6 +118,8 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             followMenuItem?.isChecked = it
             updateMenu()
         }
+
+        recentsListViewModel.setSource(upNextPartsFragId, mainViewModel.getUpNextPartsSource())
 
         recentsListViewModel.itemClickedEvent.observe(this) {
             onPartsListItemInteraction(it.item as? PartFull)
