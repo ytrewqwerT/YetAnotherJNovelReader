@@ -17,6 +17,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.coroutines.resume
 
@@ -86,18 +87,11 @@ class RemoteRepository private constructor(
                 .addBaseFilter("offset", "$offset")
                 .setSeriesFilters(seriesFilters)
                 .build()
-            val request = JsonArrayRequest(
-                Request.Method.GET, url, null,
-                Response.Listener {
-                    Log.d(TAG, "SeriesSuccess: Found ${it.length()} series")
-                    Log.v(TAG, it.toString(4))
-                    cont.resume(Serie.fromJson(it))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "SeriesFailure: $it")
-                    cont.resume(null)
-                }
-            )
+            val request = createListRequest(url) {
+                Log.d(TAG, "SeriesRequest: Found ${it?.length()} series")
+                if (it != null) cont.resume(Serie.fromJson(it))
+                else cont.resume(null)
+            }
             requestQueue.add(request)
         }
     suspend fun getSerieVolumesJson(serieId: String, amount: Int, offset: Int) =
@@ -107,17 +101,11 @@ class RemoteRepository private constructor(
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
                 .build()
-            val request = JsonArrayRequest(
-                Request.Method.GET, url, null,
-                Response.Listener {
-                    Log.d(TAG, "SeriesVolumesSuccess: Found ${it.length()} volumes")
-                    cont.resume(Volume.fromJson(it))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "SeriesVolumesFailure: $it")
-                    cont.resume(null)
-                }
-            )
+            val request = createListRequest(url) {
+                Log.d(TAG, "SerieVolumesRequest: Found ${it?.length()} volumes")
+                if (it != null) cont.resume(Volume.fromJson(it))
+                else cont.resume(null)
+            }
             requestQueue.add(request)
         }
     suspend fun getVolumePartsJson(volumeId: String, amount: Int, offset: Int) =
@@ -127,17 +115,11 @@ class RemoteRepository private constructor(
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
                 .build()
-            val request = JsonArrayRequest(
-                Request.Method.GET, url, null,
-                Response.Listener {
-                    Log.d(TAG, "VolumePartsSuccess: Found ${it.length()} parts")
-                    cont.resume(Part.fromJson(it))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "VolumePartsFailure: $it")
-                    cont.resume(null)
-                }
-            )
+            val request = createListRequest(url) {
+                Log.d(TAG, "VolumePartsRequest: Found ${it?.length()} parts")
+                if (it != null) cont.resume(Part.fromJson(it))
+                else cont.resume(null)
+            }
             requestQueue.add(request)
         }
     suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
@@ -148,17 +130,11 @@ class RemoteRepository private constructor(
                 .addBaseFilter("offset", "$offset")
                 .setSeriesFilters(seriesFilters)
                 .build()
-            val request = JsonArrayRequest(
-                Request.Method.GET, url, null,
-                Response.Listener {
-                    Log.d(TAG, "RecentPartSuccess: Found ${it.length()} parts")
-                    cont.resume(Part.fromJson(it))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "RecentPartFailure: $it")
-                    cont.resume(null)
-                }
-            )
+            val request = createListRequest(url) {
+                Log.d(TAG, "RecentPartsRequest: Found ${it?.length()} parts")
+                if (it != null) cont.resume(Part.fromJson(it))
+                else cont.resume(null)
+            }
             requestQueue.add(request)
         }
 
@@ -239,4 +215,9 @@ class RemoteRepository private constructor(
         requestQueue.add(request)
     }
 
+    private fun createListRequest(url: String, result: (JSONArray?) -> Unit) = JsonArrayRequest(
+        Request.Method.GET, url, null,
+        Response.Listener { result(it) },
+        Response.ErrorListener { result(null) }
+    )
 }
