@@ -76,12 +76,9 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             else -> return
         }
 
-        // TODO: Find the next part for the series
-        val nextPartNum = 1
-        val follow = Follow(serieId, nextPartNum)
         viewModelScope.launch {
-            if (following) repository.deleteFollows(follow)
-            else repository.insertFollows(follow)
+            if (following) repository.unfollowSeries(serieId)
+            else repository.followSeries(serieId)
         }
     }
 

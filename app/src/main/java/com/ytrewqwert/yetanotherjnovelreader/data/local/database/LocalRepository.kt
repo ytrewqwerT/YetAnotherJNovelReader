@@ -44,8 +44,8 @@ class LocalRepository private constructor(appContext: Context) {
         }
     }
 
-    suspend fun insertFollows(vararg follows: Follow) {
-        withContext(Dispatchers.IO) { followDao.insert(*follows) }
+    suspend fun updateFollows(vararg follows: Follow) {
+        withContext(Dispatchers.IO) { followDao.update(*follows) }
     }
 
     suspend fun upsertSeries(vararg series: Serie) {
@@ -60,6 +60,9 @@ class LocalRepository private constructor(appContext: Context) {
     suspend fun upsertProgress(vararg progress: Progress) {
         withContext(Dispatchers.IO) { progressDao.upsert(*progress) }
     }
+    suspend fun upsertFollows(vararg follows: Follow) {
+        withContext(Dispatchers.IO) { followDao.upsert(*follows) }
+    }
 
     suspend fun deleteFollows(vararg follows: Follow) {
         withContext(Dispatchers.IO) { followDao.delete(*follows) }
@@ -73,6 +76,9 @@ class LocalRepository private constructor(appContext: Context) {
 
     suspend fun getParts(vararg partId: String): List<PartFull> = withContext(Dispatchers.IO) {
         partDao.getParts(*partId)
+    }
+    suspend fun getLatestFinishedPart(serieId: String): PartFull? = withContext(Dispatchers.IO) {
+        partDao.getLatestFinishedPart(serieId)
     }
     suspend fun getAllFollows(): List<Follow> = withContext(Dispatchers.IO) {
         followDao.getAllFollows()

@@ -80,15 +80,21 @@ class Repository private constructor(appContext: Context) {
     suspend fun fetchUpNextParts(): FetchResult? {
         val follows = local.getAllFollows()
         val pairs = follows.map { Pair(it.serieId, it.nextPartNum) }
-        val parts = remote.getUpNextParts(pairs) ?: return null
+        val parts = remote.getUpNextParts(pairs)
         local.upsertParts(*parts.toTypedArray())
         return FetchResult.PART_PAGE // No more "pages" since the function doesn't paginate fetches
     }
 
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
-    suspend fun insertFollows(vararg follow: Follow) { local.insertFollows(*follow) }
-    suspend fun deleteFollows(vararg follow: Follow) { local.deleteFollows(*follow) }
+    suspend fun followSeries(serieId: String) {
+        val latestFinishedPart = local.getLatestFinishedPart(serieId)
+        // Default the "up-next" part to the part after the latest finished part on initial follow.
+        val nextPartNum = (latestFinishedPart?.part?.seriesPartNum ?: 0) + 1
+        local.upsertFollows(Follow(serieId, nextPartNum))
+    }
+    // Note that Room database deletions are based on primary key only. '0' has no effect here.
+    suspend fun unfollowSeries(serieId: String) { local.deleteFollows(Follow(serieId, 0)) }
 
     fun getUsername() = prefStore.username
     fun isMember() = prefStore.isMember ?: false
@@ -123,12 +129,16 @@ class Repository private constructor(appContext: Context) {
             progress < 0.0 -> 0.0
             else -> progress
         }
-        local.upsertProgress(
-            Progress(
-                partId,
-                boundedProgress
-            )
-        )
+        local.upsertProgress(Progress(partId, boundedProgress))
+        if (boundedProgress == 1.0) {
+            // Update the "up-next" part if the series is being followed. Note that
+            // Room's Update functions only update rows and won't insert any new rows.
+            local.getParts(partId).getOrNull(0)?.let {
+                val serieId = it.part.serieId
+                val nextPartNum = it.part.seriesPartNum + 1
+                local.updateFollows(Follow(serieId, nextPartNum))
+            }
+        }
 
         val userId = prefStore.userId ?: return false
         return remote.setUserPartProgress(userId, partId, boundedProgress)
