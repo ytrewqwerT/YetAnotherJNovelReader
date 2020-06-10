@@ -9,6 +9,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class SerieDao : BaseDao<Serie>() {
     @Transaction
-    @Query("SELECT * FROM Serie")
+    @Query("SELECT * FROM Serie ORDER BY created DESC")
     abstract fun getAllSeries(): Flow<List<SerieFull>>
 }

@@ -9,6 +9,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class VolumeDao : BaseDao<Volume>() {
     @Transaction
-    @Query("SELECT * FROM Volume WHERE serieId = :serieId")
+    @Query("SELECT * FROM Volume WHERE serieId = :serieId ORDER BY volumeNum ASC")
     abstract fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>>
 }
