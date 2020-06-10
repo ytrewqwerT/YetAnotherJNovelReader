@@ -5,5 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Follow(
-    @PrimaryKey val serieId: String
+    @PrimaryKey val serieId: String,
+    val nextPartNum: Int
 )

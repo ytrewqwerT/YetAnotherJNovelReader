@@ -16,6 +16,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONArray
 import org.json.JSONObject
@@ -137,7 +139,34 @@ class RemoteRepository private constructor(
             }
             requestQueue.add(request)
         }
-
+    suspend fun getUpNextParts(parts: List<Pair<String, Int>>): List<Part> {
+        val resultParts = ArrayList<Part>()
+        coroutineScope {
+            parts.forEach {
+                launch {
+                    val part = suspendCancellableCoroutine<Part?> { cont ->
+                        val url = ParameterizedURLBuilder("$API_ADDR/parts/findOne")
+                            .addFilter("serieId", it.first)
+                            .addFilter("partNumber", "${it.second}")
+                            .build()
+                        val request = JsonObjectRequest(
+                            Request.Method.GET, url, null,
+                            Response.Listener {
+                                cont.resume(Part.fromJson(it))
+                            },
+                            Response.ErrorListener {
+                                cont.resume(null)
+                            }
+                        )
+                        requestQueue.add(request)
+                    }
+                    if (part != null) resultParts.add(part)
+                }
+            }
+        }
+        Log.d(TAG, "UpNextParts: Found ${resultParts.size}/${parts.size} parts")
+        return resultParts
+    }
     suspend fun getUserPartProgressJson(userId: String) =
         suspendCancellableCoroutine<List<Progress>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")

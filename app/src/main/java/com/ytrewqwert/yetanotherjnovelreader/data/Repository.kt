@@ -76,6 +76,15 @@ class Repository private constructor(appContext: Context) {
         else FetchResult.PART_PAGE
     }
 
+    fun getUpNextPartsFlow(): Flow<List<PartFull>> = local.getUpNextParts()
+    suspend fun fetchUpNextParts(): FetchResult? {
+        val follows = local.getAllFollows()
+        val pairs = follows.map { Pair(it.serieId, it.nextPartNum) }
+        val parts = remote.getUpNextParts(pairs) ?: return null
+        local.upsertParts(*parts.toTypedArray())
+        return FetchResult.PART_PAGE // No more "pages" since the function doesn't paginate fetches
+    }
+
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
     suspend fun insertFollows(vararg follow: Follow) { local.insertFollows(*follow) }

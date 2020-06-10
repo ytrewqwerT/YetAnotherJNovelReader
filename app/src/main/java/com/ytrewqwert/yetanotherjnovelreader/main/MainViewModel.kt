@@ -28,6 +28,15 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
+    @ExperimentalCoroutinesApi
+    fun getUpNextPartsSource(): ListItemViewModel.ListItemSource {
+        return ListItemViewModel.ListItemSource(
+            repository.getUpNextPartsFlow()
+        ) { _, _, _ ->
+            repository.fetchUpNextParts()
+        }
+    }
+
     fun loggedIn() = repository.loggedIn()
     fun getUsername() = repository.getUsername()
 

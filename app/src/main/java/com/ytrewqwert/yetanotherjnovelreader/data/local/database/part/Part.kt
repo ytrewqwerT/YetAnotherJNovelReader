@@ -24,7 +24,7 @@ data class Part(
     val preview: Boolean
 ) : ListItem {
     companion object {
-        private fun fromJson(partJson: JSONObject): Part {
+        fun fromJson(partJson: JSONObject): Part {
             // Find the value for coverThumbUrl (if it exists)
             val attachments = partJson.getJSONArray("attachments")
             var coverUrl = ""
