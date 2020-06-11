@@ -9,12 +9,12 @@ import androidx.security.crypto.MasterKeys
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
 import com.ytrewqwert.yetanotherjnovelreader.setBoolean
 import com.ytrewqwert.yetanotherjnovelreader.setString
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.channelFlow
 import java.time.Instant
 import java.time.Period
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 class PreferenceStore private constructor(private val appContext: Context) {
 
     companion object {
@@ -63,7 +63,6 @@ class PreferenceStore private constructor(private val appContext: Context) {
         set(value) = sharedPref.setBoolean(PrefKeys.IS_MEMBER, value ?: false)
 
     // Non-reader settings
-    @ExperimentalCoroutinesApi
     val isFilterFollowing = channelFlow {
         offer(sharedPref.getBoolean(PrefKeys.IS_FOLLOW, false))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -80,7 +79,6 @@ class PreferenceStore private constructor(private val appContext: Context) {
     private var fontStyle = getTypeface()
     private var readerMargins = getMargins()
 
-    @ExperimentalCoroutinesApi
     val readerSettings = channelFlow {
         offer(ReaderPreferences(paginated, fontSize, fontStyle, readerMargins))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->

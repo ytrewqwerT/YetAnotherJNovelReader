@@ -6,7 +6,6 @@ import androidx.core.content.edit
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import org.json.JSONArray
-import org.json.JSONObject
 
 fun BitmapDrawable.scaleToWidth(width: Int) {
     val height = width * intrinsicHeight / intrinsicWidth

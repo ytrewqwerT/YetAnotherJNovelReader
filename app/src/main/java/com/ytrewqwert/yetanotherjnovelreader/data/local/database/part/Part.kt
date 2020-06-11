@@ -30,7 +30,7 @@ data class Part(
             var coverUrl = ""
             for (i in 0 until attachments.length()) {
                 val attachUrl = attachments.getJSONObject(i).getString("fullpath")
-                if (attachUrl?.contains("cover") == true) coverUrl = attachUrl
+                if (attachUrl.contains("cover")) coverUrl = attachUrl
             }
 
             return Part(

@@ -14,12 +14,10 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
     companion object {
         private const val PAGE_SIZE = 50
@@ -56,7 +54,6 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
     fun getHasMorePages(fragId: Int): LiveData<Boolean> = getHandler(fragId).morePages
 
     fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
-    @ExperimentalCoroutinesApi
     fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
     fun reload(fragId: Int) { getHandler(fragId).reload() }
     fun fetchNextPage(fragId: Int) { getHandler(fragId).fetchNextPage() }
@@ -103,10 +100,10 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         private var itemsCap = PAGE_SIZE
 
         fun setHeader(value: ListHeader) { header.value = listOf(value) }
-        @ExperimentalCoroutinesApi
         fun setDataSource(newSource: ListItemSource) {
             listItemSource = newSource
             listItemFlowCollector.job = viewModelScope.launch {
+                @Suppress("EXPERIMENTAL_API_USAGE")
                 newSource.sourceFlow
                     .combine(repository.isFilterFollowing) { items, filterOn ->
                         items.filter { !filterOn || it.isFollowed() }

@@ -21,7 +21,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 class MainActivity : AppCompatActivity(), LoginResultListener {
@@ -45,7 +44,6 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
     private val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
     private val upNextPartsFragId = MainPagerAdapter.ChildFragments.UP_NEXT_PARTS.ordinal
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -78,7 +76,6 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         listItemViewModel.setSource(upNextPartsFragId, mainViewModel.getUpNextPartsSource())
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         appBarMenu = menu
@@ -98,7 +95,6 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         activePagerFragment?.onResume()
     }
 
-    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.account_login -> {
             if (mainViewModel.loggedIn()) mainViewModel.logout()

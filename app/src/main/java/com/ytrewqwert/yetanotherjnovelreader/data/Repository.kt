@@ -12,7 +12,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 
 class Repository private constructor(appContext: Context) {
@@ -29,11 +28,9 @@ class Repository private constructor(appContext: Context) {
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
-    @ExperimentalCoroutinesApi
     val isFilterFollowing get() = prefStore.isFilterFollowing
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
-    @ExperimentalCoroutinesApi
     fun getReaderSettingsFlow() = prefStore.readerSettings
 
     suspend fun getImage(source: String): Bitmap? = remote.getImage(source)

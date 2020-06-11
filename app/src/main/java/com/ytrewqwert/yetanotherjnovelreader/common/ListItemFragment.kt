@@ -20,9 +20,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecycle
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItemRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 class ListItemFragment : Fragment(),
     ListItem.InteractionListener, ImageSource, ListFooter.InteractionListener {
 
