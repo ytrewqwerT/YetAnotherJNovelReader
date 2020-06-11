@@ -10,16 +10,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 class ExplorerViewModel(private val repository: Repository) : ViewModel() {
 
-    @ExperimentalCoroutinesApi
     fun getSeriesSource(): ListItemViewModel.ListItemSource {
         return ListItemViewModel.ListItemSource(
             repository.getSeriesFlow()
         ) { amount, offset, followedOnly ->
-            if (followedOnly) repository.fetchSeries(amount, offset, true)
-            else repository.fetchSeries(amount, offset, false)
+            repository.fetchSeries(amount, offset, followedOnly)
         }
     }
 
+    // Ignore followedOnly for volumes and parts as they're already restricted to a single series.
     fun getSerieVolumesSource(serie: SerieFull): ListItemViewModel.ListItemSource {
         return ListItemViewModel.ListItemSource(
             repository.getSerieVolumesFlow(serie.serie.id)

@@ -89,6 +89,7 @@ class ExplorerFragment : Fragment() {
     }
     private fun onPartsListItemInteraction(part: PartFull) {
         Log.d(TAG, "Part clicked: ${part.part.title}")
+
         val intent = Intent(context, PartActivity::class.java)
         intent.putExtra(PartActivity.EXTRA_PART_ID, part.part.id)
         startActivity(intent)
