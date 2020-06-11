@@ -20,7 +20,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ExplorerFragment : Fragment() {
     companion object {
@@ -36,7 +35,6 @@ class ExplorerFragment : Fragment() {
         ListItemViewModelFactory(Repository.getInstance(requireContext()))
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setListItemFragment(ListTypes.SERIES.ordinal, ListTypes.SERIES.name)
@@ -57,7 +55,6 @@ class ExplorerFragment : Fragment() {
         curFragment?.onResume()
     }
 
-    @ExperimentalCoroutinesApi
     private fun observeViewModels() {
         listItemViewModel.setSource(ListTypes.SERIES.ordinal, viewModel.getSeriesSource())
 
@@ -89,6 +86,7 @@ class ExplorerFragment : Fragment() {
     }
     private fun onPartsListItemInteraction(part: PartFull) {
         Log.d(TAG, "Part clicked: ${part.part.title}")
+
         val intent = Intent(context, PartActivity::class.java)
         intent.putExtra(PartActivity.EXTRA_PART_ID, part.part.id)
         startActivity(intent)

@@ -42,9 +42,7 @@ class PartActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPartBinding
     private val viewModel by viewModels<PartViewModel> {
-        PartViewModelFactory(
-            Repository.getInstance(applicationContext), resources, partId
-        )
+        PartViewModelFactory(Repository.getInstance(applicationContext), resources, partId)
     }
 
     private lateinit var layoutRoot: View
@@ -81,7 +79,7 @@ class PartActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean  = when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean  = when (item.itemId) {
         android.R.id.home -> {
             finish()
             true

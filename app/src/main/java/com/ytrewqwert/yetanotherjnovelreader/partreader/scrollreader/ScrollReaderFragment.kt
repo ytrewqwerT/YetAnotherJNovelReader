@@ -41,7 +41,8 @@ class ScrollReaderFragment : Fragment() {
         textView?.setOnClickListener {
             viewModel.toggleAppBarVisibility()
         }
-        // Indirectly notify scrollView to update its position when textView's layout changes
+        // Indirectly notify scrollView (via databinding) to update its position when textView's
+        // layout changes.
         textView?.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             viewModel.currentProgress.value = viewModel.currentProgress.value
         }

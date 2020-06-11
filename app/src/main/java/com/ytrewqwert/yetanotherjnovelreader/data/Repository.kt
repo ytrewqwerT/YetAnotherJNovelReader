@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.Spanned
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
@@ -11,7 +12,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 
 class Repository private constructor(appContext: Context) {
@@ -28,18 +28,16 @@ class Repository private constructor(appContext: Context) {
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
-    @ExperimentalCoroutinesApi
     val isFilterFollowing get() = prefStore.isFilterFollowing
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
-    @ExperimentalCoroutinesApi
     fun getReaderSettingsFlow() = prefStore.readerSettings
 
     suspend fun getImage(source: String): Bitmap? = remote.getImage(source)
     suspend fun getPartContent(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
         val partHtml = remote.getPartContentJson(partId) ?: return null
-        return PartHtmlParser(partId).parse(partHtml)
+        return PartHtmlParser.parse(partHtml, partId)
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
