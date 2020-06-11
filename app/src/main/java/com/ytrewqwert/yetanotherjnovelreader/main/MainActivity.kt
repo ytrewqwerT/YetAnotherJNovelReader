@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.viewpager.widget.ViewPager
@@ -31,12 +32,15 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
     private val mainViewModel by viewModels<MainViewModel> {
         MainViewModelFactory(Repository.getInstance(this))
     }
-    private val recentsListViewModel by viewModels<ListItemViewModel> {
+    private val listItemViewModel by viewModels<ListItemViewModel> {
         ListItemViewModelFactory(Repository.getInstance(this))
     }
 
     private var appBarMenu: Menu? = null
     private lateinit var viewPager: ViewPager
+    private val activePagerFragment: Fragment? get() = supportFragmentManager.findFragmentByTag(
+        "android:switcher:${R.id.pager}:${viewPager.currentItem}"
+    )
 
     private val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
     private val upNextPartsFragId = MainPagerAdapter.ChildFragments.UP_NEXT_PARTS.ordinal
@@ -50,23 +54,35 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         viewPager = findViewById(R.id.pager)
         val viewPagerAdapter = MainPagerAdapter(supportFragmentManager)
         viewPager.adapter = viewPagerAdapter
-        // Set primary navigation fragment to the focused viewpager page to allow interception
+        // Set primary navigation fragment to the focused viewpager page to allow touch interception
         viewPager.addOnPageSelectedListener {
             supportFragmentManager.commit {
-                val fragment = supportFragmentManager.findFragmentByTag(
-                    "android:switcher:${R.id.pager}:${viewPager.currentItem}"
-                )
-                setPrimaryNavigationFragment(fragment)
+                setPrimaryNavigationFragment(activePagerFragment)
             }
         }
-        observeViewModels()
+
+        mainViewModel.logoutEvent.observe(this) { loggedOut ->
+            if (loggedOut) onLoginResult(false)
+            else Toast.makeText(this, "Logout failed", Toast.LENGTH_LONG).show()
+        }
+        mainViewModel.isFilterFollowing.observe(this) {
+            val followMenuItem = appBarMenu?.findItem(R.id.following)
+            followMenuItem?.isChecked = it
+            updateMenu()
+        }
+        listItemViewModel.itemClickedEvent.observe(this) {
+            onPartsListItemInteraction(it.item as? PartFull)
+        }
+
+        listItemViewModel.setSource(recentPartsFragId, mainViewModel.getRecentPartsSource())
+        listItemViewModel.setSource(upNextPartsFragId, mainViewModel.getUpNextPartsSource())
     }
 
     @ExperimentalCoroutinesApi
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         appBarMenu = menu
-        menu?.findItem(R.id.following)?.isChecked = mainViewModel.isFilterFollowing.value ?: false
+        menu.findItem(R.id.following)?.isChecked = mainViewModel.isFilterFollowing.value ?: false
         updateMenu()
         return true
     }
@@ -76,24 +92,17 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         Toast.makeText(this, loginStatusText, Toast.LENGTH_LONG).show()
         updateMenu()
 
-        val fragment = supportFragmentManager.findFragmentByTag(
-            "android:switcher:${R.id.pager}:${viewPager.currentItem}"
-        )
-
         // Resuming ListItemFragments force-updates them into (un)greying out non-viewable parts
         //  and ExplorerFragment propagates the onResume to its children to do the same.
         // Probably shouldn't be using lifecycle functions like this, but ¯\_(ツ)_/¯
-        fragment?.onResume()
+        activePagerFragment?.onResume()
     }
 
     @ExperimentalCoroutinesApi
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.account_login -> {
-            if (mainViewModel.loggedIn()) {
-                mainViewModel.logout()
-            } else {
-                LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
-            }
+            if (mainViewModel.loggedIn()) mainViewModel.logout()
+            else LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
             true
         }
         R.id.following -> {
@@ -101,29 +110,6 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             true
         }
         else -> super.onOptionsItemSelected(item)
-    }
-
-    @ExperimentalCoroutinesApi
-    private fun observeViewModels() {
-        mainViewModel.logoutEvent.observe(this) { loggedOut ->
-            if (loggedOut) onLoginResult(false)
-            else {
-                Toast.makeText(this@MainActivity, "Logout failed", Toast.LENGTH_LONG)
-                    .show()
-            }
-        }
-        recentsListViewModel.setSource(recentPartsFragId, mainViewModel.getRecentPartsSource())
-        mainViewModel.isFilterFollowing.observe(this) {
-            val followMenuItem = appBarMenu?.findItem(R.id.following)
-            followMenuItem?.isChecked = it
-            updateMenu()
-        }
-
-        recentsListViewModel.setSource(upNextPartsFragId, mainViewModel.getUpNextPartsSource())
-
-        recentsListViewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? PartFull)
-        }
     }
 
     private fun onPartsListItemInteraction(part: PartFull?) {
