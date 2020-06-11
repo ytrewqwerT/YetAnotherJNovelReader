@@ -57,7 +57,9 @@ class ListItemFragment : Fragment(),
         }
         viewModel.getIsReloading(uid).observe(this) {
             swipeRefreshLayout?.isRefreshing = it
-            if (it) listFooterAdapter.isVisible = it
+        }
+        viewModel.getHasMorePages(uid).observe(this) {
+            listFooterAdapter.isVisible = it
         }
     }
 
@@ -92,19 +94,11 @@ class ListItemFragment : Fragment(),
         recyclerViewAdapter.notifyDataSetChanged()
     }
 
-    override fun onClick(item: ListItem) {
-        viewModel.listItemFragmentViewOnClick(uid, item)
-    }
-
-    override fun onFollowClick(item: ListItem) {
-        viewModel.toggleFollowItem(item)
-    }
-
+    override fun onClick(item: ListItem) { viewModel.listItemFragmentViewOnClick(uid, item) }
+    override fun onFollowClick(item: ListItem) { viewModel.toggleFollowItem(item) }
+    override fun onFooterReached() { viewModel.fetchNextPage(uid) }
     override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
         viewModel.getImage(source, callback)
     }
 
-    override fun onFooterReached() {
-        viewModel.fetchNextPage(uid) { listFooterAdapter.isVisible = it }
-    }
 }

@@ -11,7 +11,6 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.FetchResult
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
@@ -54,14 +53,13 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
     fun getHeaderList(fragId: Int): LiveData<List<ListHeader>?> = getHandler(fragId).header
     fun getItemList(fragId: Int): LiveData<List<ListItem>?> = getHandler(fragId).items
     fun getIsReloading(fragId: Int): LiveData<Boolean> = getHandler(fragId).reloading
+    fun getHasMorePages(fragId: Int): LiveData<Boolean> = getHandler(fragId).morePages
 
     fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
     @ExperimentalCoroutinesApi
     fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
     fun reload(fragId: Int) { getHandler(fragId).reload() }
-    fun fetchNextPage(fragId: Int, onComplete: (morePages: Boolean) -> Unit = {}) {
-        getHandler(fragId).fetchNextPage(onComplete)
-    }
+    fun fetchNextPage(fragId: Int) { getHandler(fragId).fetchNextPage() }
 
     fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
         itemClickedEvent.value = ItemClickEvent(fragmentId, item)
@@ -100,6 +98,7 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         val header = MutableLiveData<List<ListHeader>?>(emptyList())
         val items = MutableLiveData<List<ListItem>?>(emptyList())
         val reloading = MutableLiveData(false)
+        val morePages = MutableLiveData(false)
 
         private var itemsCap = PAGE_SIZE
 
@@ -129,33 +128,35 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
             fetchNextPage { reloading.value = false }
         }
 
-        fun fetchNextPage(onComplete: (morePages: Boolean) -> Unit = {}) {
+        fun fetchNextPage(onComplete: () -> Unit = {}) {
             if (listItemFetcher?.isCompleted == false) return
 
             itemsCap += PAGE_SIZE
             listItemFetcher = viewModelScope.launch {
-                onComplete(performFetch() ?: return@launch)
+                val result = performFetch()
+                morePages.value = result
+                onComplete()
             }
         }
 
-        private suspend fun performFetch(): Boolean? {
-            if (listItemSource == null) return null
+        // Returns true if there may still be more pages that can be shown. False otherwise.
+        private suspend fun performFetch(): Boolean {
+            if (listItemSource == null) return false
 
             val result = listItemSource?.fetchItems?.invoke(
                 PAGE_SIZE, itemsCap - PAGE_SIZE, isFilterFollowing
             )
             // Note that when the fetch succeeds, the result is automatically propagated to the
-            // flow via a DB upsertion.
+            // flow via a DB upsertion, so there's no need to manually update the items list.
             return when (result) {
                 FetchResult.FULL_PAGE -> true
                 FetchResult.PART_PAGE -> false
                 null -> {
-                    // Fetch failed; show next cached page from DB.
+                    // Fetch failed; manually update list to show next cached page from DB.
                     items.value = latestItems.subList(0, latestItems.size.coerceAtMost(itemsCap))
-                    null
+                    items.value?.size != itemsCap
                 }
             }
         }
     }
-
 }
