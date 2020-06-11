@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.Spanned
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
@@ -39,7 +40,7 @@ class Repository private constructor(appContext: Context) {
     suspend fun getPartContent(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
         val partHtml = remote.getPartContentJson(partId) ?: return null
-        return PartHtmlParser(partId).parse(partHtml)
+        return PartHtmlParser.parse(partHtml, partId)
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
