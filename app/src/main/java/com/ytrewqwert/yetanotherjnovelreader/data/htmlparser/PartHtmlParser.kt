@@ -4,7 +4,13 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import java.util.ArrayDeque
 
+/** Singleton exposing a function for converting html to a [Spanned]. */
 object PartHtmlParser {
+    /**
+     * Converts the provided [html] (containing a part's contents) into a [Spanned].
+     *
+     * @param[partId] The ID of the part, used for logging unexpected html tags/args.
+     */
     fun parse(html: String, partId: String): Spanned {
         val tagApplier = HtmlTagApplier(partId)
         val noNewLine = html.replace("\n", "")

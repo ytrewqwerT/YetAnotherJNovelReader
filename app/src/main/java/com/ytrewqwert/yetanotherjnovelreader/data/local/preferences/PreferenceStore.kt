@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.channelFlow
 import java.time.Instant
 import java.time.Period
 
+/** Exposes the values for the user's preferences. */
 @Suppress("EXPERIMENTAL_API_USAGE")
 class PreferenceStore private constructor(private val appContext: Context) {
 
@@ -79,6 +80,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
     private var fontStyle = getTypeface()
     private var readerMargins = getMargins()
 
+    /** Aggregates a number of preferences for styling the app's part reader. */
     val readerSettings = channelFlow {
         offer(ReaderPreferences(paginated, fontSize, fontStyle, readerMargins))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
@@ -105,7 +107,7 @@ class PreferenceStore private constructor(private val appContext: Context) {
         awaitClose { sharedPref.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
-    fun authExpired(): Boolean {
+    fun isAuthExpired(): Boolean {
         if (authToken == null) return true
         val authInstant = Instant.parse(authDate)
         val cutoffInstant = Instant.now().minus(Period.ofDays(14))
@@ -143,7 +145,10 @@ class PreferenceStore private constructor(private val appContext: Context) {
         return Margins(top, bottom, left, right)
     }
 
+    /** A collection of values defining how large the margins around each edge should be. */
     data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)
+
+    /** Aggregates a number of preferences relating to the app's part reader. */
     data class ReaderPreferences(
         val isHorizontal: Boolean,
         val fontSize: Int,

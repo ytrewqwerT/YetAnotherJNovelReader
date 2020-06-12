@@ -16,16 +16,26 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooter
 import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooterRecyclerViewAdapter
+import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItemRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 
+/**
+ * Displays a combined list of [ListHeader]s, [ListItem]s, and [ListFooter]s provided by an
+ * external source.
+ *
+ * An argument, [ARG_ID], must be provided identifying this [ListItemFragment]'s ID so that it knows
+ * which data to retrieve from the [ListItemViewModel].
+ */
 class ListItemFragment : Fragment(),
     ListItem.InteractionListener, ImageSource, ListFooter.InteractionListener {
 
     companion object {
         private const val TAG = "ListItemFragment"
+
+        /** An identifier for which data to retrieve from the [ListItemViewModel]. */
         const val ARG_ID = "${TAG}_ID"
     }
 

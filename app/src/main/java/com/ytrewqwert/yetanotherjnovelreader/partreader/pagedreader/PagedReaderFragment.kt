@@ -18,6 +18,10 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PrefDefaults
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
+/**
+ * A part reader fragment showing the contents of the part in multiple pages that are scrolled
+ * through horizontally.
+ */
 class PagedReaderFragment : Fragment() {
 
     private val partViewModel by activityViewModels<PartViewModel>()

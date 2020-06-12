@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicBoolean
 
+/** A [MutableLiveData] that only notifies a single observer once for each value change. */
 class SingleLiveEvent<T> : MutableLiveData<T>() {
 
     private var mPending = AtomicBoolean(false)

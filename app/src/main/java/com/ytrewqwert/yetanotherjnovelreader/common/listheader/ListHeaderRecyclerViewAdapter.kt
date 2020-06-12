@@ -10,6 +10,11 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import kotlinx.android.synthetic.main.list_header.view.*
 
+/**
+ * A [RecyclerView.Adapter] for displaying [ListHeader]s.
+ *
+ * @property[imageSource] An object from which referenced images can be retrieved.
+ */
 class ListHeaderRecyclerViewAdapter(
     private val imageSource: ImageSource? = null
 ) : RecyclerView.Adapter<ListHeaderRecyclerViewAdapter.ViewHolder>() {

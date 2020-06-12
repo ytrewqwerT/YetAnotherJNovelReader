@@ -1,10 +1,19 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader
 
+import android.graphics.text.LineBreaker
 import android.text.*
 import android.text.style.ImageSpan
 import android.text.style.LeadingMarginSpan
 import android.util.Log
 
+/**
+ * A class used to split a long [Spanned] object into pages.
+ *
+ * @property[text] The [Spanned] text to split into pages.
+ * @property[width] The width of a single page, in px.
+ * @property[height] The height of a single page, in px.
+ * @property[paint] The paint to be used to draw the text.
+ */
 class Paginator(
     private val text: Spanned,
     private val width: Int,
@@ -17,6 +26,11 @@ class Paginator(
         Log.d("Paginator", "width/height = $width/$height")
     }
 
+    /**
+     * Splits the given [text] into pages.
+     *
+     * @return A resulting list of text to be shown in each page.
+     */
     fun paginateText(): List<CharSequence> {
         if (width == 0 || height == 0) return emptyList()
 
@@ -28,7 +42,7 @@ class Paginator(
                     remainingSpan, 0, remainingSpan.length, paint, width
                 )
                     .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL)
-                    .setJustificationMode(StaticLayout.JUSTIFICATION_MODE_INTER_WORD)
+                    .setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD)
                     .build()
 
                 var lineNum = 0

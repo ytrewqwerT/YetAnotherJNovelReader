@@ -5,13 +5,16 @@ import android.graphics.drawable.BitmapDrawable
 import androidx.core.content.edit
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import org.json.JSONObject
 import org.json.JSONArray
 
+/** Set's this BitmapDrawable's width to equal the given [width], retaining image aspect ratio. */
 fun BitmapDrawable.scaleToWidth(width: Int) {
     val height = width * intrinsicHeight / intrinsicWidth
     setBounds(0, 0, width, height)
 }
 
+/** Applies [block] to each [JSONObject] in the array. */
 inline fun <reified T> JSONArray.forEach(block: (T) -> Unit) {
     for (i in 0 until length()) {
         val item = get(i)
@@ -19,13 +22,16 @@ inline fun <reified T> JSONArray.forEach(block: (T) -> Unit) {
     }
 }
 
+/** Shortcut for setting the value of a boolean preference. */
 fun SharedPreferences.setBoolean(key: String, value: Boolean) {
     edit(true) { putBoolean(key, value) }
 }
+/** Shortcut for setting the value of a string preference. */
 fun SharedPreferences.setString(key: String, value: String?) {
     edit(true) { putString(key, value) }
 }
 
+/** Calls the provided listener each time a new page is selected. */
 fun ViewPager.addOnPageSelectedListener(listener: (position: Int) -> Unit) {
     addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
         override fun onPageScrollStateChanged(state: Int) {}
@@ -39,6 +45,7 @@ fun ViewPager.addOnPageSelectedListener(listener: (position: Int) -> Unit) {
     })
 }
 
+/** Calls the provided listener each time a new page is selected. */
 fun ViewPager2.addOnPageSelectedListener(listener: (position: Int) -> Unit) {
     registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {

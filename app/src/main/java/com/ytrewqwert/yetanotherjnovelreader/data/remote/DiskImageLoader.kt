@@ -10,9 +10,8 @@ import com.ytrewqwert.yetanotherjnovelreader.BuildConfig
 import java.io.File
 import java.util.*
 
-class DiskImageLoader(appContext: Context) :
-    ImageLoader.ImageCache {
-
+/** An [ImageLoader.ImageCache] that saves images to local storage. */
+class DiskImageLoader(appContext: Context) : ImageLoader.ImageCache {
     companion object {
         private const val TAG = "DiskImageLoader"
         private const val MAX_KEY_LEN = 64
@@ -22,12 +21,7 @@ class DiskImageLoader(appContext: Context) :
 
     init {
         val cacheDir = File(appContext.cacheDir, "disklrucache")
-        cache = DiskLruCache.open(
-            cacheDir,
-            BuildConfig.VERSION_CODE,
-            1,
-            1 shl 24
-        )
+        cache = DiskLruCache.open(cacheDir, BuildConfig.VERSION_CODE, 1, 1 shl 24)
     }
 
     override fun getBitmap(url: String?): Bitmap? {

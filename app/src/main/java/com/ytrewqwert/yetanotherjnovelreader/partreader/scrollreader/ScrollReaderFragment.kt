@@ -13,6 +13,7 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentScrollReaderBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
+/** A part reader fragment showing the contents of the part as a single long vertical strip. */
 class ScrollReaderFragment : Fragment() {
 
     private val viewModel by activityViewModels<PartViewModel>()

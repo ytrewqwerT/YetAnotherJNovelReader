@@ -6,6 +6,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 
+/** An aggregate class combining a [serie] with related [following] information. */
 data class SerieFull(
     @Embedded val serie: Serie,
     @Relation(parentColumn = "id", entityColumn = "serieId") private val following: Follow?

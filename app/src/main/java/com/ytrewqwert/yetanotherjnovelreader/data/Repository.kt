@@ -14,6 +14,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceSt
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import kotlinx.coroutines.flow.Flow
 
+/** A one-stop shop for objects needing to interact with the locally and remotely saved data. */
 class Repository private constructor(appContext: Context) {
     companion object {
         @Volatile
@@ -28,7 +29,9 @@ class Repository private constructor(appContext: Context) {
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
 
+    /** Identifies whether lists should filter items to only show followed items. */
     val isFilterFollowing get() = prefStore.isFilterFollowing
+    /** Set whether lists should filter items to only show followed items. */
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
     fun getReaderSettingsFlow() = prefStore.readerSettings
@@ -36,14 +39,14 @@ class Repository private constructor(appContext: Context) {
     suspend fun getImage(source: String): Bitmap? = remote.getImage(source)
     suspend fun getPartContent(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
-        val partHtml = remote.getPartContentJson(partId) ?: return null
+        val partHtml = remote.getPartHtml(partId) ?: return null
         return PartHtmlParser.parse(partHtml, partId)
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
     suspend fun fetchSeries(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
         val follows = if (followedOnly) local.getAllFollows().map { it.serieId} else null
-        val series = remote.getSeriesJson(amount, offset, follows) ?: return null
+        val series = remote.getSeries(amount, offset, follows) ?: return null
         local.upsertSeries(*series.toTypedArray())
         return if (series.size == amount) FetchResult.FULL_PAGE
         else FetchResult.PART_PAGE
@@ -51,7 +54,7 @@ class Repository private constructor(appContext: Context) {
 
     fun getSerieVolumesFlow(serieId: String): Flow<List<VolumeFull>> = local.getSerieVolumes(serieId)
     suspend fun fetchSerieVolumes(serieId: String, amount: Int, offset: Int): FetchResult? {
-        val volumes = remote.getSerieVolumesJson(serieId, amount, offset) ?: return null
+        val volumes = remote.getSerieVolumes(serieId, amount, offset) ?: return null
         local.upsertVolumes(*volumes.toTypedArray())
         return if (volumes.size == amount) FetchResult.FULL_PAGE
         else FetchResult.PART_PAGE
@@ -59,7 +62,7 @@ class Repository private constructor(appContext: Context) {
 
     fun getVolumePartsFlow(volumeId: String): Flow<List<PartFull>> = local.getVolumeParts(volumeId)
     suspend fun fetchVolumeParts(volumeId: String, amount: Int, offset: Int): FetchResult? {
-        val parts = remote.getVolumePartsJson(volumeId, amount, offset) ?: return null
+        val parts = remote.getVolumeParts(volumeId, amount, offset) ?: return null
         local.upsertParts(*parts.toTypedArray())
         return if (parts.size == amount) FetchResult.FULL_PAGE
         else FetchResult.PART_PAGE
@@ -85,6 +88,7 @@ class Repository private constructor(appContext: Context) {
 
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
+    /** Sets a series with ID [serieId] as being followed by the user. */
     suspend fun followSeries(serieId: String) {
         val latestFinishedPart = local.getLatestFinishedPart(serieId)
         // Default the "up-next" part to the part after the latest finished part on initial follow.
@@ -92,11 +96,13 @@ class Repository private constructor(appContext: Context) {
         local.upsertFollows(Follow(serieId, nextPartNum))
     }
     // Note that Room database deletions are based on primary key only. '0' has no effect here.
+    /** Sets a series with ID [serieId] as not being followed by the user. */
     suspend fun unfollowSeries(serieId: String) { local.deleteFollows(Follow(serieId, 0)) }
 
     fun getUsername() = prefStore.username
     fun isMember() = prefStore.isMember ?: false
 
+    fun isLoggedIn() = (prefStore.authToken != null)
     suspend fun login(email: String, password: String): Boolean {
         val userData = remote.login(email, password)
         prefStore.setUserData(userData)
@@ -106,11 +112,10 @@ class Repository private constructor(appContext: Context) {
         if (userId != null) {
             prefStore.email = email
             prefStore.password = password
-            fetchPartProgress()
+            fetchPartsProgress()
         }
         return userData != null
     }
-    fun loggedIn() = (prefStore.authToken != null)
     suspend fun logout(): Boolean {
         remote.logout()
         // Don't care whether the user was actually logged out or not. Just clear data.
@@ -141,10 +146,15 @@ class Repository private constructor(appContext: Context) {
         val userId = prefStore.userId ?: return false
         return remote.setUserPartProgress(userId, partId, boundedProgress)
     }
-    private suspend fun fetchPartProgress(): Boolean {
+    /**
+     * Retrieves all of the user's part progress data and saves it in the local database.
+     *
+     * @return true if successful and false otherwise.
+     */
+    private suspend fun fetchPartsProgress(): Boolean {
         refreshLoginIfAuthExpired()
         val userId = prefStore.userId ?: return false
-        val progresses = remote.getUserPartProgressJson(userId) ?: return false
+        val progresses = remote.getUserPartProgress(userId) ?: return false
         local.upsertProgress(*progresses.toTypedArray())
         return true
     }
@@ -164,7 +174,7 @@ class Repository private constructor(appContext: Context) {
         }
     }
     private suspend fun refreshLoginIfAuthExpired(): Boolean {
-        return if (loggedIn() && prefStore.authExpired()) {
+        return if (isLoggedIn() && prefStore.isAuthExpired()) {
             remote.logout()
             loginFromStore()
         } else false

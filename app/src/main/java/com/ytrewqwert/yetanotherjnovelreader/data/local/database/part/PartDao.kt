@@ -21,6 +21,7 @@ abstract class PartDao : BaseDao<Part>() {
     @Query("SELECT * FROM Part WHERE volumeId = :volumeId ORDER BY seriesPartNum ASC")
     abstract fun getVolumeParts(volumeId: String): Flow<List<PartFull>>
 
+    /** Returns a [Flow] of the next [PartFull]s to read from series that are being followed. */
     @Transaction
     @Query("SELECT * FROM Part WHERE EXISTS (" +
             "  SELECT NULL FROM Follow " +
@@ -30,6 +31,10 @@ abstract class PartDao : BaseDao<Part>() {
             "ORDER BY Part.title ASC")
     abstract fun getUpNextParts(): Flow<List<PartFull>>
 
+    /**
+     * Returns the most recently released [PartFull] in a series with ID [serieId] that has been
+     * fully read.
+     */
     @Query("SELECT * FROM Part WHERE serieId = :serieId AND EXISTS (" +
             "  SELECT NULL FROM Progress " +
             "  WHERE Part.id = Progress.partId " +

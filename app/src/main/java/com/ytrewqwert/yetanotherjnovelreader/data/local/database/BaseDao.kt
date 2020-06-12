@@ -2,6 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database
 
 import androidx.room.*
 
+/** An abstract [Dao] class defining some basic operations for an [Entity] of type [T]. */
 abstract class BaseDao<T> {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insert(vararg items: T): LongArray

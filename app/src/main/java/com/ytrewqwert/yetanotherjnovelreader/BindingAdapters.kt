@@ -8,14 +8,16 @@ import androidx.viewpager2.widget.ViewPager2
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import kotlin.math.roundToInt
 
+/** Custom databinding binding adapters used by the app. */
 object BindingAdapters {
-
+    /** Sets the size of text in a [TextView]. */
     @BindingAdapter("android:textSize")
     @JvmStatic
     fun textViewTextSize(textView: TextView, sizeSP: Int) {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSP.toFloat())
     }
 
+    /** Sets the size of the horizontal margins around a [TextView]. */
     @BindingAdapter("readerMarginHorizontal")
     @JvmStatic
     fun textViewReaderMarginHorizontal(textView: TextView, marginsDP: PreferenceStore.Margins) {
@@ -25,6 +27,7 @@ object BindingAdapters {
         textView.setPadding(marginLeft, textView.paddingTop, marginRight, textView.paddingBottom)
     }
 
+    /** Sets the size of the vertical margins around a [TextView]. */
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun textViewReaderMarginVertical(textView: TextView, marginsDP: PreferenceStore.Margins) {
@@ -34,6 +37,7 @@ object BindingAdapters {
         textView.setPadding(textView.paddingLeft, marginTop, textView.paddingRight, marginBottom)
     }
 
+    /** Sets the size of the vertical margins around a [ScrollView]. */
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDP: PreferenceStore.Margins) {
@@ -43,6 +47,7 @@ object BindingAdapters {
         scrollView.setPadding(scrollView.paddingLeft, marginTop, scrollView.paddingRight, marginBottom)
     }
 
+    /** Sets a [ScrollView]'s scroll position to the given value (between 0 and 1). */
     @BindingAdapter("partProgress")
     @JvmStatic
     fun setScrollReaderPosition(scrollView: ScrollView, position: Double) {
@@ -52,6 +57,11 @@ object BindingAdapters {
         scrollView.scrollTo(0, scrollPos.toInt())
     }
 
+    /**
+     * Sets a [ViewPager2]'s currently shown page to be at the page most closely corresponding to
+     * given value as a proportion. e.g. A [position] of 0.5 would move the ViewPager2 to roughly
+     * the middle page, w.r.t. the pager's total number of pages.
+     */
     @BindingAdapter("partProgress")
     @JvmStatic
     fun setPagedReaderPosition(pager: ViewPager2, position: Double) {

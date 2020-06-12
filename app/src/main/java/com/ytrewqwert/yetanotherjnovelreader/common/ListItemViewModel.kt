@@ -18,23 +18,41 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+/** Exposes data for one or more [ListItemFragment]s. */
 class ListItemViewModel(private val repository: Repository) : ViewModel() {
     companion object {
         private const val PAGE_SIZE = 50
     }
 
+    /**
+     * Contains data about the clicking of a [ListItem].
+     *
+     * @property[fragId] The ID of the list where the click occurred.
+     * @property[item] The ListItem that was clicked.
+     */
     data class ItemClickEvent(
-        val fragmentId: Int,
+        val fragId: Int,
         val item: ListItem
     )
+
+    /**
+     * Identifies where a list should source data from.
+     *
+     * @property[sourceFlow] A flow for the items to be shown in the list.
+     * @property[fetchItems] A callback for fetching more items in the list.
+     */
     data class ListItemSource(
         val sourceFlow: Flow<List<ListItem>>,
         val fetchItems: suspend (amount: Int, offset: Int, followedOnly: Boolean) -> FetchResult?
     )
 
     private val lists = ArrayList<SingleListHandler>()
+
+    /** Triggers when an item in a list is clicked. */
     val itemClickedEvent = SingleLiveEvent<ItemClickEvent>()
+
     private var isFilterFollowing = false
+
     init {
         viewModelScope.launch {
             repository.isFilterFollowing.collect {
@@ -44,24 +62,40 @@ class ListItemViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
+    /**
+     * Retrieves an image.
+     *
+     * @param[source] The URL where the image can be found.
+     * @param[callback] A callback to provide the image back to the requester.
+     */
+    fun getImage(source: String, callback: (source: String, image: Bitmap?) -> Unit) {
         viewModelScope.launch { callback(source, repository.getImage(source)) }
     }
 
+    /** Retrieves the header list LiveData corresponding to the list with ID [fragId]. */
     fun getHeaderList(fragId: Int): LiveData<List<ListHeader>?> = getHandler(fragId).header
+    /** Retrieves the item list LiveData corresponding to the list with ID [fragId]. */
     fun getItemList(fragId: Int): LiveData<List<ListItem>?> = getHandler(fragId).items
+    /** Retrieves a LiveData indicating reloading state for the [fragId]'s list. */
     fun getIsReloading(fragId: Int): LiveData<Boolean> = getHandler(fragId).reloading
+    /** Retrieves a LiveData indicating whether more pages are available for the [fragId]'s list. */
     fun getHasMorePages(fragId: Int): LiveData<Boolean> = getHandler(fragId).morePages
 
+    /** Sets the header for the list with ID [fragId]. */
     fun setHeader(fragId: Int, value: ListHeader) { getHandler(fragId).setHeader(value) }
+    /** Sets the source from which more items in the [fragId]'s list can be retrieved. */
     fun setSource(fragId: Int, source: ListItemSource) { getHandler(fragId).setDataSource(source) }
+    /** Refreshes the [fragId]'s list and resets it to showing only the first page of content. */
     fun reload(fragId: Int) { getHandler(fragId).reload() }
+    /** Fetches the next set of items to be shown in [fragId]'s list and appends it to that list. */
     fun fetchNextPage(fragId: Int) { getHandler(fragId).fetchNextPage() }
 
-    fun listItemFragmentViewOnClick(fragmentId: Int, item: ListItem) {
-        itemClickedEvent.value = ItemClickEvent(fragmentId, item)
+    /** Notifies a listener of [itemClickedEvent] of an [item] being clicked. */
+    fun listItemFragmentViewOnClick(fragId: Int, item: ListItem) {
+        itemClickedEvent.value = ItemClickEvent(fragId, item)
     }
 
+    /** Toggle's the given [item]'s 'follow' state on/off. */
     fun toggleFollowItem(item: ListItem) {
         val following: Boolean = item.isFollowed()
         val serieId: String = when (item) {

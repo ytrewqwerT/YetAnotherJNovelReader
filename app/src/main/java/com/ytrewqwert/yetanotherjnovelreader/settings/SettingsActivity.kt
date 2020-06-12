@@ -8,6 +8,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.ytrewqwert.yetanotherjnovelreader.R
 
+/** An activity for viewing and modifying the user's settings/preferences. */
 class SettingsActivity : AppCompatActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 

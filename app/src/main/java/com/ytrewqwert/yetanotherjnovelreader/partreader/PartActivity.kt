@@ -26,6 +26,7 @@ import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderF
 import com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader.ScrollReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 
+/** Displays the contents of a part for the user to read. */
 class PartActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_PART_ID = "PART_ID"
@@ -188,8 +189,6 @@ class PartActivity : AppCompatActivity() {
     }
 
     private fun transitionToContent() {
-        viewModel.gotoProgressEvent.value = true
-
         val loadBarAnimator = AnimatorInflater.loadAnimator(this, android.R.animator.fade_out)
         loadBarAnimator.setTarget(loadBar)
         loadBarAnimator.doOnEnd { loadBar.visibility = View.GONE }

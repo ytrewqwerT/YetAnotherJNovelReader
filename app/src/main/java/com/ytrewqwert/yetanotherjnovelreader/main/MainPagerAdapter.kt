@@ -7,9 +7,11 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.seriesnavigation.ExplorerFragment
 
+/** An adapter for the ViewPager in the [MainActivity]. */
 class MainPagerAdapter(fm: FragmentManager)
     : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
+    /** Defines what pages are available and the order they are shown in. */
     enum class ChildFragments {
         RECENT_PARTS,
         EXPLORER,

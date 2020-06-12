@@ -9,6 +9,19 @@ import com.ytrewqwert.yetanotherjnovelreader.forEach
 import org.json.JSONArray
 import org.json.JSONObject
 
+/**
+ * Contains data about a volume with ID [id].
+ *
+ * @property[serieId] The ID of the series that this part belongs to.
+ * @property[title] The title of this part.
+ * @property[titleslug] This part's title, but slugified.
+ * @property[volumeNum] The volume number of this volume in the series.
+ * @property[description] A description for this volume.
+ * @property[descriptionShort] A shortened description for this volume.
+ * @property[coverUrl] A URL identifying the source of the cover image for this part.
+ * @property[tags] A comma-separated string containing relevant tags for this part.
+ * @property[created] The time when this series was created.
+ */
 @Entity
 data class Volume(
     @PrimaryKey val id: String,
@@ -45,6 +58,8 @@ data class Volume(
                 created = source.getString("created")
             )
         }
+
+        /** Converts the given [volumesJson] into a list of [Volume]. */
         fun fromJson(volumesJson: JSONArray): List<Volume> = ArrayList<Volume>().apply {
             volumesJson.forEach<JSONObject> { add(fromJson(it)) }
         }

@@ -16,34 +16,50 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+/**
+ * Exposes data for the [PartActivity].
+ *
+ * @property[partId] The ID of the part to be shown in the [PartActivity].
+ */
 class PartViewModel(
     private val repository: Repository,
     private val resources: Resources,
     private val partId: String
 ) : ViewModel() {
+    /** The width of the page in which the part's text can be drawn. */
     var pageWidthPx: Int private set
+    /** The height of the page in which the part's text can be drawn. */
     var pageHeightPx: Int private set
 
+    /** Notifies an observer of when something goes wrong, with a message of what went wrong. */
     val errorEvent = SingleLiveEvent<String>()
+    /** Notifies an observer of whether the part's content is ready to be displayed to the user. */
     val partReady = SingleLiveEvent<Boolean>()
-    val gotoProgressEvent = SingleLiveEvent<Boolean>()
+    /** Notifies an observer of whether the top app bar should be shown. */
     val showAppBar = SingleLiveEvent<Boolean>()
 
     private var contentsNoImages: Spanned? = null
     private val _contents = MutableLiveData<Spanned>()
+    /** The content of the part, to be displayed to the user. */
     val contents: LiveData<Spanned> get() = _contents
 
     private val _horizontalReader = MutableLiveData<Boolean>()
     private val _fontSize = MutableLiveData<Int>()
     private val _fontStyle = MutableLiveData<Typeface>()
     private val _margin = MutableLiveData<PreferenceStore.Margins>()
+    /** Whether the activity should use a paginated, horizontally scrolling reader. */
     val horizontalReader: LiveData<Boolean> = _horizontalReader
+    /** The size to make the reader's normal text, in sp. */
     val fontSize: LiveData<Int> = _fontSize
+    /** The typeface to use in drawing the text in the reader. */
     val fontStyle: LiveData<Typeface> = _fontStyle
+    /** How much space to leave around each edge of the reader. */
     val margin: LiveData<PreferenceStore.Margins> = _margin
 
     private var savedProgress = 0.0
+    /** The user's current reading progress through the part. */
     val currentProgress = MutableLiveData(0.0)
+    /** A String representation of [currentProgress] (for databinding). */
     val progressText: LiveData<String> = Transformations.map(currentProgress) {
         "${(100*it).toInt()}%"
     }
@@ -73,6 +89,7 @@ class PartViewModel(
         showAppBar.value = !(showAppBar.value ?: false)
     }
 
+    /** Sets the dimensions of the drawable region for a single page. */
     fun setPageDimens(widthPx: Int, heightPx: Int) {
         pageWidthPx = widthPx
         pageHeightPx = heightPx
@@ -82,6 +99,7 @@ class PartViewModel(
         }
     }
 
+    /** Saves the current value of [currentProgress] to the local and remote database. */
     fun uploadProgressNow() {
         // Only upload if the value has changed since last upload
         val progress = currentProgress.value ?: 0.0

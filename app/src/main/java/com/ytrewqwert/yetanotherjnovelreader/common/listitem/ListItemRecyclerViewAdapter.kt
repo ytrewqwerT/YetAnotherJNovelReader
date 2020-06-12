@@ -12,6 +12,11 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import kotlinx.android.synthetic.main.list_item.view.*
 
+/**
+ * A [RecyclerView.Adapter] for displaying [ListItem]s.
+ *
+ * @property[imageSource] An object from which referenced images can be retrieved.
+ */
 class ListItemRecyclerViewAdapter(
     private val listener: ListItem.InteractionListener? = null,
     private val imageSource: ImageSource? = null

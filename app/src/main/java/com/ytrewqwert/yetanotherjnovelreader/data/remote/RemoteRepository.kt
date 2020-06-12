@@ -23,14 +23,20 @@ import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.coroutines.resume
 
+/**
+ * Exposes methods for fetching data from the remote database.
+ *
+ * Methods with nullable return values return null if the request failed for some reason.
+ */
 class RemoteRepository private constructor(
     appContext: Context,
     private var authToken: String?
 ) {
-
     companion object {
         private const val TAG = "RemoteRepository"
+        /** The address for J-Novel Club's backend API. */
         const val API_ADDR = "https://api.j-novel.club/api"
+        /** The address where J-Novel Club stores images. */
         const val IMG_ADDR = "https://d2dq7ifhe7bu0f.cloudfront.net"
 
         @Volatile
@@ -64,7 +70,7 @@ class RemoteRepository private constructor(
             }
         })
     }
-    suspend fun getPartContentJson(partId: String) =
+    suspend fun getPartHtml(partId: String) =
         suspendCancellableCoroutine<String?> { cont ->
             val url = "$API_ADDR/parts/${partId}/partData"
             val request = AuthorizedJsonObjectRequest(
@@ -82,7 +88,7 @@ class RemoteRepository private constructor(
             requestQueue.add(request)
         }
 
-    suspend fun getSeriesJson(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
+    suspend fun getSeries(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
         suspendCancellableCoroutine<List<Serie>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/series")
                 .addBaseFilter("limit", "$amount")
@@ -96,10 +102,10 @@ class RemoteRepository private constructor(
             }
             requestQueue.add(request)
         }
-    suspend fun getSerieVolumesJson(serieId: String, amount: Int, offset: Int) =
+    suspend fun getSerieVolumes(serieId: String, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Volume>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/volumes")
-                .addFilter("serieId", serieId)
+                .addWhereFilter("serieId", serieId)
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
                 .build()
@@ -110,10 +116,10 @@ class RemoteRepository private constructor(
             }
             requestQueue.add(request)
         }
-    suspend fun getVolumePartsJson(volumeId: String, amount: Int, offset: Int) =
+    suspend fun getVolumeParts(volumeId: String, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Part>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/parts")
-                .addFilter("volumeId", volumeId)
+                .addWhereFilter("volumeId", volumeId)
                 .addBaseFilter("limit", "$amount")
                 .addBaseFilter("offset", "$offset")
                 .build()
@@ -146,8 +152,8 @@ class RemoteRepository private constructor(
                 launch {
                     val part = suspendCancellableCoroutine<Part?> { cont ->
                         val url = ParameterizedURLBuilder("$API_ADDR/parts/findOne")
-                            .addFilter("serieId", it.first)
-                            .addFilter("partNumber", "${it.second}")
+                            .addWhereFilter("serieId", it.first)
+                            .addWhereFilter("partNumber", "${it.second}")
                             .build()
                         val request = JsonObjectRequest(
                             Request.Method.GET, url, null,
@@ -167,7 +173,7 @@ class RemoteRepository private constructor(
         Log.d(TAG, "UpNextParts: Found ${resultParts.size}/${parts.size} parts")
         return resultParts
     }
-    suspend fun getUserPartProgressJson(userId: String) =
+    suspend fun getUserPartProgress(userId: String) =
         suspendCancellableCoroutine<List<Progress>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")
                 .addInclude("readParts")
@@ -187,6 +193,7 @@ class RemoteRepository private constructor(
             )
             requestQueue.add(request)
         }
+    /** Returns true if successful, false otherwise. */
     suspend fun setUserPartProgress(userId: String, partId: String, progress: Double) =
         suspendCancellableCoroutine<Boolean> { cont ->
             val args = JSONObject().put("partId", partId).put("completion", progress)

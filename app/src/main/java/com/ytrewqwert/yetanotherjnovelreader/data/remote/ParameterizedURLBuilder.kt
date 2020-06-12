@@ -4,33 +4,42 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+/**
+ * Appends filters to a URL for a server running [Loopback](https://loopback.io/).
+ *
+ * @property[baseUrl] The original URL without any filters attached.
+ */
 class ParameterizedURLBuilder(
     private val baseUrl: String
 ) {
-
     private val fieldInListFilters = ArrayList<Pair<String, List<String>>>()
     private val whereFilters = HashMap<String, String>()
     private val baseFilters = ArrayList<Pair<String, String>>()
     private val includes = ArrayList<String>()
 
-    fun addFilter(key: String, value: String): ParameterizedURLBuilder {
-        whereFilters[key] = value
+    /** Filter that checks if [field]'s value is [value]. */
+    fun addWhereFilter(field: String, value: String): ParameterizedURLBuilder {
+        whereFilters[field] = value
         return this
     }
+    /** Filter that checks if [field]'s value is in [values]. */
     fun addFieldInListFilter(field: String, values: List<String>?): ParameterizedURLBuilder {
         if (values == null) return this
         fieldInListFilters.add(Pair(field, values))
         return this
     }
+    /** Includes relevant instances of the specified object type in the result. */
     fun addInclude(value: String): ParameterizedURLBuilder {
         includes.add(value)
         return this
     }
+    /** Add a filter in the root level. i.e. ?filters={"[type]":"[value]", ...} */
     fun addBaseFilter(type: String, value: String): ParameterizedURLBuilder {
         baseFilters.add(Pair(type, value))
         return this
     }
 
+    /** Returns the URL with the filters attached. Can only be called once per instance. */
     fun build() = toString()
 
     override fun toString(): String {

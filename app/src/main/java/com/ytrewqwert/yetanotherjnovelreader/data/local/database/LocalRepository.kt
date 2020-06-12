@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
+/** Exposes methods for interacting with the local database. */
 class LocalRepository private constructor(appContext: Context) {
     companion object {
         @Volatile
@@ -71,7 +72,9 @@ class LocalRepository private constructor(appContext: Context) {
     fun getSeries(): Flow<List<SerieFull>> = serieDao.getAllSeries()
     fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>> = volumeDao.getSerieVolumes(serieId)
     fun getVolumeParts(volumeId: String): Flow<List<PartFull>> = partDao.getVolumeParts(volumeId)
+    /** Retrieves parts ordered by their release date, newest first. */
     fun getRecentParts(): Flow<List<PartFull>> = partDao.getRecentParts()
+    /** Retrieves the next part for the user to read, for each of their followed series. */
     fun getUpNextParts(): Flow<List<PartFull>> = partDao.getUpNextParts()
 
     suspend fun getParts(vararg partId: String): List<PartFull> = withContext(Dispatchers.IO) {

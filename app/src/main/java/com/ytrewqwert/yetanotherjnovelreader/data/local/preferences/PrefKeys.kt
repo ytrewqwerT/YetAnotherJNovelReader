@@ -1,5 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.local.preferences
 
+/** Defines keys for user preferences. */
 object PrefKeys {
     const val EMAIL = "EMAIL"
     const val PASSWORD = "PASSWORD"

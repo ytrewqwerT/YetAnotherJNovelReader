@@ -22,7 +22,7 @@ import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
-
+/** The app's entry point. Shows the user lists of available parts for reading. */
 class MainActivity : AppCompatActivity(), LoginResultListener {
     companion object {
         private const val TAG = "MainActivity"
@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.account_login -> {
-            if (mainViewModel.loggedIn()) mainViewModel.logout()
+            if (mainViewModel.isLoggedIn()) mainViewModel.logout()
             else LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
             true
         }
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
     private fun updateMenu() {
         val nameHolder = appBarMenu?.findItem(R.id.account_name)
         val loginItem = appBarMenu?.findItem(R.id.account_login)
-        if (mainViewModel.loggedIn()) {
+        if (mainViewModel.isLoggedIn()) {
             nameHolder?.title = mainViewModel.getUsername()
             loginItem?.title = getString(R.string.logout)
         } else {

@@ -16,6 +16,7 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.DialogLoginBinding
 
+/** A dialog for logging in via email/password. */
 class LoginDialog : DialogFragment() {
 
     private var listener: LoginResultListener? = null

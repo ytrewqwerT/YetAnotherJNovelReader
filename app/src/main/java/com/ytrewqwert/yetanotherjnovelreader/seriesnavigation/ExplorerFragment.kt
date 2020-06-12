@@ -21,6 +21,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
+/** Displays lists of series, volumes and parts allowing for exploration of available content. */
 class ExplorerFragment : Fragment() {
     companion object {
         private const val TAG = "NavigationFragment"

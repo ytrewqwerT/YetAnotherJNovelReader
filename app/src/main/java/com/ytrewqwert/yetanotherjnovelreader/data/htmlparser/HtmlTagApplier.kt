@@ -12,12 +12,18 @@ import android.text.style.StyleSpan
 import android.util.Log
 import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterface
 
+/** Class for processing html tags. */
 class HtmlTagApplier(private val partId: String) {
     companion object {
         private const val TAG = "HtmlTagApplier"
         private val HEADING_SIZES = arrayOf(1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f)
     }
 
+    /**
+     * Formats [tagContents] based on an open/close html tag pair.
+     *
+     * @param[tagLabelTokens] A list containing the tag's label followed by any provided arguments.
+     */
     fun applyTagPair(
         tagLabelTokens: List<CharSequence>, tagContents: SpannableStringBuilder
     ) {
@@ -37,6 +43,11 @@ class HtmlTagApplier(private val partId: String) {
         }
     }
 
+    /**
+     * Returns a [SpannableStringBuilder] representing the provided self-closing html tag.
+     *
+     * @param[tagLabelTokens] A list containing the tag's label followed by any provided arguments.
+     */
     fun applyLoneTag(
         tagLabelTokens: List<CharSequence>
     ): SpannableStringBuilder {

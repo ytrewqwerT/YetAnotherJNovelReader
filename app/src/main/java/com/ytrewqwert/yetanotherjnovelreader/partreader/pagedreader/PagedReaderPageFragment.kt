@@ -14,6 +14,7 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderPageBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 
+/** An individual page in the [PagedReaderFragment]. */
 class PagedReaderPageFragment : Fragment() {
     companion object {
         const val ARG_PAGE_NUM = "PAGED_READER_PAGE_NUM"
@@ -44,7 +45,7 @@ class PagedReaderPageFragment : Fragment() {
         }
 
         val pageNum = requireArguments().getInt(ARG_PAGE_NUM, 0)
-        pagedReaderViewModel.getPageContent(pageNum)?.observe(viewLifecycleOwner) {
+        pagedReaderViewModel.getPageContent(pageNum).observe(viewLifecycleOwner) {
             textView?.text = it
         }
 

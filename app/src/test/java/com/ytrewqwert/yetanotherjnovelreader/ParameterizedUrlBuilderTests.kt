@@ -10,7 +10,7 @@ class ParameterizedUrlBuilderTests {
 
         var expectedUrl = """?filter={"where":{"launchDate":{"gt":"now"},"or":[{"id":"a"},{"id":"b"}]},"order":"launchDate+DESC"}"""
         var actualUrl = ParameterizedURLBuilder("")
-            .addFilter("launchDate", """{"gt":"now"}""")
+            .addWhereFilter("launchDate", """{"gt":"now"}""")
             .setSeriesFilters(listOf("a", "b"))
             .addBaseFilter("order", "launchDate+DESC")
             .build()
@@ -19,7 +19,7 @@ class ParameterizedUrlBuilderTests {
         expectedUrl = "?filter=" +
                 "{\"where\":{\"id\":\"serieId\"},\"include\":[\"volumes\",\"parts\"]}"
         actualUrl = ParameterizedURLBuilder("")
-            .addFilter("id", "serieId")
+            .addWhereFilter("id", "serieId")
             .addInclude("volumes")
             .addInclude("parts")
             .build()

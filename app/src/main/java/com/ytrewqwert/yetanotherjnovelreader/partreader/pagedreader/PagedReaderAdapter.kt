@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
+/** A pager adapter for [PagedReaderFragment] managing each individual page. */
 class PagedReaderAdapter(
     frag: Fragment
 ) : FragmentStateAdapter(frag) {
