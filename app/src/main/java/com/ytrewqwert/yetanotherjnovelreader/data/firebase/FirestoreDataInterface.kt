@@ -11,15 +11,19 @@ object FirestoreDataInterface {
     /** Logs an unhandled html [tag] found in [srcPartId] to the Firestore. */
     fun insertUnhandledHtmlTag(srcPartId: String, tag: String) {
         val docPath = "data/unhandled_html/tags/$tag/part_ids/$srcPartId"
-        val docRef = db.document(docPath)
-        createDocIfNotExists(docRef)
+        createDocIfNotExists(db.document(docPath))
     }
 
     /** Logs an unhandled [arg] to a html [tag] found in [srcPartId] to the Firestore. */
     fun insertUnhandledHtmlArg(srcPartId: String, tag: String, arg: String) {
         val docPath = "data/unhandled_html/tags/$tag/args/$arg/part_ids/$srcPartId"
-        val docRef = db.document(docPath)
-        createDocIfNotExists(docRef)
+        createDocIfNotExists(db.document(docPath))
+    }
+
+    /** Logs an unhandled html character [code] found in [srcPartId] to the Firestore. */
+    fun insertUnhandledCharCode(srcPartId: String, code: String) {
+        val docPath = "data/unhandled_html/char_codes/$code/part_ids/$srcPartId"
+        createDocIfNotExists(db.document(docPath))
     }
 
     private fun createDocIfNotExists(docRef: DocumentReference) {

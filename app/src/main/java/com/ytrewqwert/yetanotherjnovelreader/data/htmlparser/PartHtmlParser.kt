@@ -13,20 +13,21 @@ object PartHtmlParser {
      */
     fun parse(html: String, partId: String): Spanned {
         val tagApplier = HtmlTagApplier(partId)
-        val noNewLine = html.replace("\n", "")
+        val noCharCodes = HtmlCharCodeConverter(partId).processHtml(html)
+        val noNewLines = noCharCodes.replace("\n", "")
         val tagRegex = Regex("<[^>]*>")
         val tagStack = ArrayDeque<IncompleteTag>()
         tagStack.addFirst(IncompleteTag(listOf(""))) // Dummy tag to store processed contents
 
         var searchStartIndex = 0
-        var match = tagRegex.find(noNewLine, searchStartIndex)
+        var match = tagRegex.find(noNewLines, searchStartIndex)
         while (match != null) {
             // Append any skipped text to the parent tag before processing the current match.
-            tagStack.first.contents.append(noNewLine.subSequence(searchStartIndex, match.range.first))
+            tagStack.first.contents.append(noNewLines.subSequence(searchStartIndex, match.range.first))
 
             val tagLabelTokens = match.value.trim('<', '/', '>', ' ').split(' ')
             when {
-                noNewLine[match.range.first + 1] == '/' -> {
+                noNewLines[match.range.first + 1] == '/' -> {
                     // Closing tag
                     val openTag = tagStack.first
                     if (openTag.tagLabelTokens[0] == tagLabelTokens[0]) {
@@ -38,7 +39,7 @@ object PartHtmlParser {
                         tagStack.first.contents.append(tagApplier.applyLoneTag(tagLabelTokens))
                     }
                 }
-                noNewLine[match.range.last - 1] == '/' -> {
+                noNewLines[match.range.last - 1] == '/' -> {
                     // Self-closing tag
                     tagStack.first.contents.append(tagApplier.applyLoneTag(tagLabelTokens))
                 }
@@ -53,10 +54,10 @@ object PartHtmlParser {
                 }
             }
             searchStartIndex = match.range.last + 1
-            match = tagRegex.find(noNewLine, searchStartIndex)
+            match = tagRegex.find(noNewLines, searchStartIndex)
         }
 
-        val tail = noNewLine.subSequence(searchStartIndex, noNewLine.length)
+        val tail = noNewLines.subSequence(searchStartIndex, noNewLines.length)
         tagStack.first.contents.append(tail)
         return tagStack.first.contents
     }

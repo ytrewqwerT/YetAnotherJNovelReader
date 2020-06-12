@@ -12,7 +12,11 @@ import android.text.style.StyleSpan
 import android.util.Log
 import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterface
 
-/** Class for processing html tags. */
+/**
+ * Class for processing html tags.
+ *
+ * @property[partId] The source part to attribute any unhandled tags to when logging.
+ */
 class HtmlTagApplier(private val partId: String) {
     companion object {
         private const val TAG = "HtmlTagApplier"
