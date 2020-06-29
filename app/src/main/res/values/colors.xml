@@ -4,6 +4,9 @@
     <color name="colorPrimary">#16D</color>
     <color name="colorPrimaryDark">#16D</color>
     <color name="colorAccent">#FF7979</color>
-    <color name="navbarReaderColor">#FFF</color>
+
+    <color name="colorStar">#CC0</color>
     <color name="disabled">#8888</color>
+
+    <color name="navbarReaderColor">#FFF</color>
 </resources>

@@ -14,4 +14,6 @@
     <string name="reader">Reader</string>
     <string name="reader_margin">Reader Margin</string>
     <string name="filter_followed_series">Filter Followed Series</string>
+    <string name="cover_image">Cover Image</string>
+    <string name="followed">Followed</string>
 </resources>

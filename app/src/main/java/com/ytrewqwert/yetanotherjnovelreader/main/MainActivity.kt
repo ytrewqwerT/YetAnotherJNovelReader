@@ -130,9 +130,9 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
 
         val followMenuItem = appBarMenu?.findItem(R.id.following)
         followMenuItem?.icon = if (followMenuItem?.isChecked == true) {
-            resources.getDrawable(R.drawable.ic_star_gold_24dp, null)
+            resources.getDrawable(R.drawable.ic_star_24dp, null)
         } else {
-            resources.getDrawable(R.drawable.ic_star_border_gold_24dp, null)
+            resources.getDrawable(R.drawable.ic_star_border_24dp, null)
         }
     }
 }

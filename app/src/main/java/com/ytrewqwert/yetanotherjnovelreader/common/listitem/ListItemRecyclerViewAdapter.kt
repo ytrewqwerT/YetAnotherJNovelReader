@@ -41,8 +41,8 @@ class ListItemRecyclerViewAdapter(
         }
 
         val followIconId = when (contents.isFollowing) {
-            true -> R.drawable.ic_star_gold_24dp
-            false -> R.drawable.ic_star_border_gold_24dp
+            true -> R.drawable.ic_star_24dp
+            false -> R.drawable.ic_star_border_24dp
         }
         val followIcon = holder.view.resources.getDrawable(followIconId, null)
         holder.following.setImageDrawable(followIcon)
