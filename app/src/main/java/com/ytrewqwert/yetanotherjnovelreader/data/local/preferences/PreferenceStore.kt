@@ -130,11 +130,9 @@ class PreferenceStore private constructor(private val appContext: Context) {
     }
 
     private fun getTypeface(): Typeface {
-        return when (val styleString = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!) {
-            "default" -> Typeface.defaultFromStyle(Typeface.NORMAL)
-            // Recreating every time the style is requested is probably a bad idea
-            else -> Typeface.createFromAsset(appContext.assets, "fonts/$styleString")
-        }
+        val fontStr = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!
+        val fontResId = FontResIds.getFontResourceId(fontStr) ?: return Typeface.DEFAULT
+        return appContext.resources.getFont(fontResId)
     }
 
     private fun getMargins(): Margins {
