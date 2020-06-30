@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  Note: modifications to font_names and font_files must also modify class FontResIds...  -->
     <string-array name="font_names">
         <item>Default</item>
         <item>Alegreya</item>
@@ -10,10 +11,10 @@
     </string-array>
     <string-array name="font_files">
         <item>default</item>
-        <item>alegreya.ttf</item>
-        <item>alegreya_sans.ttf</item>
-        <item>crimson_text.ttf</item>
-        <item>lora.ttf</item>
-        <item>open_sans.ttf</item>
+        <item>alegreya</item>
+        <item>alegreya_sans</item>
+        <item>crimson_text</item>
+        <item>lora</item>
+        <item>open_sans</item>
     </string-array>
 </resources>
