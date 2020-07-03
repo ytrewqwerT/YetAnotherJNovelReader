@@ -10,7 +10,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.TagApplier
  */
 abstract class LoneTagApplier(partId: CharSequence) : TagApplier(partId) {
     /** Returns a  representation of the html tag with properties specified by [args]. */
-    abstract fun apply(args: List<CharSequence>): SpannableStringBuilder
+    abstract fun apply(args: List<Pair<CharSequence, CharSequence>>): SpannableStringBuilder
 
     companion object {
         /** Returns the [LoneTagApplier] for [tag], injecting [partId] for its source part. */

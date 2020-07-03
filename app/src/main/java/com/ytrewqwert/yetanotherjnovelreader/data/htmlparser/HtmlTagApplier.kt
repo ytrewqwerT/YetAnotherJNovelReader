@@ -13,26 +13,26 @@ class HtmlTagApplier(private val partId: String) {
     /**
      * Formats [tagContents] based on an open/close html tag pair.
      *
-     * @param[tagLabelTokens] A list containing the tag's label followed by any provided arguments.
+     * @param[tagLabel] The tag's label (e.g. 'p' for paragraphs)
+     * @param[tagArgs] A list of pairs grouping any arguments with their values.
      */
     fun applyTagPair(
-        tagLabelTokens: List<CharSequence>, tagContents: SpannableStringBuilder
+        tagLabel: CharSequence,
+        tagArgs: List<Pair<CharSequence, CharSequence>>,
+        tagContents: SpannableStringBuilder
     ) {
-        val label = tagLabelTokens[0]
-        val args = tagLabelTokens.subList(1, tagLabelTokens.size)
-        PairTagApplier.getApplier(label, partId).apply(args, tagContents)
+        PairTagApplier.getApplier(tagLabel, partId).apply(tagArgs, tagContents)
     }
 
     /**
      * Returns a [SpannableStringBuilder] representing the provided self-closing html tag.
      *
-     * @param[tagLabelTokens] A list containing the tag's label followed by any provided arguments.
+     * @param[tagLabel] The tag's label (e.g. 'br' for a line break)
+     * @param[tagArgs] A list of pairs grouping any arguments with their values.
      */
     fun applyLoneTag(
-        tagLabelTokens: List<CharSequence>
+        tagLabel: CharSequence, tagArgs: List<Pair<CharSequence, CharSequence>>
     ): SpannableStringBuilder {
-        val label = tagLabelTokens[0]
-        val args = tagLabelTokens.subList(1, tagLabelTokens.size)
-        return LoneTagApplier.getApplier(label, partId).apply(args)
+        return LoneTagApplier.getApplier(tagLabel, partId).apply(tagArgs)
     }
 }

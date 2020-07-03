@@ -3,9 +3,6 @@ package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.pairtags
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.TagApplier
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags.BrLoneTagApplier
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags.DummyLoneTagApplier
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags.ImgLoneTagApplier
 import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags.LoneTagApplier
 
 /**
@@ -15,7 +12,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags.LoneT
  */
 abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
     /** Applies the html tag pair modified by properties specified by [args] to [contents]. */
-    abstract fun apply(args: List<CharSequence>, contents: SpannableStringBuilder)
+    abstract fun apply(args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder)
 
     /** Applies [spans], exclusive-exclusive, to the entire length of [target]. */
     protected fun applySpans(target: Spannable, vararg spans: Any) {

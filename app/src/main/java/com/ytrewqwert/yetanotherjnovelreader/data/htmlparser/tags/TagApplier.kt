@@ -21,9 +21,10 @@ abstract class TagApplier(private val partId: CharSequence) {
     }
 
     /** Logs a warning and reports any (unhandled) arguments to the linked Firestore. */
-    protected fun warnIfArgsNotEmpty(tag: CharSequence, args: List<CharSequence>) {
+    protected fun warnIfArgsNotEmpty(tag: CharSequence, args: List<Pair<CharSequence, CharSequence>>) {
         if (args.isEmpty()) return
         Log.w(TAG, "Unhandled args for tag \"$tag\": $args")
-        reportUnhandledArg(tag, *args.toTypedArray())
+        val combinedTypeValue = args.map { "${it.first}=${it.second}" }
+        reportUnhandledArg(tag, *combinedTypeValue.toTypedArray())
     }
 }

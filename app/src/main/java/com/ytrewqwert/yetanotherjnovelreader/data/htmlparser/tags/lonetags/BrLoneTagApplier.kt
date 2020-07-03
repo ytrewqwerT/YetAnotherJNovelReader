@@ -8,7 +8,7 @@ import android.text.SpannableStringBuilder
  * @param[partId] The id of the source part to attribute unhandled arguments to.
  */
 class BrLoneTagApplier(partId: CharSequence) : LoneTagApplier(partId) {
-    override fun apply(args: List<CharSequence>): SpannableStringBuilder {
+    override fun apply(args: List<Pair<CharSequence, CharSequence>>): SpannableStringBuilder {
         warnIfArgsNotEmpty("br", args)
         return SpannableStringBuilder("\n")
     }

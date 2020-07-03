@@ -16,18 +16,28 @@ class PPairTagApplier(partId: CharSequence) : PairTagApplier(partId) {
         private const val TAG = "PPairTagApplier"
     }
 
-    override fun apply(args: List<CharSequence>, contents: SpannableStringBuilder) {
+    override fun apply(args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder) {
         var putLeadingMargin = true
         for (arg in args) {
-            when (arg) {
-                "class=\"centerp\"" -> {
-                    val centerSpan = AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
-                    applySpans(contents, centerSpan)
-                    putLeadingMargin = false
+            val (type, value) = arg
+            when (type) {
+                "class" -> {
+                    val splitValues = value.trim('"').split(' ')
+                    for (v in splitValues) when(v) {
+                        "centerp" -> {
+                            val centerSpan = AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
+                            applySpans(contents, centerSpan)
+                            putLeadingMargin = false
+                        }
+                        else -> {
+                            Log.w(TAG, "Unhandled arg: $arg")
+                            reportUnhandledArg("p", "$type=\"$v\"")
+                        }
+                    }
                 }
                 else -> {
                     Log.w(TAG, "Unhandled arg: $arg")
-                    reportUnhandledArg("p", "$arg")
+                    reportUnhandledArg("p", "$type=$value")
                 }
             }
         }
