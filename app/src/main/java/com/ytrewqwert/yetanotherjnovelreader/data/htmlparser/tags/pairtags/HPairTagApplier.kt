@@ -16,7 +16,9 @@ class HPairTagApplier(partId: CharSequence, private val headerSize: Int) : PairT
         private val HEADING_SIZES = arrayOf(1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f)
     }
 
-    override fun apply(args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder) {
+    override fun apply(
+        args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
+    ) {
         warnIfArgsNotEmpty("h$headerSize", args)
         applySpans(
             contents,

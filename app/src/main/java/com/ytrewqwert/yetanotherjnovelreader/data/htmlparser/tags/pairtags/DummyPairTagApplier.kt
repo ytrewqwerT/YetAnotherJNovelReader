@@ -18,13 +18,15 @@ class DummyPairTagApplier(private val partId: CharSequence, private val tag: Cha
         private const val TAG = "DummyPairTagApplier"
     }
 
-    override fun apply(args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder) {
+    override fun apply(
+        args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
+    ) {
         Log.w(TAG, "Unhandled html tag pair: $tag")
         FirestoreDataInterface.insertUnhandledHtmlTag("$partId", "$tag")
         warnIfArgsNotEmpty(tag, args)
 
         val argsCombinedTypeValue = args.map { "${it.first}=${it.second}" }
-        val openTag = "<$tag ${argsCombinedTypeValue.joinToString(" ")} />"
+        val openTag = "<$tag ${argsCombinedTypeValue.joinToString(" ")}>"
         val closeTag = "<$tag />"
         contents.insert(0, openTag)
         contents.append(closeTag)

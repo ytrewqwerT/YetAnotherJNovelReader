@@ -10,7 +10,9 @@ import android.text.style.StyleSpan
  * @param[partId] The id of the source part to attribute unhandled arguments to.
  */
 class EmPairTagApplier(partId: CharSequence) : PairTagApplier(partId) {
-    override fun apply(args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder) {
+    override fun apply(
+        args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
+    ) {
         warnIfArgsNotEmpty("em", args)
         applySpans(contents, StyleSpan(Typeface.ITALIC))
     }

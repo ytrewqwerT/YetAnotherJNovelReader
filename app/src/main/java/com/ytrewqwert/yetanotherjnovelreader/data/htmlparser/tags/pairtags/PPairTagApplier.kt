@@ -15,7 +15,9 @@ class PPairTagApplier(partId: CharSequence) : PairTagApplier(partId) {
         private const val TAG = "PPairTagApplier"
     }
 
-    override fun apply(args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder) {
+    override fun apply(
+        args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
+    ) {
         applySpans(contents, LeadingMarginSpan.Standard(100, 0)) // Paragraph indentation
         for (arg in args) {
             val (type, value) = arg

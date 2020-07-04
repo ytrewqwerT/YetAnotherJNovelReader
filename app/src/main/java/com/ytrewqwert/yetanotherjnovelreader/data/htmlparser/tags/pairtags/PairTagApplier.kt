@@ -10,7 +10,9 @@ import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.TagApplier
  */
 abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
     /** Applies the html tag pair modified by properties specified by [args] to [contents]. */
-    abstract fun apply(args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder)
+    abstract fun apply(
+        args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
+    )
 
     companion object {
         /** Returns the [PairTagApplier] for [tag], injecting [partId] as its source part. */
@@ -19,6 +21,7 @@ abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
             "p" -> PPairTagApplier(partId)
             "b" -> BPairTagApplier(partId)
             "em" -> EmPairTagApplier(partId)
+            "u" -> UPairTagApplier(partId)
             else -> DummyPairTagApplier(partId, tag)
         }
     }
