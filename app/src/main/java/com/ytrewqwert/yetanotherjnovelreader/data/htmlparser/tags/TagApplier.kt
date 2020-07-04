@@ -1,5 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags
 
+import android.text.Spannable
 import android.util.Log
 import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterface
 
@@ -11,6 +12,13 @@ import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterfac
 abstract class TagApplier(private val partId: CharSequence) {
     companion object {
         private const val TAG = "TagApplier"
+
+        /** Applies [spans], exclusive-exclusive, to the entire length of [target]. */
+        fun applySpans(target: Spannable, vararg spans: Any) {
+            for (span in spans) {
+                target.setSpan(span, 0, target.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
     }
 
     /** Logs any unhandled [args] from a given html [tag] to the linked Firestore. */
