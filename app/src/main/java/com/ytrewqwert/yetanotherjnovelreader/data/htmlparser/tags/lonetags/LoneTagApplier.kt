@@ -16,6 +16,7 @@ abstract class LoneTagApplier(partId: CharSequence) : TagApplier(partId) {
         /** Returns the [LoneTagApplier] for [tag], injecting [partId] for its source part. */
         fun getApplier(tag: CharSequence, partId: CharSequence): LoneTagApplier = when(tag) {
             "br" -> BrLoneTagApplier(partId)
+            "hr" -> HrLoneTagApplier(partId)
             "img" -> ImgLoneTagApplier(partId)
             else -> DummyLoneTagApplier(partId, tag)
         }

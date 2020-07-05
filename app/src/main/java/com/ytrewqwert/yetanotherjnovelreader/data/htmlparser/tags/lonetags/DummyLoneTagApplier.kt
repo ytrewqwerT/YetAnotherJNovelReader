@@ -24,7 +24,7 @@ class DummyLoneTagApplier(private val partId: CharSequence, private val tag: Cha
         warnIfArgsNotEmpty(tag, args)
 
         val argsCombinedTypeValue = args.map { "${it.first}=${it.second}" }
-        val fullTag = "<$tag ${argsCombinedTypeValue.joinToString(" ")} />"
+        val fullTag = "<$tag ${argsCombinedTypeValue.joinToString(" ")}/>"
         return SpannableStringBuilder(fullTag)
     }
 }
