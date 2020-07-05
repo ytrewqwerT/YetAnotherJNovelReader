@@ -31,9 +31,11 @@ class HtmlCharCodeConverter(private val partId: String) {
         return result.toString()
     }
 
+    // Should probably generalise the replacements of "#xxx" style codes.
     private fun convertCharCode(code: String): String = when (code) {
         "#38", "amp" -> "&"
         "#39", "apos" -> "'"
+        "#8195", "emsp" -> "\u2003"
         else -> {
             Log.w(TAG, "Unhandled html character code: &$code;")
             FirestoreDataInterface.insertUnhandledCharCode(partId, code)
