@@ -22,6 +22,7 @@ abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
             "b" -> BPairTagApplier(partId)
             "em" -> EmPairTagApplier(partId)
             "u" -> UPairTagApplier(partId)
+            "s" -> SPairTagApplier(partId)
             else -> DummyPairTagApplier(partId, tag)
         }
     }
