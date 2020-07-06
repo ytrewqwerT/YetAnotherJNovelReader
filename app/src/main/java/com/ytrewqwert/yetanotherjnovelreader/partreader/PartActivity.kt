@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -69,6 +70,7 @@ class PartActivity : AppCompatActivity() {
         loadBar = findViewById(R.id.load_bar)
         readerContainer = findViewById(R.id.reader_container)
 
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         initialiseSystemBars()
         initialiseObserversListeners()
         setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
