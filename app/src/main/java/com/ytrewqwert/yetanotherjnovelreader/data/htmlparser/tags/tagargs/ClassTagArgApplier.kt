@@ -19,6 +19,7 @@ object ClassTagArgApplier : TagArgApplier {
     private fun getClassApplier(cls: CharSequence): TagArgApplier? = when(cls) {
         "centerp" -> CenterpApplier
         "noindent" -> NoindentApplier
+        "signature" -> SignatureApplier
         else -> null
     }
 }
