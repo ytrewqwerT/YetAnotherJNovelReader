@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.PairTagApplier
 
 /**
  * PairTagApplier for header html tags. (i.e. h1 - h6).

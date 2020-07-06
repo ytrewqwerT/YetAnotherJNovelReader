@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.text.SpannableStringBuilder
 import android.text.style.ReplacementSpan
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
 
 /**
  * LoneTagApplier for the 'hr' html tag.

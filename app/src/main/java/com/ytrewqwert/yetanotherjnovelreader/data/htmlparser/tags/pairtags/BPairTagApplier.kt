@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.pairtags
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.PairTagApplier
 
 /**
  * PairTagApplier for the 'b' html tag.

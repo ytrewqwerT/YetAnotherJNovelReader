@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.pairtags
 import android.text.SpannableStringBuilder
 import android.text.style.LeadingMarginSpan
 import android.util.Log
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.PairTagApplier
 import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.TagArgApplier
 
 /**

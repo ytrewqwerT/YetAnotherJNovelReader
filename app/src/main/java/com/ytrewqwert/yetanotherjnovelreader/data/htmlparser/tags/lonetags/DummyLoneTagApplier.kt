@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags
 import android.text.SpannableStringBuilder
 import android.util.Log
 import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterface
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
 
 /**
  * A dummy LoneTagApplier for unhandled tags. Reports the tag and returns the original tag as a

@@ -1,7 +1,7 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags
+package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags
 
 import android.text.SpannableStringBuilder
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.TagApplier
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags.*
 
 /**
  * *Interface* for the application of self-closing html tags.

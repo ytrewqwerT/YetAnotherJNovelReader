@@ -1,7 +1,7 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.pairtags
+package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags
 
 import android.text.SpannableStringBuilder
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.TagApplier
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.pairtags.*
 
 /**
  * *Interface* for the application of open/close html tag pairs.
@@ -23,6 +23,7 @@ abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
             "em" -> EmPairTagApplier(partId)
             "u" -> UPairTagApplier(partId)
             "s" -> SPairTagApplier(partId)
+            "sup" -> SupPairTagApplier(partId)
             else -> DummyPairTagApplier(partId, tag)
         }
     }

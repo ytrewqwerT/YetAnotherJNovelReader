@@ -2,6 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags
 
 import android.text.Html
 import android.text.SpannableStringBuilder
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
 
 /**
  * LoneTagApplier for the 'img' html tag.

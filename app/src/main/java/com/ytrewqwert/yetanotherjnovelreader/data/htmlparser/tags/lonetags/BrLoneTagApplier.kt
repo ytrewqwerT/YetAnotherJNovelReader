@@ -1,6 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags
 
 import android.text.SpannableStringBuilder
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
 
 /**
  * LoneTagApplier for the 'br' html tag.

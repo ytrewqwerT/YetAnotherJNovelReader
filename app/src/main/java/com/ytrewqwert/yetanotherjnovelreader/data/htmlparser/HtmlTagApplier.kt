@@ -1,8 +1,8 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser
 
 import android.text.SpannableStringBuilder
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.lonetags.LoneTagApplier
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.pairtags.PairTagApplier
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.PairTagApplier
 
 /**
  * Class for processing html tags.
