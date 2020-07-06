@@ -16,7 +16,7 @@ object FontResIds {
     fun getFontResourceId(fontStr: String): Int? = when (fontStr) {
         "alegreya" -> R.font.alegreya_family
         "alegreya_sans" -> R.font.alegreya_sans_family
-        "crimson_text" -> R.font.crimson_text_family
+        "amiri" -> R.font.amiri_family
         "lora" -> R.font.lora_family
         "open_sans" -> R.font.open_sans_family
         else -> null

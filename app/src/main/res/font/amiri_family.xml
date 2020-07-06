@@ -3,17 +3,17 @@
     <font
         android:fontStyle="normal"
         android:fontWeight="400"
-        android:font="@font/crimson_text" />
+        android:font="@font/amiri" />
     <font
         android:fontStyle="italic"
         android:fontWeight="400"
-        android:font="@font/crimson_text_italic" />
+        android:font="@font/amiri_italic" />
     <font
         android:fontStyle="normal"
         android:fontWeight="700"
-        android:font="@font/crimson_text_bold" />
+        android:font="@font/amiri_bold" />
     <font
         android:fontStyle="italic"
         android:fontWeight="700"
-        android:font="@font/crimson_text_bold_italic" />
+        android:font="@font/amiri_bold_italic" />
 </font-family>
