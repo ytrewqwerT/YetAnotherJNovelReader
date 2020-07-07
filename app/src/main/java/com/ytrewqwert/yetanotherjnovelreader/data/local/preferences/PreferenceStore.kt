@@ -40,19 +40,19 @@ class PreferenceStore private constructor(private val appContext: Context) {
 
     // User login details
     var email: String?
-        get() = sharedPref.getString(PrefKeys.EMAIL, null)
-        set(value) = sharedPref.setString(PrefKeys.EMAIL, value)
+        get() = encryptedPreferences.getString(PrefKeys.EMAIL, null)
+        set(value) = encryptedPreferences.setString(PrefKeys.EMAIL, value)
     var password: String?
         get() = encryptedPreferences.getString(PrefKeys.PASSWORD, null)
         set(value) = encryptedPreferences.setString(PrefKeys.PASSWORD, value)
+    var authToken: String?
+        get() = encryptedPreferences.getString(PrefKeys.AUTH_TOKEN, null)
+        set(value) = encryptedPreferences.setString(PrefKeys.AUTH_TOKEN, value)
 
     // User account details
     var userId: String?
         get() = sharedPref.getString(PrefKeys.USER_ID, null)
         set(value) = sharedPref.setString(PrefKeys.USER_ID, value)
-    var authToken: String?
-        get() = sharedPref.getString(PrefKeys.AUTH_TOKEN, null)
-        set(value) = sharedPref.setString(PrefKeys.AUTH_TOKEN, value)
     private var authDate: String?
         get() = sharedPref.getString(PrefKeys.AUTH_DATE, null)
         set(value) = sharedPref.setString(PrefKeys.AUTH_DATE, value)
