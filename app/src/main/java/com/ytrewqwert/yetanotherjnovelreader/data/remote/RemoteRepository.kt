@@ -16,6 +16,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.JNCApiFactory
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -88,20 +89,17 @@ class RemoteRepository private constructor(
             requestQueue.add(request)
         }
 
-    suspend fun getSeries(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
-        suspendCancellableCoroutine<List<Serie>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/series")
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .addFieldInListFilter("id", seriesFilters)
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "SeriesRequest: Found ${it?.length()} series")
-                if (it != null) cont.resume(Serie.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
+    suspend fun getSeries(amount: Int, offset: Int, seriesFilters: List<String>? = null): List<Serie>? {
+        val filters = UrlParameterBuilder().apply {
+            addLimit(amount)
+            addOffset(offset)
+            if (seriesFilters != null) addWhereFieldInList("id", seriesFilters)
+        }.toString()
+
+        val rawSeries = JNCApiFactory.jncApi.getSeries(filters)
+        Log.d(TAG, "SeriesRequest: Found ${rawSeries.size} series")
+        return rawSeries.map { Serie.fromSerieRaw(it) }
+    }
     suspend fun getSerieVolumes(serieId: String, amount: Int, offset: Int) =
         suspendCancellableCoroutine<List<Volume>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/volumes")
