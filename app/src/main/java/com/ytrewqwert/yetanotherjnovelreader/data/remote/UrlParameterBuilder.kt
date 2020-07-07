@@ -11,12 +11,16 @@ class UrlParameterBuilder {
     private val wheres = ArrayList<String>()
     private var limit: String? = null
     private var offset: String? = null
+    private var order: String? = null
 
     /** Adds a parameter of the form "limit":value */
     fun addLimit(value: Int) { limit = "\"limit\":$value" }
 
     /** Adds a parameter of the form "offset":value */
     fun addOffset(value: Int) { offset = "\"offset\":$value" }
+
+    /** Adds a parameter of the form "order":"value" */
+    fun addOrder(value: String) { order = "\"order\":\"$value\"" }
 
     /** Adds a 'where' parameter of the form: "key":value */
     fun addWhere(key: String, value: String) { wheres.add("\"$key\":$value") }
@@ -34,6 +38,7 @@ class UrlParameterBuilder {
         if (wheres.isNotEmpty()) result.add(wheresJoined())
         if (limit != null) result.add(limit)
         if (offset != null) result.add(offset)
+        if (order != null) result.add(order)
         return result.toString()
     }
 

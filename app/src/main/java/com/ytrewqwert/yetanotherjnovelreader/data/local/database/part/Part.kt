@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import com.ytrewqwert.yetanotherjnovelreader.forEach
-import org.json.JSONArray
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.PartRaw
 import org.json.JSONObject
 
 /**
@@ -38,6 +37,28 @@ data class Part(
     val preview: Boolean
 ) : ListItem {
     companion object {
+        /** Converts the given [partRaw] into a [Part]. */
+        fun fromPartRaw(partRaw: PartRaw): Part {
+            var coverUrl = ""
+            for (attach in partRaw.attachments) {
+                if (attach.imgUrl.contains("cover")) coverUrl = attach.imgUrl
+            }
+
+            return Part(
+                id = partRaw.id,
+                volumeId = partRaw.volumeId,
+                serieId = partRaw.serieId,
+                title = partRaw.title,
+                titleslug = partRaw.titleslug,
+                seriesPartNum = partRaw.partNumber,
+                coverUrl = coverUrl,
+                tags = partRaw.tags,
+                launchDate = partRaw.launchDate,
+                expired = partRaw.expired,
+                preview = partRaw.preview
+            )
+        }
+
         /** Converts the given [partJson] into a [Part]. */
         fun fromJson(partJson: JSONObject): Part {
             // Find the value for coverThumbUrl (if it exists)
@@ -61,10 +82,6 @@ data class Part(
                 expired = partJson.getBoolean("expired"),
                 preview = partJson.getBoolean("preview")
             )
-        }
-        /** Converts the given [partsJson] into a list of [Part]. */
-        fun fromJson(partsJson: JSONArray): List<Part> = ArrayList<Part>().apply {
-            partsJson.forEach<JSONObject> { add(fromJson(it)) }
         }
     }
 

@@ -8,7 +8,6 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
-import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
@@ -20,7 +19,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.JNCApiFactory
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.coroutines.resume
 
@@ -100,49 +98,40 @@ class RemoteRepository private constructor(
         Log.d(TAG, "SeriesRequest: Found ${rawSeries.size} series")
         return rawSeries.map { Serie.fromSerieRaw(it) }
     }
-    suspend fun getSerieVolumes(serieId: String, amount: Int, offset: Int) =
-        suspendCancellableCoroutine<List<Volume>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/volumes")
-                .addWhereFilter("serieId", serieId)
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "SerieVolumesRequest: Found ${it?.length()} volumes")
-                if (it != null) cont.resume(Volume.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
-    suspend fun getVolumeParts(volumeId: String, amount: Int, offset: Int) =
-        suspendCancellableCoroutine<List<Part>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/parts")
-                .addWhereFilter("volumeId", volumeId)
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "VolumePartsRequest: Found ${it?.length()} parts")
-                if (it != null) cont.resume(Part.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
-    suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
-        suspendCancellableCoroutine<List<Part>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/parts")
-                .addBaseFilter("order", "launchDate+DESC")
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .addFieldInListFilter("serieId", seriesFilters)
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "RecentPartsRequest: Found ${it?.length()} parts")
-                if (it != null) cont.resume(Part.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
+    suspend fun getSerieVolumes(serieId: String, amount: Int, offset: Int): List<Volume>? {
+        val filters = UrlParameterBuilder().apply {
+            addLimit(amount)
+            addOffset(offset)
+            addWhere("serieId", "\"$serieId\"")
+        }.toString()
+
+        val rawVolumes = JNCApiFactory.jncApi.getVolumes(filters)
+        Log.d(TAG, "SerieVolumesRequest: Found ${rawVolumes.size} volumes")
+        return rawVolumes.map { Volume.fromVolumeRaw(it) }
+    }
+    suspend fun getVolumeParts(volumeId: String, amount: Int, offset: Int): List<Part>? {
+        val filters = UrlParameterBuilder().apply {
+            addLimit(amount)
+            addOffset(offset)
+            addWhere("volumeId", "\"$volumeId\"")
+        }.toString()
+
+        val rawParts = JNCApiFactory.jncApi.getParts(filters)
+        Log.d(TAG, "VolumePartsRequest: Found ${rawParts.size} parts")
+        return rawParts.map { Part.fromPartRaw(it) }
+    }
+    suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null): List<Part>? {
+        val filters = UrlParameterBuilder().apply {
+            addOrder("launchDate+DESC")
+            addLimit(amount)
+            addOffset(offset)
+            if (seriesFilters != null) addWhereFieldInList("serieId", seriesFilters)
+        }.toString()
+
+        val rawParts = JNCApiFactory.jncApi.getParts(filters)
+        Log.d(TAG, "RecentPartsRequest: Found ${rawParts.size} parts")
+        return rawParts.map { Part.fromPartRaw(it) }
+    }
     suspend fun getUpNextParts(parts: List<Pair<String, Int>>): List<Part> {
         val resultParts = ArrayList<Part>()
         coroutineScope {
@@ -171,6 +160,7 @@ class RemoteRepository private constructor(
         Log.d(TAG, "UpNextParts: Found ${resultParts.size}/${parts.size} parts")
         return resultParts
     }
+
     suspend fun getUserPartProgress(userId: String) =
         suspendCancellableCoroutine<List<Progress>?> { cont ->
             val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")
@@ -248,10 +238,4 @@ class RemoteRepository private constructor(
         )
         requestQueue.add(request)
     }
-
-    private fun createListRequest(url: String, result: (JSONArray?) -> Unit) = JsonArrayRequest(
-        Request.Method.GET, url, null,
-        Response.Listener { result(it) },
-        Response.ErrorListener { result(null) }
-    )
 }
