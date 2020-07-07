@@ -6,7 +6,6 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.PartRaw
-import org.json.JSONObject
 
 /**
  * Contains data about a part with ID [id].
@@ -56,31 +55,6 @@ data class Part(
                 launchDate = partRaw.launchDate,
                 expired = partRaw.expired,
                 preview = partRaw.preview
-            )
-        }
-
-        /** Converts the given [partJson] into a [Part]. */
-        fun fromJson(partJson: JSONObject): Part {
-            // Find the value for coverThumbUrl (if it exists)
-            val attachments = partJson.getJSONArray("attachments")
-            var coverUrl = ""
-            for (i in 0 until attachments.length()) {
-                val attachUrl = attachments.getJSONObject(i).getString("fullpath")
-                if (attachUrl.contains("cover")) coverUrl = attachUrl
-            }
-
-            return Part(
-                id = partJson.getString("id"),
-                volumeId = partJson.getString("volumeId"),
-                serieId = partJson.getString("serieId"),
-                title = partJson.getString("title"),
-                titleslug = partJson.getString("titleslug"),
-                seriesPartNum = partJson.getInt("partNumber"),
-                coverUrl = coverUrl,
-                tags = partJson.getString("tags"),
-                launchDate = partJson.getString("launchDate"),
-                expired = partJson.getBoolean("expired"),
-                preview = partJson.getBoolean("preview")
             )
         }
     }

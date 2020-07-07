@@ -16,10 +16,11 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.JNCApiFactory
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
+import retrofit2.HttpException
 import kotlin.coroutines.resume
 
 /**
@@ -135,29 +136,28 @@ class RemoteRepository private constructor(
     suspend fun getUpNextParts(parts: List<Pair<String, Int>>): List<Part> {
         val resultParts = ArrayList<Part>()
         coroutineScope {
-            parts.forEach {
-                launch {
-                    val part = suspendCancellableCoroutine<Part?> { cont ->
-                        val url = ParameterizedURLBuilder("$API_ADDR/parts/findOne")
-                            .addWhereFilter("serieId", it.first)
-                            .addWhereFilter("partNumber", "${it.second}")
-                            .build()
-                        val request = JsonObjectRequest(
-                            Request.Method.GET, url, null,
-                            Response.Listener {
-                                cont.resume(Part.fromJson(it))
-                            },
-                            Response.ErrorListener {
-                                cont.resume(null)
-                            }
-                        )
-                        requestQueue.add(request)
-                    }
-                    if (part != null) resultParts.add(part)
+            val jobs = parts.map {
+                async {
+                    val filters = UrlParameterBuilder().apply {
+                        addWhere("serieId", "\"${it.first}\"")
+                        addWhere("partNumber", "${it.second}")
+                    }.toString()
+
+                    val rawPart = JNCApiFactory.jncApi.getPart(filters)
+                    Part.fromPartRaw(rawPart)
+                }
+            }
+
+            for (job in jobs) {
+                try {
+                    val part = job.await()
+                    resultParts.add(part)
+                } catch (e: HttpException) {
+                    if (e.code() != 404) throw e // 404 returned if the part doesn't exist...
                 }
             }
         }
-        Log.d(TAG, "UpNextParts: Found ${resultParts.size}/${parts.size} parts")
+        Log.d(TAG, "UpNextPartsRequest: Found ${resultParts.size}/${parts.size} parts")
         return resultParts
     }
 

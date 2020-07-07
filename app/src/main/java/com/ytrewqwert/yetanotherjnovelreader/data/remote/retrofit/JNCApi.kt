@@ -15,4 +15,7 @@ interface JNCApi {
 
     @GET("api/parts")
     suspend fun getParts(@Query("filter") params: Any? = null): List<PartRaw>
+
+    @GET("api/parts/findOne")
+    suspend fun getPart(@Query("filter") params: Any): PartRaw
 }
