@@ -22,20 +22,9 @@ class ParameterizedURLBuilder(
         whereFilters[field] = value
         return this
     }
-    /** Filter that checks if [field]'s value is in [values]. */
-    fun addFieldInListFilter(field: String, values: List<String>?): ParameterizedURLBuilder {
-        if (values == null) return this
-        fieldInListFilters.add(Pair(field, values))
-        return this
-    }
     /** Includes relevant instances of the specified object type in the result. */
     fun addInclude(value: String): ParameterizedURLBuilder {
         includes.add(value)
-        return this
-    }
-    /** Add a filter in the root level. i.e. ?filters={"[type]":"[value]", ...} */
-    fun addBaseFilter(type: String, value: String): ParameterizedURLBuilder {
-        baseFilters.add(Pair(type, value))
         return this
     }
 

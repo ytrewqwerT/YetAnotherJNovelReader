@@ -16,12 +16,15 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.JNCApiFactory
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.ProgressRaw
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import retrofit2.HttpException
 import kotlin.coroutines.resume
+
+// TODO: Error-path handling for Retrofit requests
 
 /**
  * Exposes methods for fetching data from the remote database.
@@ -161,45 +164,23 @@ class RemoteRepository private constructor(
         return resultParts
     }
 
-    suspend fun getUserPartProgress(userId: String) =
-        suspendCancellableCoroutine<List<Progress>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")
-                .addInclude("readParts")
-                .build()
-            val request = AuthorizedJsonObjectRequest(
-                authToken, Request.Method.GET, url, null,
-                Response.Listener {
-                    val partProgress = it.getJSONArray("readParts")
-                    Log.d(TAG, "PartProgressSuccess: Found ${partProgress.length()} parts")
-                    Log.v(TAG, partProgress.toString(4))
-                    cont.resume(Progress.fromJson(partProgress))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "PartProgressFailure: $it")
-                    cont.resume(null)
-                }
-            )
-            requestQueue.add(request)
-        }
+    suspend fun getUserPartProgress(userId: String): List<Progress>? {
+        val filters = UrlParameterBuilder().apply {
+            addInclude("readParts")
+        }.toString()
+
+        val rawUserWithProgress = JNCApiFactory.jncApi.getUser(authToken, userId, filters)
+        val rawProgress = rawUserWithProgress.readParts ?: return null
+        Log.d(TAG, "LoadProgressSuccess: Found ${rawProgress.size} parts")
+        return rawProgress.map { Progress.fromProgressRaw(it) }
+    }
     /** Returns true if successful, false otherwise. */
-    suspend fun setUserPartProgress(userId: String, partId: String, progress: Double) =
-        suspendCancellableCoroutine<Boolean> { cont ->
-            val args = JSONObject().put("partId", partId).put("completion", progress)
-            val request = AuthorizedJsonObjectRequest(
-                authToken, Request.Method.POST,
-                "$API_ADDR/users/${userId}/updateReadCompletion",
-                args,
-                Response.Listener {
-                    Log.d(TAG, "SaveProgressSuccess: $partId at $progress")
-                    cont.resume(true)
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "SaveProgressFailure: $it")
-                    cont.resume(false)
-                }
-            )
-            requestQueue.add(request)
-        }
+    suspend fun setUserPartProgress(userId: String, partId: String, progress: Double): Boolean {
+        val progressRaw = ProgressRaw(partId, progress.toFloat())
+        JNCApiFactory.jncApi.setProgress(authToken, userId, progressRaw)
+        Log.d(TAG, "SaveProgressSuccess: $partId at ${progress.toFloat()}")
+        return true
+    }
 
     suspend fun login(email: String, password: String) =
         suspendCancellableCoroutine<UserData?> { cont ->

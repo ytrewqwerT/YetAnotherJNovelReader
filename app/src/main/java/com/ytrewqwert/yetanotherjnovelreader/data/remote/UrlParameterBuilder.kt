@@ -9,6 +9,7 @@ import kotlin.collections.ArrayList
  */
 class UrlParameterBuilder {
     private val wheres = ArrayList<String>()
+    private val includes = ArrayList<String>()
     private var limit: String? = null
     private var offset: String? = null
     private var order: String? = null
@@ -33,9 +34,13 @@ class UrlParameterBuilder {
         wheres.add(str)
     }
 
+    /** Adds a directive to include relevant instances of the given object type in the result. */
+    fun addInclude(type: String) { includes.add(type) }
+
     override fun toString(): String {
         val result = StringJoiner(",", "{", "}")
         if (wheres.isNotEmpty()) result.add(wheresJoined())
+        if (includes.isNotEmpty()) result.add(includesJoined())
         if (limit != null) result.add(limit)
         if (offset != null) result.add(offset)
         if (order != null) result.add(order)
@@ -45,6 +50,12 @@ class UrlParameterBuilder {
     private fun wheresJoined(): String {
         val result = StringJoiner(",","\"where\":{","}")
         for (item in wheres) { result.add(item) }
+        return result.toString()
+    }
+
+    private fun includesJoined(): String {
+        val result = StringJoiner(",", "\"include\":[", "]")
+        for (include in includes) result.add("\"${include}\"")
         return result.toString()
     }
 }

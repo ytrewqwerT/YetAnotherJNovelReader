@@ -9,5 +9,5 @@ object JNCApiFactory {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val jncApi = retrofit.create(JNCApi::class.java)
+    val jncApi: JNCApi = retrofit.create(JNCApi::class.java)
 }

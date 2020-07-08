@@ -2,9 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ytrewqwert.yetanotherjnovelreader.forEach
-import org.json.JSONArray
-import org.json.JSONObject
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.ProgressRaw
 
 /**
  * Identifies how much progress the user has made through the part with ID [partId].
@@ -17,15 +15,10 @@ data class Progress(
     val progress: Double
 ) {
     companion object {
-        /** Converts the given [progressJson] into a [Progress]. */
-        private fun fromJson(progressJson: JSONObject) = Progress(
-            partId = progressJson.getString("partId"),
-            progress = progressJson.getDouble("completion")
+        /** Converts the given [progressRaw] into a [Progress]. */
+        fun fromProgressRaw(progressRaw: ProgressRaw) = Progress(
+            partId = progressRaw.partId,
+            progress = progressRaw.completion.toDouble()
         )
-
-        /** Converts the given [progressesJson] into a list of [Progress]. */
-        fun fromJson(progressesJson: JSONArray): List<Progress> = ArrayList<Progress>().apply {
-            progressesJson.forEach<JSONObject> { add(fromJson(it)) }
-        }
     }
 }

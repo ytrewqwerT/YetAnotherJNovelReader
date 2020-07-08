@@ -1,10 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit
 
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.PartRaw
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.SerieRaw
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.VolumeRaw
-import retrofit2.http.GET
-import retrofit2.http.Query
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.*
+import retrofit2.http.*
 
 interface JNCApi {
     @GET("api/series")
@@ -18,4 +15,20 @@ interface JNCApi {
 
     @GET("api/parts/findOne")
     suspend fun getPart(@Query("filter") params: Any): PartRaw
+
+    // Authorized requests...
+
+    @GET("api/users/{userId}")
+    suspend fun getUser(
+        @Header("Authorization") authToken: String?,
+        @Path("userId") userId: String,
+        @Query("filter") params: Any
+    ): UserRaw
+
+    @POST("api/users/{userId}/updateReadCompletion")
+    suspend fun setProgress(
+        @Header("Authorization") authToken: String?,
+        @Path("userId") userId: String,
+        @Body progress: ProgressRaw
+    )
 }
