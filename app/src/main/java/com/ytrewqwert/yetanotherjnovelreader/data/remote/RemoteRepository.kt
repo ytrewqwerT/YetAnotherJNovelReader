@@ -135,7 +135,7 @@ class RemoteRepository private constructor(
     }
     suspend fun getUpNextParts(parts: List<Pair<String, Int>>): List<Part> {
         val resultParts = ArrayList<Part>()
-        coroutineScope {
+        supervisorScope {
             val jobs = parts.map {
                 async {
                     val filters = UrlParameterBuilder().apply {
