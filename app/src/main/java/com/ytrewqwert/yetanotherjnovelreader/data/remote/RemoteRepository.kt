@@ -15,9 +15,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.LoginRaw
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.ProgressRaw
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
-import retrofit2.HttpException
-
-// TODO: Error-path handling for Retrofit requests
 
 /**
  * Exposes methods for fetching data from the remote database.
@@ -52,8 +49,11 @@ class RemoteRepository private constructor(
         val result = imageLoader.execute(request)
         return result.drawable
     }
+
     suspend fun getPartHtml(partId: String): String? {
-        val rawPartContent = JNCApiFactory.jncApi.getPartHtml(authToken, partId)
+        val rawPartContent = safeNetworkCall("PartFailure") {
+            JNCApiFactory.jncApi.getPartHtml(authToken, partId)
+        } ?: return null
         Log.d(TAG, "PartSuccess: Found part $partId")
         return rawPartContent.dataHTML
     }
@@ -65,10 +65,13 @@ class RemoteRepository private constructor(
             if (seriesFilters != null) addWhereFieldInList("id", seriesFilters)
         }.toString()
 
-        val rawSeries = JNCApiFactory.jncApi.getSeries(filters)
-        Log.d(TAG, "SeriesRequest: Found ${rawSeries.size} series")
+        val rawSeries = safeNetworkCall("SeriesFailure") {
+            JNCApiFactory.jncApi.getSeries(filters)
+        } ?: return null
+        Log.d(TAG, "SeriesSuccess: Found ${rawSeries.size} series")
         return rawSeries.map { Serie.fromSerieRaw(it) }
     }
+
     suspend fun getSerieVolumes(serieId: String, amount: Int, offset: Int): List<Volume>? {
         val filters = UrlParameterBuilder().apply {
             addLimit(amount)
@@ -76,10 +79,13 @@ class RemoteRepository private constructor(
             addWhere("serieId", "\"$serieId\"")
         }.toString()
 
-        val rawVolumes = JNCApiFactory.jncApi.getVolumes(filters)
-        Log.d(TAG, "SerieVolumesRequest: Found ${rawVolumes.size} volumes")
+        val rawVolumes = safeNetworkCall("SerieVolumesFailure") {
+            JNCApiFactory.jncApi.getVolumes(filters)
+        } ?: return null
+        Log.d(TAG, "SerieVolumesSuccess: Found ${rawVolumes.size} volumes")
         return rawVolumes.map { Volume.fromVolumeRaw(it) }
     }
+
     suspend fun getVolumeParts(volumeId: String, amount: Int, offset: Int): List<Part>? {
         val filters = UrlParameterBuilder().apply {
             addLimit(amount)
@@ -87,10 +93,13 @@ class RemoteRepository private constructor(
             addWhere("volumeId", "\"$volumeId\"")
         }.toString()
 
-        val rawParts = JNCApiFactory.jncApi.getParts(filters)
-        Log.d(TAG, "VolumePartsRequest: Found ${rawParts.size} parts")
+        val rawParts = safeNetworkCall("VolumePartsFailure") {
+            JNCApiFactory.jncApi.getParts(filters)
+        } ?: return null
+        Log.d(TAG, "VolumePartsSuccess: Found ${rawParts.size} parts")
         return rawParts.map { Part.fromPartRaw(it) }
     }
+
     suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null): List<Part>? {
         val filters = UrlParameterBuilder().apply {
             addOrder("launchDate+DESC")
@@ -99,10 +108,13 @@ class RemoteRepository private constructor(
             if (seriesFilters != null) addWhereFieldInList("serieId", seriesFilters)
         }.toString()
 
-        val rawParts = JNCApiFactory.jncApi.getParts(filters)
-        Log.d(TAG, "RecentPartsRequest: Found ${rawParts.size} parts")
+        val rawParts = safeNetworkCall("RecentPartsFailure") {
+            JNCApiFactory.jncApi.getParts(filters)
+        } ?: return null
+        Log.d(TAG, "RecentPartsSuccess: Found ${rawParts.size} parts")
         return rawParts.map { Part.fromPartRaw(it) }
     }
+
     suspend fun getUpNextParts(parts: List<Pair<String, Int>>): List<Part> {
         val resultParts = ArrayList<Part>()
         supervisorScope {
@@ -113,21 +125,19 @@ class RemoteRepository private constructor(
                         addWhere("partNumber", "${it.second}")
                     }.toString()
 
-                    val rawPart = JNCApiFactory.jncApi.getPart(filters)
+                    val rawPart = safeNetworkCall("UpNextPartFailure") {
+                        JNCApiFactory.jncApi.getPart(filters)
+                    } ?: return@async null
                     Part.fromPartRaw(rawPart)
                 }
             }
 
             for (job in jobs) {
-                try {
-                    val part = job.await()
-                    resultParts.add(part)
-                } catch (e: HttpException) {
-                    if (e.code() != 404) throw e // 404 returned if the part doesn't exist...
-                }
+                val part = job.await()
+                resultParts.add(part ?: continue)
             }
         }
-        Log.d(TAG, "UpNextPartsRequest: Found ${resultParts.size}/${parts.size} parts")
+        Log.d(TAG, "UpNextParts: Found ${resultParts.size}/${parts.size} parts")
         return resultParts
     }
 
@@ -136,30 +146,47 @@ class RemoteRepository private constructor(
             addInclude("readParts")
         }.toString()
 
-        val rawUserWithProgress = JNCApiFactory.jncApi.getUser(authToken, userId, filters)
+        val rawUserWithProgress = safeNetworkCall("LoadProgressFailure") {
+            JNCApiFactory.jncApi.getUser(authToken, userId, filters)
+        } ?: return null
         val rawProgress = rawUserWithProgress.readParts ?: return null
         Log.d(TAG, "LoadProgressSuccess: Found ${rawProgress.size} parts")
         return rawProgress.map { Progress.fromProgressRaw(it) }
     }
+
     /** Returns true if successful, false otherwise. */
     suspend fun setUserPartProgress(userId: String, partId: String, progress: Double): Boolean {
         val progressRaw = ProgressRaw(partId, progress.toFloat())
-        JNCApiFactory.jncApi.setProgress(authToken, userId, progressRaw)
+        safeNetworkCall("SaveProgressFailure") {
+            JNCApiFactory.jncApi.setProgress(authToken, userId, progressRaw)
+        } ?: return false
         Log.d(TAG, "SaveProgressSuccess: $partId at ${progress.toFloat()}")
         return true
     }
 
     suspend fun login(email: String, password: String): UserData? {
         val credentials = LoginRaw(email, password)
-        val rawUser = JNCApiFactory.jncApi.login(credentials)
+        val rawUser = safeNetworkCall("LoginFailure") {
+            JNCApiFactory.jncApi.login(credentials)
+        } ?: return null
         Log.d(TAG, "LoginSuccess")
         authToken = rawUser.authToken
         return UserData.fromUserRaw(rawUser)
     }
+
     suspend fun logout(): Boolean {
-        JNCApiFactory.jncApi.logout(authToken)
+        safeNetworkCall("LogoutFailure") { JNCApiFactory.jncApi.logout(authToken) }
         Log.d(TAG, "LogoutSuccess")
         authToken = null
         return true
+    }
+
+    private suspend fun <T> safeNetworkCall(failMsg: String, request: suspend () -> T): T? {
+        return try {
+            request()
+        } catch (tr: Throwable) {
+            Log.w(TAG, "NetworkCallFailure ($failMsg): $tr")
+            null
+        }
     }
 }
