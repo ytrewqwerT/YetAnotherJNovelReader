@@ -1,8 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader
 
-import android.content.res.Resources
 import android.graphics.Typeface
-import android.graphics.drawable.BitmapDrawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -23,7 +21,6 @@ import kotlinx.coroutines.launch
  */
 class PartViewModel(
     private val repository: Repository,
-    private val resources: Resources,
     private val partId: String
 ) : ViewModel() {
     /** The width of the page in which the part's text can be drawn. */
@@ -126,8 +123,7 @@ class PartViewModel(
     }
 
     private suspend fun replaceTempImage(img: ImageSpan, spanBuilder: SpannableStringBuilder) {
-        val bitmap = repository.getImage(img.source ?: return)
-        val drawable = BitmapDrawable(resources, bitmap)
+        val drawable = repository.getImage(img.source ?: return) ?:return
         drawable.scaleToWidth(pageWidthPx)
         val newImg = ImageSpan(drawable)
 

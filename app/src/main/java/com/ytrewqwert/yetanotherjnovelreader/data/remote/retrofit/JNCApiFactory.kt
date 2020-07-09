@@ -4,8 +4,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object JNCApiFactory {
+    private const val JNCApiAddr = "https://api.j-novel.club/"
+
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.j-novel.club/")
+        .baseUrl(JNCApiAddr)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 

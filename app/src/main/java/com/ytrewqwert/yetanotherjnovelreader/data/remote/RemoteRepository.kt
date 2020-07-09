@@ -1,12 +1,10 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.remote
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.util.Log
-import com.android.volley.RequestQueue
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.ImageLoader
-import com.android.volley.toolbox.Volley
+import coil.Coil
+import coil.request.GetRequest
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
@@ -17,9 +15,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.LoginRaw
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.ProgressRaw
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.HttpException
-import kotlin.coroutines.resume
 
 // TODO: Error-path handling for Retrofit requests
 
@@ -29,13 +25,11 @@ import kotlin.coroutines.resume
  * Methods with nullable return values return null if the request failed for some reason.
  */
 class RemoteRepository private constructor(
-    appContext: Context,
+    private val appContext: Context,
     private var authToken: String?
 ) {
     companion object {
         private const val TAG = "RemoteRepository"
-        /** The address for J-Novel Club's backend API. */
-        const val API_ADDR = "https://api.j-novel.club/api"
         /** The address where J-Novel Club stores images. */
         const val IMG_ADDR = "https://d2dq7ifhe7bu0f.cloudfront.net"
 
@@ -49,26 +43,14 @@ class RemoteRepository private constructor(
             }
     }
 
-    private val requestQueue: RequestQueue by lazy { Volley.newRequestQueue(appContext) }
-    private val imageLoader = ImageLoader(requestQueue, DiskImageLoader(appContext))
+    private val imageLoader = Coil.imageLoader(appContext)
 
-    suspend fun getImage(source: String) =
-        suspendCancellableCoroutine<Bitmap?> { cont ->
-        imageLoader.get(source, object : ImageLoader.ImageListener {
-            override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
-                Log.d(TAG, "ImageSuccess: Source = $source")
-                val bitmap = response?.bitmap
-                if (bitmap != null) {
-                    cont.resume(response.bitmap)
-                } else if (!isImmediate) {
-                    throw IllegalStateException("Volley successfully retrieved a null image?")
-                }
-            }
-            override fun onErrorResponse(error: VolleyError?) {
-                Log.w(TAG, "ImageFailure: $error")
-                cont.resume(null)
-            }
-        })
+    suspend fun getImage(source: String): Drawable? {
+        val request = GetRequest.Builder(appContext)
+            .data(source)
+            .build()
+        val result = imageLoader.execute(request)
+        return result.drawable
     }
     suspend fun getPartHtml(partId: String): String? {
         val rawPartContent = JNCApiFactory.jncApi.getPartHtml(authToken, partId)
@@ -167,7 +149,7 @@ class RemoteRepository private constructor(
         return true
     }
 
-    suspend fun login(email: String, password: String): UserData {
+    suspend fun login(email: String, password: String): UserData? {
         val credentials = LoginRaw(email, password)
         val rawUser = JNCApiFactory.jncApi.login(credentials)
         Log.d(TAG, "LoginSuccess")
