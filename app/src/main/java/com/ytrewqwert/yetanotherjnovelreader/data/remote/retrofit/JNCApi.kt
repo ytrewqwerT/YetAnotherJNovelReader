@@ -17,8 +17,6 @@ interface JNCApi {
     @GET("api/parts/findOne")
     suspend fun getPart(@Query("filter") params: Any): PartRaw
 
-    // Authorized requests...
-
     @GET("api/users/{userId}")
     suspend fun getUser(
         @Header("Authorization") authToken: String?,
@@ -38,4 +36,10 @@ interface JNCApi {
 
     @POST("api/users/logout")
     suspend fun logout(@Header("Authorization") authToken: String?): Response<Void>
+
+    @GET("api/parts/{partId}/partData")
+    suspend fun getPartHtml(
+        @Header("Authorization") authToken: String?,
+        @Path("partId") partId: String
+    ): PartContentRaw
 }

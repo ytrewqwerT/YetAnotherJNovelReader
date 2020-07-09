@@ -3,9 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.remote
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.Volley
@@ -72,23 +70,11 @@ class RemoteRepository private constructor(
             }
         })
     }
-    suspend fun getPartHtml(partId: String) =
-        suspendCancellableCoroutine<String?> { cont ->
-            val url = "$API_ADDR/parts/${partId}/partData"
-            val request = AuthorizedJsonObjectRequest(
-                authToken, Request.Method.GET, url, null,
-                Response.Listener {
-                    Log.d(TAG, "PartSuccess: Found part $partId")
-                    Log.v(TAG, it.toString(4))
-                    cont.resume(it.getString("dataHTML"))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "PartFailure: $it")
-                    cont.resume(null)
-                }
-            )
-            requestQueue.add(request)
-        }
+    suspend fun getPartHtml(partId: String): String? {
+        val rawPartContent = JNCApiFactory.jncApi.getPartHtml(authToken, partId)
+        Log.d(TAG, "PartSuccess: Found part $partId")
+        return rawPartContent.dataHTML
+    }
 
     suspend fun getSeries(amount: Int, offset: Int, seriesFilters: List<String>? = null): List<Serie>? {
         val filters = UrlParameterBuilder().apply {
