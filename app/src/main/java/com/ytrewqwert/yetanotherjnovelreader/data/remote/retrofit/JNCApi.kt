@@ -1,6 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit
 
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.*
+import retrofit2.Response
 import retrofit2.http.*
 
 interface JNCApi {
@@ -31,4 +32,10 @@ interface JNCApi {
         @Path("userId") userId: String,
         @Body progress: ProgressRaw
     )
+
+    @POST("api/users/login?include=user")
+    suspend fun login(@Body credentials: LoginRaw): UserRaw
+
+    @POST("api/users/logout")
+    suspend fun logout(@Header("Authorization") authToken: String?): Response<Void>
 }

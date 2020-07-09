@@ -8,7 +8,6 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
@@ -16,11 +15,11 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.JNCApiFactory
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.LoginRaw
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.ProgressRaw
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.json.JSONObject
 import retrofit2.HttpException
 import kotlin.coroutines.resume
 
@@ -182,41 +181,17 @@ class RemoteRepository private constructor(
         return true
     }
 
-    suspend fun login(email: String, password: String) =
-        suspendCancellableCoroutine<UserData?> { cont ->
-            val args = JSONObject().put("email", email).put("password", password)
-
-            val request = JsonObjectRequest(
-                Request.Method.POST,
-                "$API_ADDR/users/login?include=user",
-                args,
-                Response.Listener {
-                    Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
-                    authToken = it?.getString("id")
-                    cont.resume(UserData.fromJson(it))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "LoginFailure: $it")
-                    cont.resume(null)
-                }
-            )
-            requestQueue.add(request)
-        }
-    suspend fun logout() =
-        suspendCancellableCoroutine<Boolean> { cont ->
-        val request = AuthorizedStringRequest(
-            authToken, Request.Method.POST,
-            "$API_ADDR/users/logout",
-            Response.Listener {
-                Log.d(TAG, "LogoutSuccess")
-                authToken = null
-                cont.resume(true)
-            },
-            Response.ErrorListener {
-                Log.w(TAG, "LogoutFailure? $it")
-                cont.resume(false)
-            }
-        )
-        requestQueue.add(request)
+    suspend fun login(email: String, password: String): UserData {
+        val credentials = LoginRaw(email, password)
+        val rawUser = JNCApiFactory.jncApi.login(credentials)
+        Log.d(TAG, "LoginSuccess")
+        authToken = rawUser.authToken
+        return UserData.fromUserRaw(rawUser)
+    }
+    suspend fun logout(): Boolean {
+        JNCApiFactory.jncApi.logout(authToken)
+        Log.d(TAG, "LogoutSuccess")
+        authToken = null
+        return true
     }
 }
