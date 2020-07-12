@@ -70,6 +70,6 @@ data class Serie(
         val lowerTerm = term.toLowerCase(Locale.ROOT)
         if (title.toLowerCase(Locale.ROOT).contains(lowerTerm)) return true
         if (tags.toLowerCase(Locale.ROOT).contains(lowerTerm)) return true
-        return false
+        return super.hasTerm(term)
     }
 }

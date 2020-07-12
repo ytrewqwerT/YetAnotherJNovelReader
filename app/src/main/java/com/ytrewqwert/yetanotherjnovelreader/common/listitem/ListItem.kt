@@ -9,7 +9,7 @@ interface ListItem {
     fun isFollowed(): Boolean = false
 
     /** Returns true if this object relates to the search [term] in some way and false otherwise. */
-    fun hasTerm(term: String): Boolean
+    fun hasTerm(term: String): Boolean = term.isBlank() // Default true if the term is blank
 
     /**
      * Contains information on what to show for a [ListItem] in the list.
