@@ -33,8 +33,11 @@ class HtmlCharCodeConverter(private val partId: String) {
 
     // Should probably generalise the replacements of "#xxx" style codes.
     private fun convertCharCode(code: String): String = when (code) {
+        "#34", "quot" -> "\""
         "#38", "amp" -> "&"
         "#39", "apos" -> "'"
+        "#60", "lt" -> "<"
+        "#62", "gt" -> ">"
         "#8195", "emsp" -> "\u2003"
         else -> {
             Log.w(TAG, "Unhandled html character code: &$code;")
