@@ -22,12 +22,17 @@ class ListItemRecyclerViewAdapter(
     private val imageSource: ImageSource? = null
 ) : RecyclerView.Adapter<ListItemRecyclerViewAdapter.ViewHolder>() {
 
-    private var items: List<ListItem> = emptyList()
+    var items: List<ListItem> = emptyList()
+        set(value) { field = value; notifyDataSetChanged() }
+    private val filteredItems: List<ListItem> get() = items.filter { it.hasTerm(filterStr) }
 
-    override fun getItemCount(): Int = items.size
+    var filterStr: String = ""
+        set(value) { field = value; notifyDataSetChanged() }
+
+    override fun getItemCount(): Int = filteredItems.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contents = items[position].getListItemContents()
+        val contents = filteredItems[position].getListItemContents()
 
         holder.titleText.text = contents.mTitle
         holder.subText.text = contents.mText
@@ -55,10 +60,10 @@ class ListItemRecyclerViewAdapter(
             holder.progressBar.visibility = View.INVISIBLE
         }
 
-        holder.following.setOnClickListener { listener?.onFollowClick(items[position]) }
+        holder.following.setOnClickListener { listener?.onFollowClick(filteredItems[position]) }
         if (contents.clickable) {
             holder.view.foreground = null
-            holder.view.setOnClickListener { listener?.onClick(items[position]) }
+            holder.view.setOnClickListener { listener?.onClick(filteredItems[position]) }
         } else {
             val disabledColor = holder.view.resources.getColor(R.color.disabled, null)
             holder.view.foreground = ColorDrawable(disabledColor)
@@ -70,11 +75,6 @@ class ListItemRecyclerViewAdapter(
         val view =LayoutInflater.from(parent.context)
             .inflate(R.layout.list_item, parent, false)
         return ViewHolder(view)
-    }
-
-    fun setItems(newItems: List<ListItem>) {
-        items = newItems
-        notifyDataSetChanged()
     }
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {

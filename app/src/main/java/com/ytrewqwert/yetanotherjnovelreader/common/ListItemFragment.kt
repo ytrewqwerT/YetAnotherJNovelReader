@@ -61,7 +61,7 @@ class ListItemFragment : Fragment(),
             if (it != null) listHeaderAdapter.setItems(it)
         }
         viewModel.getItemList(uid).observe(this) {
-            if (it != null) listItemAdapter.setItems(it)
+            if (it != null) listItemAdapter.items = it
         }
         viewModel.getIsReloading(uid).observe(this) {
             swipeRefreshLayout?.isRefreshing = it
