@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model
+package com.ytrewqwert.yetanotherjnovelreader.data.remote.model
 
 data class PartRaw(
     val id: String,

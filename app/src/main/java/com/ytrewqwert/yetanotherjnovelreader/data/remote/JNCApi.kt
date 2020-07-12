@@ -1,6 +1,6 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit
+package com.ytrewqwert.yetanotherjnovelreader.data.remote
 
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.*
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.*
 import retrofit2.Response
 import retrofit2.http.*
 

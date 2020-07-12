@@ -10,9 +10,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.JNCApiFactory
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.LoginRaw
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.ProgressRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.LoginRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.ProgressRaw
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 

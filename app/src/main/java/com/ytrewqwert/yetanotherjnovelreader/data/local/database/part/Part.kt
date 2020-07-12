@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.PartRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.PartRaw
 
 /**
  * Contains data about a part with ID [id].

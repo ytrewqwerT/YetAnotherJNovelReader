@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model
+package com.ytrewqwert.yetanotherjnovelreader.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 

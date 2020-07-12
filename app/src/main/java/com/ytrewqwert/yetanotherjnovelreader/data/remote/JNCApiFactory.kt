@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit
+package com.ytrewqwert.yetanotherjnovelreader.data.remote
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -12,5 +12,6 @@ object JNCApiFactory {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val jncApi: JNCApi = retrofit.create(JNCApi::class.java)
+    val jncApi: JNCApi = retrofit.create(
+        JNCApi::class.java)
 }

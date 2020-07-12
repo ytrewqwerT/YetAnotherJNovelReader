@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.VolumeRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.VolumeRaw
 
 /**
  * Contains data about a volume with ID [id].

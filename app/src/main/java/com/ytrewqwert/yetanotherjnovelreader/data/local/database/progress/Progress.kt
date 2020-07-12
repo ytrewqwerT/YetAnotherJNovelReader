@@ -2,7 +2,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.ProgressRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.ProgressRaw
 
 /**
  * Identifies how much progress the user has made through the part with ID [partId].

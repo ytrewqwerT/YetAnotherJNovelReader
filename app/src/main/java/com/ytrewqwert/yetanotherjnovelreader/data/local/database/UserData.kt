@@ -1,6 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.local.database
 
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.UserRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.UserRaw
 
 /**
  * Contains some data pertaining to a user's J-Novel Club account.

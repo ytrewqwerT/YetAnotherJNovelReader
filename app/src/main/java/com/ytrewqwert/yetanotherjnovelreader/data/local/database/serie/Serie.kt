@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit.model.SerieRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.SerieRaw
 
 /**
  * Contains data about a series with ID [id].
