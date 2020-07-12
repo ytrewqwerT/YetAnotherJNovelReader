@@ -8,6 +8,9 @@ interface ListItem {
     /** Determines whether this object should be shown as 'followed' in the list. */
     fun isFollowed(): Boolean = false
 
+    /** Returns true if this object relates to the search [term] in some way and false otherwise. */
+    fun hasTerm(term: String): Boolean
+
     /**
      * Contains information on what to show for a [ListItem] in the list.
      *

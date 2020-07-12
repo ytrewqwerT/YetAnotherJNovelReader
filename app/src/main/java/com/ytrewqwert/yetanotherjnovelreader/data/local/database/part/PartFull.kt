@@ -20,4 +20,6 @@ data class PartFull(
         if (isFollowed()) contents = contents.copy(isFollowing = true)
         return contents
     }
+
+    override fun hasTerm(term: String): Boolean = part.hasTerm(term)
 }

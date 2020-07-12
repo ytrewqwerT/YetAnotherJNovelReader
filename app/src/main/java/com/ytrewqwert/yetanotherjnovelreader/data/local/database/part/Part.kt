@@ -6,6 +6,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.PartRaw
+import java.util.*
 
 /**
  * Contains data about a part with ID [id].
@@ -64,6 +65,13 @@ data class Part(
         "${RemoteRepository.IMG_ADDR}/$coverUrl",
         null, readable()
     )
+
+    override fun hasTerm(term: String): Boolean {
+        val lowerTerm = term.toLowerCase(Locale.ROOT)
+        if (title.toLowerCase(Locale.ROOT).contains(lowerTerm)) return true
+        if (tags.toLowerCase(Locale.ROOT).contains(lowerTerm)) return true
+        return false
+    }
 
     private fun readable(): Boolean {
         if (expired) return false

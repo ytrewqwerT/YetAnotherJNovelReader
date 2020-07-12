@@ -6,6 +6,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.VolumeRaw
+import java.util.*
 
 /**
  * Contains data about a volume with ID [id].
@@ -67,4 +68,11 @@ data class Volume(
         title,
         description
     )
+
+    override fun hasTerm(term: String): Boolean {
+        val lowerTerm = term.toLowerCase(Locale.ROOT)
+        if (title.toLowerCase(Locale.ROOT).contains(lowerTerm)) return true
+        if (tags.toLowerCase(Locale.ROOT).contains(lowerTerm)) return true
+        return false
+    }
 }

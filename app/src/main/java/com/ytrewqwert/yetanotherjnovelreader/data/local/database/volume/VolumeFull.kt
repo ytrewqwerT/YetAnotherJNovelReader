@@ -5,6 +5,7 @@ import androidx.room.Relation
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
+import java.util.*
 
 /** An aggregate class combining a [volume] with related [following] information. */
 data class VolumeFull(
@@ -20,4 +21,6 @@ data class VolumeFull(
     }
 
     override fun getListHeaderContents(): ListHeader.Contents = volume.getListHeaderContents()
+
+    override fun hasTerm(term: String): Boolean = volume.hasTerm(term)
 }
