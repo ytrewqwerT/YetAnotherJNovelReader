@@ -1,27 +1,19 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.remote
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.util.Log
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.ImageLoader
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
+import coil.Coil
+import coil.request.GetRequest
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.UserData
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.Part
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progress
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import org.json.JSONArray
-import org.json.JSONObject
-import kotlin.coroutines.resume
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.LoginRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.ProgressRaw
+import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 
 /**
  * Exposes methods for fetching data from the remote database.
@@ -29,18 +21,22 @@ import kotlin.coroutines.resume
  * Methods with nullable return values return null if the request failed for some reason.
  */
 class RemoteRepository private constructor(
-    appContext: Context,
+    private val appContext: Context,
     private var authToken: String?
 ) {
     companion object {
         private const val TAG = "RemoteRepository"
-        /** The address for J-Novel Club's backend API. */
-        const val API_ADDR = "https://api.j-novel.club/api"
         /** The address where J-Novel Club stores images. */
         const val IMG_ADDR = "https://d2dq7ifhe7bu0f.cloudfront.net"
 
         @Volatile
         private var INSTANCE: RemoteRepository? = null
+        /**
+         * Retrieves or creates an instance of [RemoteRepository] tied to the application's context.
+         *
+         * @param[context] A Context object related to the application.
+         * @param[authToken] The user's authorisation token, or null for no authorisation.
+         */
         fun getInstance(context: Context, authToken: String? = null) =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: RemoteRepository(context.applicationContext, authToken).also {
@@ -49,211 +45,216 @@ class RemoteRepository private constructor(
             }
     }
 
-    private val requestQueue: RequestQueue by lazy { Volley.newRequestQueue(appContext) }
-    private val imageLoader = ImageLoader(requestQueue, DiskImageLoader(appContext))
+    private val jncApi = JNCApiFactory.jncApi
+    private val imageLoader = Coil.imageLoader(appContext)
 
-    suspend fun getImage(source: String) =
-        suspendCancellableCoroutine<Bitmap?> { cont ->
-        imageLoader.get(source, object : ImageLoader.ImageListener {
-            override fun onResponse(response: ImageLoader.ImageContainer?, isImmediate: Boolean) {
-                Log.d(TAG, "ImageSuccess: Source = $source")
-                val bitmap = response?.bitmap
-                if (bitmap != null) {
-                    cont.resume(response.bitmap)
-                } else if (!isImmediate) {
-                    throw IllegalStateException("Volley successfully retrieved a null image?")
-                }
-            }
-            override fun onErrorResponse(error: VolleyError?) {
-                Log.w(TAG, "ImageFailure: $error")
-                cont.resume(null)
-            }
-        })
+    /** Fetches the image referenced by the [source] url. */
+    suspend fun getImage(source: String): Drawable? {
+        val request = GetRequest.Builder(appContext)
+            .data(source)
+            .build()
+        val result = imageLoader.execute(request)
+        return result.drawable
     }
-    suspend fun getPartHtml(partId: String) =
-        suspendCancellableCoroutine<String?> { cont ->
-            val url = "$API_ADDR/parts/${partId}/partData"
-            val request = AuthorizedJsonObjectRequest(
-                authToken, Request.Method.GET, url, null,
-                Response.Listener {
-                    Log.d(TAG, "PartSuccess: Found part $partId")
-                    Log.v(TAG, it.toString(4))
-                    cont.resume(it.getString("dataHTML"))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "PartFailure: $it")
-                    cont.resume(null)
-                }
-            )
-            requestQueue.add(request)
-        }
 
-    suspend fun getSeries(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
-        suspendCancellableCoroutine<List<Serie>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/series")
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .addFieldInListFilter("id", seriesFilters)
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "SeriesRequest: Found ${it?.length()} series")
-                if (it != null) cont.resume(Serie.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
-    suspend fun getSerieVolumes(serieId: String, amount: Int, offset: Int) =
-        suspendCancellableCoroutine<List<Volume>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/volumes")
-                .addWhereFilter("serieId", serieId)
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "SerieVolumesRequest: Found ${it?.length()} volumes")
-                if (it != null) cont.resume(Volume.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
-    suspend fun getVolumeParts(volumeId: String, amount: Int, offset: Int) =
-        suspendCancellableCoroutine<List<Part>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/parts")
-                .addWhereFilter("volumeId", volumeId)
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "VolumePartsRequest: Found ${it?.length()} parts")
-                if (it != null) cont.resume(Part.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
-    suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null) =
-        suspendCancellableCoroutine<List<Part>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/parts")
-                .addBaseFilter("order", "launchDate+DESC")
-                .addBaseFilter("limit", "$amount")
-                .addBaseFilter("offset", "$offset")
-                .addFieldInListFilter("serieId", seriesFilters)
-                .build()
-            val request = createListRequest(url) {
-                Log.d(TAG, "RecentPartsRequest: Found ${it?.length()} parts")
-                if (it != null) cont.resume(Part.fromJson(it))
-                else cont.resume(null)
-            }
-            requestQueue.add(request)
-        }
+    /** Retrieves the contents of the part with id [partId] as a string formatted with html. */
+    suspend fun getPartHtml(partId: String): String? {
+        val rawPartContent = safeNetworkCall("PartFailure") {
+            jncApi.getPartHtml(authToken, partId)
+        } ?: return null
+        Log.d(TAG, "PartSuccess: Found part $partId")
+        return rawPartContent.dataHTML
+    }
+
+    /**
+     * Fetches a list of all* available series.
+     *
+     * @param[amount] The maximum number of series to fetch.
+     * @param[offset] An offset for how many series in the list to skip (for pagination).
+     * @param[seriesFilters] A filter for which series to fetch; null for no filter.
+     * @return A list of series with size no greater than [amount].
+     */
+    suspend fun getSeries(amount: Int, offset: Int, seriesFilters: List<String>? = null): List<Serie>? {
+        val filters = UrlParameterBuilder().apply {
+            addLimit(amount)
+            addOffset(offset)
+            if (seriesFilters != null) addWhereFieldInList("id", seriesFilters)
+        }.toString()
+
+        val rawSeries = safeNetworkCall("SeriesFailure") {
+            jncApi.getSeries(filters)
+        } ?: return null
+        Log.d(TAG, "SeriesSuccess: Found ${rawSeries.size} series")
+        return rawSeries.map { Serie.fromSerieRaw(it) }
+    }
+
+    /**
+     * Fetches a list of the volumes in a series.
+     *
+     * @param[serieId] The id of the series to fetch volumes from.
+     * @param[amount] The maximum number of volumes to fetch.
+     * @param[offset] An offset for how many volumes in the list to skip (for pagination).
+     * @return A list of volumes with size no greater than [amount].
+     */
+    suspend fun getSerieVolumes(serieId: String, amount: Int, offset: Int): List<Volume>? {
+        val filters = UrlParameterBuilder().apply {
+            addLimit(amount)
+            addOffset(offset)
+            addWhere("serieId", "\"$serieId\"")
+        }.toString()
+
+        val rawVolumes = safeNetworkCall("SerieVolumesFailure") {
+            jncApi.getVolumes(filters)
+        } ?: return null
+        Log.d(TAG, "SerieVolumesSuccess: Found ${rawVolumes.size} volumes")
+        return rawVolumes.map { Volume.fromVolumeRaw(it) }
+    }
+
+    /**
+     * Fetches a list of the parts in a volume.
+     *
+     * @param[volumeId] The id of the volume to fetch parts from.
+     * @param[amount] The maximum number of parts to fetch.
+     * @param[offset] An offset for how many parts in the list to skip (for pagination).
+     * @return A list of parts with size no greater than [amount].
+     */
+    suspend fun getVolumeParts(volumeId: String, amount: Int, offset: Int): List<Part>? {
+        val filters = UrlParameterBuilder().apply {
+            addLimit(amount)
+            addOffset(offset)
+            addWhere("volumeId", "\"$volumeId\"")
+        }.toString()
+
+        val rawParts = safeNetworkCall("VolumePartsFailure") {
+            jncApi.getParts(filters)
+        } ?: return null
+        Log.d(TAG, "VolumePartsSuccess: Found ${rawParts.size} parts")
+        return rawParts.map { Part.fromPartRaw(it) }
+    }
+
+    /**
+     * Fetches a list of all* available parts, most recently released first.
+     *
+     * @param[amount] The maximum number of parts to fetch.
+     * @param[offset] An offset for how many parts in the list to skip (for pagination).
+     * @param[seriesFilters] A filter for which series' parts to fetch; null for no filter.
+     * @return A list of parts with size no greater than [amount].
+     */
+    suspend fun getRecentParts(amount: Int, offset: Int, seriesFilters: List<String>? = null): List<Part>? {
+        val filters = UrlParameterBuilder().apply {
+            addOrder("launchDate+DESC")
+            addLimit(amount)
+            addOffset(offset)
+            if (seriesFilters != null) addWhereFieldInList("serieId", seriesFilters)
+        }.toString()
+
+        val rawParts = safeNetworkCall("RecentPartsFailure") {
+            jncApi.getParts(filters)
+        } ?: return null
+        Log.d(TAG, "RecentPartsSuccess: Found ${rawParts.size} parts")
+        return rawParts.map { Part.fromPartRaw(it) }
+    }
+
+    /**
+     * Fetches a list of parts identified by a series id and part number in that series.
+     *
+     * @param[parts] A list of pairs, where each pair contains a series id and part number
+     *  identifying a unique part
+     * @return A list containing the requested parts that currently exist and are available.
+     */
     suspend fun getUpNextParts(parts: List<Pair<String, Int>>): List<Part> {
         val resultParts = ArrayList<Part>()
-        coroutineScope {
-            parts.forEach {
-                launch {
-                    val part = suspendCancellableCoroutine<Part?> { cont ->
-                        val url = ParameterizedURLBuilder("$API_ADDR/parts/findOne")
-                            .addWhereFilter("serieId", it.first)
-                            .addWhereFilter("partNumber", "${it.second}")
-                            .build()
-                        val request = JsonObjectRequest(
-                            Request.Method.GET, url, null,
-                            Response.Listener {
-                                cont.resume(Part.fromJson(it))
-                            },
-                            Response.ErrorListener {
-                                cont.resume(null)
-                            }
-                        )
-                        requestQueue.add(request)
-                    }
-                    if (part != null) resultParts.add(part)
+        supervisorScope {
+            val jobs = parts.map {
+                async {
+                    val filters = UrlParameterBuilder().apply {
+                        addWhere("serieId", "\"${it.first}\"")
+                        addWhere("partNumber", "${it.second}")
+                    }.toString()
+
+                    val rawPart = safeNetworkCall("UpNextPartFailure") {
+                        jncApi.getPart(filters)
+                    } ?: return@async null
+                    Part.fromPartRaw(rawPart)
                 }
+            }
+
+            for (job in jobs) {
+                val part = job.await()
+                resultParts.add(part ?: continue)
             }
         }
         Log.d(TAG, "UpNextParts: Found ${resultParts.size}/${parts.size} parts")
         return resultParts
     }
-    suspend fun getUserPartProgress(userId: String) =
-        suspendCancellableCoroutine<List<Progress>?> { cont ->
-            val url = ParameterizedURLBuilder("$API_ADDR/users/$userId")
-                .addInclude("readParts")
-                .build()
-            val request = AuthorizedJsonObjectRequest(
-                authToken, Request.Method.GET, url, null,
-                Response.Listener {
-                    val partProgress = it.getJSONArray("readParts")
-                    Log.d(TAG, "PartProgressSuccess: Found ${partProgress.length()} parts")
-                    Log.v(TAG, partProgress.toString(4))
-                    cont.resume(Progress.fromJson(partProgress))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "PartProgressFailure: $it")
-                    cont.resume(null)
-                }
-            )
-            requestQueue.add(request)
-        }
-    /** Returns true if successful, false otherwise. */
-    suspend fun setUserPartProgress(userId: String, partId: String, progress: Double) =
-        suspendCancellableCoroutine<Boolean> { cont ->
-            val args = JSONObject().put("partId", partId).put("completion", progress)
-            val request = AuthorizedJsonObjectRequest(
-                authToken, Request.Method.POST,
-                "$API_ADDR/users/${userId}/updateReadCompletion",
-                args,
-                Response.Listener {
-                    Log.d(TAG, "SaveProgressSuccess: $partId at $progress")
-                    cont.resume(true)
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "SaveProgressFailure: $it")
-                    cont.resume(false)
-                }
-            )
-            requestQueue.add(request)
-        }
 
-    suspend fun login(email: String, password: String) =
-        suspendCancellableCoroutine<UserData?> { cont ->
-            val args = JSONObject().put("email", email).put("password", password)
+    /** Fetches a list containing all of the user's (identified by [userId]) part progress data. */
+    suspend fun getUserPartProgress(userId: String): List<Progress>? {
+        val filters = UrlParameterBuilder().apply {
+            addInclude("readParts")
+        }.toString()
 
-            val request = JsonObjectRequest(
-                Request.Method.POST,
-                "$API_ADDR/users/login?include=user",
-                args,
-                Response.Listener {
-                    Log.d(TAG, "LoginSuccess: ${it.toString(4)}")
-                    authToken = it?.getString("id")
-                    cont.resume(UserData.fromJson(it))
-                },
-                Response.ErrorListener {
-                    Log.w(TAG, "LoginFailure: $it")
-                    cont.resume(null)
-                }
-            )
-            requestQueue.add(request)
-        }
-    suspend fun logout() =
-        suspendCancellableCoroutine<Boolean> { cont ->
-        val request = AuthorizedStringRequest(
-            authToken, Request.Method.POST,
-            "$API_ADDR/users/logout",
-            Response.Listener {
-                Log.d(TAG, "LogoutSuccess")
-                authToken = null
-                cont.resume(true)
-            },
-            Response.ErrorListener {
-                Log.w(TAG, "LogoutFailure? $it")
-                cont.resume(false)
-            }
-        )
-        requestQueue.add(request)
+        val rawUserWithProgress = safeNetworkCall("LoadProgressFailure") {
+            jncApi.getUser(authToken, userId, filters)
+        } ?: return null
+        val rawProgress = rawUserWithProgress.readParts ?: return null
+        Log.d(TAG, "LoadProgressSuccess: Found ${rawProgress.size} parts")
+        return rawProgress.map { Progress.fromProgressRaw(it) }
     }
 
-    private fun createListRequest(url: String, result: (JSONArray?) -> Unit) = JsonArrayRequest(
-        Request.Method.GET, url, null,
-        Response.Listener { result(it) },
-        Response.ErrorListener { result(null) }
-    )
+    /**
+     * Stores the user's progress in a part in the remote server.
+     *
+     * @param[userId] The id of the user who's progress is to be set.
+     * @param[partId] The id of the part to be setting the progress of.
+     * @param[progress] A number in the range [0,1] indicating the percentage progress to be set.
+     * @return true if the progress was successfully set and false otherwise.
+     */
+    suspend fun setUserPartProgress(userId: String, partId: String, progress: Double): Boolean {
+        val progressRaw = ProgressRaw(partId, progress.toFloat())
+        safeNetworkCall("SaveProgressFailure") {
+            jncApi.setProgress(authToken, userId, progressRaw)
+        } ?: return false
+        Log.d(TAG, "SaveProgressSuccess: $partId at ${progress.toFloat()}")
+        return true
+    }
+
+    /**
+     * Attempts to login using the given [email] and [password].
+     *
+     * @return The logged-in user's data if successful and null otherwise.
+     */
+    suspend fun login(email: String, password: String): UserData? {
+        val credentials = LoginRaw(email, password)
+        val rawUser = safeNetworkCall("LoginFailure") {
+            jncApi.login(credentials)
+        } ?: return null
+        Log.d(TAG, "LoginSuccess")
+        authToken = rawUser.authToken
+        return UserData.fromUserRaw(rawUser)
+    }
+
+    /** Attempts to log the user out of the system. Returns true if successful, false otherwise. */
+    suspend fun logout(): Boolean {
+        safeNetworkCall("LogoutFailure") { jncApi.logout(authToken) }
+        Log.d(TAG, "LogoutSuccess")
+        authToken = null
+        return true
+    }
+
+    /**
+     * Executes the given function for a result, catching any exceptions that may occur.
+     *
+     * @param[failMsg] A failure message log if an exception occurs.
+     * @param[request] The function to execute.
+     * @return The result of the function call, or null if an exception occurred.
+     */
+    private suspend fun <T> safeNetworkCall(failMsg: String, request: suspend () -> T): T? {
+        return try {
+            request()
+        } catch (tr: Throwable) {
+            Log.w(TAG, "NetworkCallFailure ($failMsg): $tr")
+            null
+        }
+    }
 }

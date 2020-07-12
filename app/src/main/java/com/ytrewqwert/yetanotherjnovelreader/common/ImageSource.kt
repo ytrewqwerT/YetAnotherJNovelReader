@@ -1,6 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 
 /**
  * Interface enabling a class to be used as a source for images.
@@ -12,5 +12,5 @@ interface ImageSource {
      * @param[source] The URL where the image can be found.
      * @param[callback] A callback to provide the image back to the requester.
      */
-    fun getImage(source: String, callback: (source: String, image: Bitmap?) -> Unit)
+    fun getImage(source: String, callback: (source: String, image: Drawable?) -> Unit)
 }

@@ -1,6 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.common
 
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -105,7 +105,7 @@ class ListItemFragment : Fragment(),
     override fun onClick(item: ListItem) { viewModel.listItemFragmentViewOnClick(uid, item) }
     override fun onFollowClick(item: ListItem) { viewModel.toggleFollowItem(item) }
     override fun onFooterReached() { viewModel.fetchNextPage(uid) }
-    override fun getImage(source: String, callback: (String, Bitmap?) -> Unit) {
+    override fun getImage(source: String, callback: (String, Drawable?) -> Unit) {
         viewModel.getImage(source, callback)
     }
 

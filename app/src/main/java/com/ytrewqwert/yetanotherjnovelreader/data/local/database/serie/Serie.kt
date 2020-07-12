@@ -5,9 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import com.ytrewqwert.yetanotherjnovelreader.forEach
-import org.json.JSONArray
-import org.json.JSONObject
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.SerieRaw
 
 /**
  * Contains data about a series with ID [id].
@@ -34,32 +32,24 @@ data class Serie(
     val overrideExpiration: Boolean
 ) : ListItem, ListHeader {
     companion object {
-        /** Converts the given [serieJson] into a [Serie]. */
-        private fun fromJson(serieJson: JSONObject): Serie {
-            // Find the value for coverThumbUrl (if it exists)
-            val attachments = serieJson.getJSONArray("attachments")
+        /** Converts the given [serieRaw] into a [Serie]. */
+        fun fromSerieRaw(serieRaw: SerieRaw): Serie {
             var coverUrl = ""
-            attachments.forEach<JSONObject> {
-                val attachUrl = it.getString("fullpath")
-                if (attachUrl.contains("cover")) coverUrl = attachUrl
+            for (attach in serieRaw.attachments) {
+                if (attach.imgUrl.contains("cover")) coverUrl = attach.imgUrl
             }
 
             return Serie(
-                id = serieJson.getString("id"),
-                title = serieJson.getString("title"),
-                titleslug = serieJson.getString("titleslug"),
-                description = serieJson.getString("description"),
-                descriptionShort = serieJson.getString("descriptionShort"),
+                id = serieRaw.id,
+                title = serieRaw.title,
+                titleslug = serieRaw.titleslug,
+                description = serieRaw.description,
+                descriptionShort = serieRaw.descriptionShort,
                 coverUrl = coverUrl,
-                tags = serieJson.getString("tags"),
-                created = serieJson.getString("created"),
-                overrideExpiration = serieJson.getBoolean("override_expiration")
+                tags = serieRaw.tags,
+                created = serieRaw.created,
+                overrideExpiration = serieRaw.overrideExpiration
             )
-        }
-
-        /** Converts the given [seriesJson] into a list of [Serie]. */
-        fun fromJson(seriesJson: JSONArray): List<Serie> = ArrayList<Serie>().apply {
-            seriesJson.forEach<JSONObject> { add(fromJson(it)) }
         }
     }
 

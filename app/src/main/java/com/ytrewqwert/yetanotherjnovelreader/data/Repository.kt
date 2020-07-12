@@ -1,7 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.data
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.text.Spanned
 import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
@@ -36,7 +36,7 @@ class Repository private constructor(appContext: Context) {
 
     fun getReaderSettingsFlow() = prefStore.readerSettings
 
-    suspend fun getImage(source: String): Bitmap? = remote.getImage(source)
+    suspend fun getImage(source: String): Drawable? = remote.getImage(source)
     suspend fun getPartContent(partId: String): Spanned? {
         refreshLoginIfAuthExpired()
         val partHtml = remote.getPartHtml(partId) ?: return null

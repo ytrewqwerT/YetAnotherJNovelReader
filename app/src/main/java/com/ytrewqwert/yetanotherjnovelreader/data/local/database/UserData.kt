@@ -1,6 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.local.database
 
-import org.json.JSONObject
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.UserRaw
 
 /**
  * Contains some data pertaining to a user's J-Novel Club account.
@@ -19,17 +19,13 @@ data class UserData(
     val isMember: Boolean
 ) {
     companion object {
-        /** Converts the given [userJson] into a [UserData]. */
-        fun fromJson(userJson: JSONObject): UserData {
-            val user = userJson.getJSONObject("user")
-            val curSub = user.getJSONObject("currentSubscription")
-            return UserData(
-                userId = userJson.getString("userId"),
-                authToken = userJson.getString("id"),
-                authDate = userJson.getString("created"),
-                username = user.getString("username"),
-                isMember = curSub.getString("status") == "active"
-            )
-        }
+        /** Converts the given [userRaw] into a [UserData]. */
+        fun fromUserRaw(userRaw: UserRaw) = UserData(
+            userId = userRaw.userId,
+            authToken = userRaw.authToken,
+            authDate = userRaw.authDate,
+            username = userRaw.user.username,
+            isMember = userRaw.user.currentSubscription.status == "active"
+        )
     }
 }

@@ -36,7 +36,7 @@ class ListItemRecyclerViewAdapter(
         holder.imageView.setImageDrawable(null)
         if (contents.mImageUrl != null) {
             imageSource?.getImage(contents.mImageUrl) { url, image ->
-                if (url == holder.imageUrl) holder.imageView.setImageBitmap(image)
+                if (url == holder.imageUrl) holder.imageView.setImageDrawable(image)
             }
         }
 

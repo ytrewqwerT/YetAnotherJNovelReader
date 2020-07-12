@@ -5,9 +5,7 @@ import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
-import com.ytrewqwert.yetanotherjnovelreader.forEach
-import org.json.JSONArray
-import org.json.JSONObject
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.VolumeRaw
 
 /**
  * Contains data about a volume with ID [id].
@@ -36,32 +34,25 @@ data class Volume(
     val created: String
 ) : ListItem, ListHeader {
     companion object {
-        private fun fromJson(source: JSONObject): Volume {
-            // Find the value for coverThumbUrl (if it exists)
-            val attachments = source.getJSONArray("attachments")
+        /** Converts the given [volumeRaw] into a [Volume]. */
+        fun fromVolumeRaw(volumeRaw: VolumeRaw): Volume {
             var coverUrl = ""
-            attachments.forEach<JSONObject> {
-                val attachUrl = it.getString("fullpath")
-                if (attachUrl.contains("cover")) coverUrl = attachUrl
+            for (attach in volumeRaw.attachments) {
+                if (attach.imgUrl.contains("cover")) coverUrl = attach.imgUrl
             }
 
             return Volume(
-                id = source.getString("id"),
-                serieId = source.getString("serieId"),
-                title = source.getString("title"),
-                titleslug = source.getString("titleslug"),
-                volumeNum = source.getInt("volumeNumber"),
-                description = source.getString("description"),
-                descriptionShort = source.getString("descriptionShort"),
+                id = volumeRaw.id,
+                serieId = volumeRaw.serieId,
+                title = volumeRaw.title,
+                titleslug = volumeRaw.titleslug,
+                volumeNum = volumeRaw.volumeNumber,
+                description = volumeRaw.description,
+                descriptionShort = volumeRaw.descriptionShort,
                 coverUrl = coverUrl,
-                tags = source.getString("tags"),
-                created = source.getString("created")
+                tags = volumeRaw.tags,
+                created = volumeRaw.created
             )
-        }
-
-        /** Converts the given [volumesJson] into a list of [Volume]. */
-        fun fromJson(volumesJson: JSONArray): List<Volume> = ArrayList<Volume>().apply {
-            volumesJson.forEach<JSONObject> { add(fromJson(it)) }
         }
     }
 
