@@ -47,12 +47,14 @@ class UrlParameterBuilder {
         return result.toString()
     }
 
+    /** Joins the 'where' parameters and returns the final 'where' statement. */
     private fun wheresJoined(): String {
         val result = StringJoiner(",","\"where\":{","}")
         for (item in wheres) { result.add(item) }
         return result.toString()
     }
 
+    /** Joins the 'include' parameters and returns the final 'include' statement. */
     private fun includesJoined(): String {
         val result = StringJoiner(",", "\"include\":[", "]")
         for (include in includes) result.add("\"${include}\"")

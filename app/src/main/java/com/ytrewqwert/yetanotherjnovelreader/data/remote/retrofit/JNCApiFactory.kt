@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.data.remote.retrofit
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/** A factory object from which instances of [JNCApi] can be retrieved. */
 object JNCApiFactory {
     private const val JNCApiAddr = "https://api.j-novel.club/"
 
