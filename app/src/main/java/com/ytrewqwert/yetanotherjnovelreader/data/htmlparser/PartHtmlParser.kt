@@ -12,13 +12,13 @@ object PartHtmlParser {
      * @param[partId] The ID of the part, used for logging unexpected html tags/args.
      */
     fun parse(html: String, partId: String): Spanned {
-        val tagApplier = HtmlTagApplier(partId)
         val noCharCodes = HtmlCharCodeConverter(partId).processHtml(html)
         val noNewLines = noCharCodes.replace("\n", "")
-        val tagRegex = Regex("<[^>]*>")
-        val tagStack = ArrayDeque<IncompleteTag>()
-        tagStack.addFirst(IncompleteTag("")) // Dummy tag to store processed contents
+        val tagApplier = HtmlTagApplier(partId)
+        // Initialise with a dummy top-level tag to store processed contents
+        val tagStack = ArrayDeque<IncompleteTag>(listOf(IncompleteTag("")))
 
+        val tagRegex = Regex("<[^>]*>")
         var searchStartIndex = 0
         var match = tagRegex.find(noNewLines, searchStartIndex)
         while (match != null) {
@@ -26,31 +26,19 @@ object PartHtmlParser {
             tagStack.first.contents.append(noNewLines.subSequence(searchStartIndex, match.range.first))
 
             val fullTag = match.value.trim('<', '/', '>', ' ')
-            var tagLabelEnd = fullTag.indexOf(' ')
-            if (tagLabelEnd == -1) tagLabelEnd = fullTag.length
-            val tagLabel = fullTag.subSequence(0, tagLabelEnd)
-            val tagArgStr = fullTag.subSequence(tagLabelEnd, fullTag.length).trim(' ')
-            val tagArgs = parseArgs(tagArgStr)
+            val (tagLabel, tagArgs) = extractTagComponents(fullTag)
             when {
-                noNewLines[match.range.first + 1] == '/' -> {
-                    // Closing tag
-                    val openTag = tagStack.first
-                    if (openTag.tagLabel == tagLabel) {
-                        tagStack.removeFirst()
-                        tagApplier.applyTagPair(openTag.tagLabel, openTag.tagArgs, openTag.contents)
-                        tagStack.first.contents.append(openTag.contents)
-                    } else {
-                        // Out-of-sequence closing tag? Treat as self-closing tag
+                noNewLines[match.range.first + 1] == '/' -> { // Closing tag
+                    if (tagStack.first.tagLabel == tagLabel) {
+                        reduceTagStackPair(tagStack, tagApplier)
+                    } else { // Treat out-of-sequence closing tag as self-closing
                         tagStack.first.contents.append(tagApplier.applyLoneTag(tagLabel, tagArgs))
                     }
                 }
-                noNewLines[match.range.last - 1] == '/' -> {
-                    // Self-closing tag
+                noNewLines[match.range.last - 1] == '/' -> { // Self-closing tag
                     tagStack.first.contents.append(tagApplier.applyLoneTag(tagLabel, tagArgs))
                 }
-                else -> {
-                    // Opening tag
-                    // Extract the label and add to the tag stack.
+                else -> { // Opening tag. Extract the label and add to the tag stack.
                     tagStack.addFirst(IncompleteTag(tagLabel, tagArgs))
                 }
             }
@@ -60,7 +48,26 @@ object PartHtmlParser {
 
         val tail = noNewLines.subSequence(searchStartIndex, noNewLines.length)
         tagStack.first.contents.append(tail)
+        while (tagStack.size > 1) reduceTagStackPair(tagStack, tagApplier)
         return tagStack.first.contents
+    }
+
+    private fun extractTagComponents(fullTag: String): Pair<CharSequence, List<Pair<CharSequence, CharSequence>>> {
+        var tagLabelEnd = fullTag.indexOf(' ')
+        if (tagLabelEnd == -1) tagLabelEnd = fullTag.length
+        val tagLabel = fullTag.subSequence(0, tagLabelEnd)
+        val tagArgStr = fullTag.subSequence(tagLabelEnd, fullTag.length).trim(' ')
+        val tagArgs = parseArgs(tagArgStr)
+        return Pair(tagLabel, tagArgs)
+    }
+
+    private fun reduceTagStackPair(
+        tagStack: ArrayDeque<IncompleteTag>, tagApplier: HtmlTagApplier
+    ) {
+        val openTag = tagStack.first
+        tagStack.removeFirst()
+        tagApplier.applyTagPair(openTag.tagLabel, openTag.tagArgs, openTag.contents)
+        tagStack.first.contents.append(openTag.contents)
     }
 
     private fun parseArgs(argStr: CharSequence): List<Pair<CharSequence, CharSequence>> {
