@@ -2,51 +2,50 @@ package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser
 
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
 import java.util.ArrayDeque
 
 /** Singleton exposing a function for converting html to a [Spanned]. */
 object PartHtmlParser {
+
     /**
      * Converts the provided [html] (containing a part's contents) into a [Spanned].
      *
      * @param[partId] The ID of the part, used for logging unexpected html tags/args.
      */
     fun parse(html: String, partId: String): Spanned {
-        val noCharCodes = HtmlCharCodeConverter(partId).processHtml(html)
-        val noNewLines = noCharCodes.replace("\n", "")
+        val cleanedHtml = cleanCharCodeNewLine(html, partId)
         val tagApplier = HtmlTagApplier(partId)
         // Initialise with a dummy top-level tag to store processed contents
         val tagStack = ArrayDeque<IncompleteTag>(listOf(IncompleteTag("")))
 
         val tagRegex = Regex("<[^>]*>")
         var searchStartIndex = 0
-        var match = tagRegex.find(noNewLines, searchStartIndex)
+        var match = tagRegex.find(cleanedHtml, searchStartIndex)
         while (match != null) {
             // Append any skipped text to the parent tag before processing the current match.
-            tagStack.first.contents.append(noNewLines.subSequence(searchStartIndex, match.range.first))
+            tagStack.first.contents.append(cleanedHtml.subSequence(searchStartIndex, match.range.first))
 
             val fullTag = match.value.trim('<', '/', '>', ' ')
             val (tagLabel, tagArgs) = extractTagComponents(fullTag)
-            when {
-                noNewLines[match.range.first + 1] == '/' -> { // Closing tag
-                    if (tagStack.first.tagLabel == tagLabel) {
-                        reduceTagStackPair(tagStack, tagApplier)
-                    } else { // Treat out-of-sequence closing tag as self-closing
-                        tagStack.first.contents.append(tagApplier.applyLoneTag(tagLabel, tagArgs))
-                    }
-                }
-                noNewLines[match.range.last - 1] == '/' -> { // Self-closing tag
+
+            // Geez, this is disgusting...
+            if (cleanedHtml[match.range.first + 1] == '/') { // Closing tag
+                if (tagStack.first.tagLabel == tagLabel)
+                    reduceTagStackPair(tagStack, tagApplier)
+                else // Treat out-of-sequence closing tag as self-closing
                     tagStack.first.contents.append(tagApplier.applyLoneTag(tagLabel, tagArgs))
-                }
-                else -> { // Opening tag. Extract the label and add to the tag stack.
+            } else { // Opening tag. Apply if LoneTag, or add to the tag stack if PairTag.
+                if (LoneTagApplier.tagIsLone(tagLabel, partId))
+                    tagStack.first.contents.append(tagApplier.applyLoneTag(tagLabel, tagArgs))
+                else
                     tagStack.addFirst(IncompleteTag(tagLabel, tagArgs))
-                }
             }
             searchStartIndex = match.range.last + 1
-            match = tagRegex.find(noNewLines, searchStartIndex)
+            match = tagRegex.find(cleanedHtml, searchStartIndex)
         }
 
-        val tail = noNewLines.subSequence(searchStartIndex, noNewLines.length)
+        val tail = cleanedHtml.subSequence(searchStartIndex, cleanedHtml.length)
         tagStack.first.contents.append(tail)
         while (tagStack.size > 1) reduceTagStackPair(tagStack, tagApplier)
         return tagStack.first.contents
@@ -85,6 +84,9 @@ object PartHtmlParser {
         }
         return resultList
     }
+
+    private fun cleanCharCodeNewLine(html: String, partId: String): String =
+        HtmlCharCodeConverter(partId).processHtml(html).replace("\n", "")
 
     private data class IncompleteTag(
         val tagLabel: CharSequence,

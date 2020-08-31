@@ -20,5 +20,9 @@ abstract class LoneTagApplier(partId: CharSequence) : TagApplier(partId) {
             "img" -> ImgLoneTagApplier(partId)
             else -> DummyLoneTagApplier(partId, tag)
         }
+
+        /** Returns true if [tagLabel] corresponds to a lone html tag. */
+        fun tagIsLone(tagLabel: CharSequence, partId: CharSequence): Boolean =
+            getApplier(tagLabel, partId) !is DummyLoneTagApplier
     }
 }
