@@ -12,7 +12,9 @@ interface JNCApi {
      * @param[params] A filter for which series to retrieve.
      */
     @GET("api/series")
-    suspend fun getSeries(@Query("filter") params: Any? = null): List<SerieRaw>
+    suspend fun getSeries(
+        @Query("filter", encoded = true) params: Any? = null
+    ): List<SerieRaw>
 
     /**
      * Retrieves a list of volumes.
@@ -20,7 +22,9 @@ interface JNCApi {
      * @param[params] A filter for which volumes to retrieve.
      */
     @GET("api/volumes")
-    suspend fun getVolumes(@Query("filter") params: Any? = null): List<VolumeRaw>
+    suspend fun getVolumes(
+        @Query("filter", encoded = true) params: Any? = null
+    ): List<VolumeRaw>
 
     /**
      * Retrieves a list of parts.
@@ -28,7 +32,9 @@ interface JNCApi {
      * @param[params] A filter for which parts to retrieve.
      */
     @GET("api/parts")
-    suspend fun getParts(@Query("filter") params: Any? = null): List<PartRaw>
+    suspend fun getParts(
+        @Query("filter", encoded = true) params: Any? = null
+    ): List<PartRaw>
 
     /**
      * Retrieves a single part.
@@ -36,7 +42,9 @@ interface JNCApi {
      * @param[params] A filter for which part to retrieve.
      */
     @GET("api/parts/findOne")
-    suspend fun getPart(@Query("filter") params: Any): PartRaw
+    suspend fun getPart(
+        @Query("filter", encoded = true) params: Any
+    ): PartRaw
 
     /**
      * Retrieves information about a user.
@@ -48,8 +56,8 @@ interface JNCApi {
     @GET("api/users/{userId}")
     suspend fun getUser(
         @Header("Authorization") authToken: String?,
-        @Path("userId") userId: String,
-        @Query("filter") params: Any
+        @Path("userId", encoded = true) userId: String,
+        @Query("filter", encoded = true) params: Any
     ): UserRaw
 
     /**
@@ -62,17 +70,21 @@ interface JNCApi {
     @POST("api/users/{userId}/updateReadCompletion")
     suspend fun setProgress(
         @Header("Authorization") authToken: String?,
-        @Path("userId") userId: String,
+        @Path("userId", encoded = true) userId: String,
         @Body progress: ProgressRaw
     )
 
     /** Logs in using the provided [credentials], returning the logged-in user's data. */
     @POST("api/users/login?include=user")
-    suspend fun login(@Body credentials: LoginRaw): UserRaw
+    suspend fun login(
+        @Body credentials: LoginRaw
+    ): UserRaw
 
     /** Logs out, invalidating the given [authToken]. */
     @POST("api/users/logout")
-    suspend fun logout(@Header("Authorization") authToken: String?): Response<Void>
+    suspend fun logout(
+        @Header("Authorization") authToken: String?
+    ): Response<Void>
 
     /**
      * Retrieves the contents of a particular part.
@@ -83,6 +95,6 @@ interface JNCApi {
     @GET("api/parts/{partId}/partData")
     suspend fun getPartHtml(
         @Header("Authorization") authToken: String?,
-        @Path("partId") partId: String
+        @Path("partId", encoded = true) partId: String
     ): PartContentRaw
 }
