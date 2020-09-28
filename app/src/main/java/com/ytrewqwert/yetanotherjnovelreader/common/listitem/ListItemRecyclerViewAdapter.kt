@@ -15,11 +15,14 @@ import kotlinx.android.synthetic.main.list_item.view.*
 /**
  * A [RecyclerView.Adapter] for displaying [ListItem]s.
  *
+ * @property[listener] A listener for handling item click events.
  * @property[imageSource] An object from which referenced images can be retrieved.
+ * @property[useCompactLayout] Set to true for a more compact view layout.
  */
 class ListItemRecyclerViewAdapter(
     private val listener: ListItem.InteractionListener? = null,
-    private val imageSource: ImageSource? = null
+    private val imageSource: ImageSource? = null,
+    private val useCompactLayout: Boolean = false
 ) : RecyclerView.Adapter<ListItemRecyclerViewAdapter.ViewHolder>() {
 
     private var items: List<ListItem> = emptyList()
@@ -30,7 +33,7 @@ class ListItemRecyclerViewAdapter(
         val contents = items[position].getListItemContents()
 
         holder.titleText.text = contents.mTitle
-        holder.subText.text = contents.mText
+        holder.subText?.text = contents.mText
         holder.imageUrl = contents.mImageUrl
 
         holder.imageView.setImageDrawable(null)
@@ -67,8 +70,9 @@ class ListItemRecyclerViewAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =LayoutInflater.from(parent.context)
-            .inflate(R.layout.list_item, parent, false)
+        val layoutId = if (useCompactLayout) R.layout.list_item_compact else R.layout.list_item
+        val view = LayoutInflater.from(parent.context)
+            .inflate(layoutId, parent, false)
         return ViewHolder(view)
     }
 
@@ -79,7 +83,7 @@ class ListItemRecyclerViewAdapter(
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
-        val subText: TextView = view.subText
+        val subText: TextView? = view.subText
         val imageView: ImageView = view.image
         val progressBar: ProgressBar = view.progress
         val following: ImageView = view.following

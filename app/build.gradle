@@ -21,6 +21,9 @@ android {
             }
         }
     }
+    buildFeatures {
+        dataBinding true
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -29,9 +32,6 @@ android {
     }
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
-    }
-    dataBinding {
-        enabled true
     }
     kotlinOptions {
         jvmTarget = '1.8'

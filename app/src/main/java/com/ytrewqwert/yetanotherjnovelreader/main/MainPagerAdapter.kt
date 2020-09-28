@@ -48,6 +48,10 @@ class MainPagerAdapter(fm: FragmentManager)
         val fragment = ListItemFragment()
         val args = Bundle()
         args.putInt(ListItemFragment.ARG_ID, id)
+
+        // Make part lists compact. (Both calls of this function are for part lists.)
+        args.putBoolean(ListItemFragment.ARG_COMPACT, true)
+
         fragment.arguments = args
         return fragment
     }

@@ -37,6 +37,8 @@ class ListItemFragment : Fragment(),
 
         /** An identifier for which data to retrieve from the [ListItemViewModel]. */
         const val ARG_ID = "${TAG}_ID"
+        /** Boolean argument that determines whether a compact view layout is used. */
+        const val ARG_COMPACT = "${TAG}_COMPACT"
     }
 
     private val viewModel by viewModels<ListItemViewModel>(
@@ -45,11 +47,12 @@ class ListItemFragment : Fragment(),
     )
 
     private val uid by lazy { requireArguments().getInt(ARG_ID, 0) }
+    private val isCompact by lazy { requireArguments().getBoolean(ARG_COMPACT, false) }
 
-    private val listHeaderAdapter = ListHeaderRecyclerViewAdapter(this)
-    private val listItemAdapter = ListItemRecyclerViewAdapter(this, this)
-    private val listFooterAdapter = ListFooterRecyclerViewAdapter(this)
-    private val recyclerViewAdapter = MergeAdapter(listHeaderAdapter, listItemAdapter, listFooterAdapter)
+    private val listHeaderAdapter by lazy { ListHeaderRecyclerViewAdapter(this) }
+    private val listItemAdapter by lazy { ListItemRecyclerViewAdapter(this, this, isCompact) }
+    private val listFooterAdapter by lazy { ListFooterRecyclerViewAdapter(this) }
+    private val recyclerViewAdapter by lazy { MergeAdapter(listHeaderAdapter, listItemAdapter, listFooterAdapter) }
 
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null

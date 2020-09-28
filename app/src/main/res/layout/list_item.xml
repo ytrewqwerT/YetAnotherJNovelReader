@@ -13,6 +13,7 @@
         android:contentDescription="@string/cover_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <ProgressBar
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:id="@+id/progress"
