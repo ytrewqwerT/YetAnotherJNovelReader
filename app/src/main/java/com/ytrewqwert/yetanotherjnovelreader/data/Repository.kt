@@ -3,6 +3,8 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Spanned
+import androidx.work.*
+import com.ytrewqwert.yetanotherjnovelreader.ProgressUploadWorker
 import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
@@ -12,6 +14,9 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 
 /** A one-stop shop for objects needing to interact with the locally and remotely saved data. */
@@ -28,6 +33,7 @@ class Repository private constructor(appContext: Context) {
     private val prefStore = PreferenceStore.getInstance(appContext)
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
+    private val workManager = WorkManager.getInstance(appContext)
 
     /** Identifies whether lists should filter items to only show followed items. */
     val isFilterFollowing get() = prefStore.isFilterFollowing
@@ -125,14 +131,9 @@ class Repository private constructor(appContext: Context) {
         return true
     }
 
-    suspend fun setPartProgress(partId: String, progress: Double): Boolean {
-        refreshLoginIfAuthExpired()
-        val boundedProgress = when {
-            progress > 1.0 -> 1.0
-            progress < 0.0 -> 0.0
-            else -> progress
-        }
-        local.upsertProgress(Progress(partId, boundedProgress))
+    suspend fun setPartProgress(partId: String, progress: Double) {
+        val boundedProgress = progress.coerceIn(0.0, 1.0)
+        local.upsertProgress(Progress(partId, boundedProgress, true))
         if (boundedProgress == 1.0) {
             // Update the "up-next" part if the series is being followed. Note that
             // Room's Update functions only update rows and won't insert any new rows.
@@ -142,9 +143,35 @@ class Repository private constructor(appContext: Context) {
                 local.updateFollows(Follow(serieId, nextPartNum))
             }
         }
-
-        val userId = prefStore.userId ?: return false
-        return remote.setUserPartProgress(userId, partId, boundedProgress)
+        enqueueProgressUploadWorker()
+    }
+    suspend fun pushProgressPendingUploadToRemote(): Boolean = coroutineScope {
+        refreshLoginIfAuthExpired()
+        val pendingProgress = local.getProgressPendingUpload()
+        val jobs = pendingProgress.map {
+            async { setRemotePartProgress(it.partId, it.progress) }
+        }
+        jobs.awaitAll().contains(false).not()
+    }
+    private fun enqueueProgressUploadWorker() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val workRequest = OneTimeWorkRequestBuilder<ProgressUploadWorker>()
+            .setConstraints(constraints)
+            .build()
+        workManager.enqueueUniqueWork(
+            "PROGRESS_UPLOAD", ExistingWorkPolicy.REPLACE, workRequest
+        )
+    }
+    private suspend fun setRemotePartProgress(partId: String, progress: Double): Boolean {
+        val boundedProgress = progress.coerceIn(0.0, 1.0)
+        val userId = prefStore.userId ?: return true
+        val progressSet = remote.setUserPartProgress(userId, partId, boundedProgress)
+        if (progressSet) {
+            local.upsertProgress(Progress(partId, boundedProgress, false))
+        }
+        return progressSet
     }
     /**
      * Retrieves all of the user's part progress data and saves it in the local database.

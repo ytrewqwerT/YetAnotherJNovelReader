@@ -3,7 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.common.listfooter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.MergeAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
 
@@ -18,7 +18,7 @@ class ListFooterRecyclerViewAdapter(
 ) : RecyclerView.Adapter<ListFooterRecyclerViewAdapter.ViewHolder>() {
     /**
      * Set's whether to show the loading item. If set to false, then the [listener] will not be
-     * notified when the end of the containing [MergeAdapter] has been reached.
+     * notified when the end of the containing [ConcatAdapter] has been reached.
      */
     var isVisible = false
         set(value) {

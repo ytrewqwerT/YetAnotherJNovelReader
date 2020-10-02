@@ -97,7 +97,7 @@ class PartActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.uploadProgressNow()
+        viewModel.saveProgress()
     }
 
     override fun onResume() {

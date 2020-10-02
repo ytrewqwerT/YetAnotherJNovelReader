@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.MergeAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -52,7 +52,7 @@ class ListItemFragment : Fragment(),
     private val listHeaderAdapter by lazy { ListHeaderRecyclerViewAdapter(this) }
     private val listItemAdapter by lazy { ListItemRecyclerViewAdapter(this, this, isCompact) }
     private val listFooterAdapter by lazy { ListFooterRecyclerViewAdapter(this) }
-    private val recyclerViewAdapter by lazy { MergeAdapter(listHeaderAdapter, listItemAdapter, listFooterAdapter) }
+    private val recyclerViewAdapter by lazy { ConcatAdapter(listHeaderAdapter, listItemAdapter, listFooterAdapter) }
 
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null

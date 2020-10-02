@@ -96,12 +96,13 @@ class PartViewModel(
         }
     }
 
-    /** Saves the current value of [currentProgress] to the local and remote database. */
-    fun uploadProgressNow() {
-        // Only upload if the value has changed since last upload
+    /** Saves the current value of [currentProgress] to the database. */
+    fun saveProgress() {
+        // Only upload if the value has changed since last save
         val progress = currentProgress.value ?: 0.0
         if (progress != savedProgress) {
             viewModelScope.launch { repository.setPartProgress(partId, progress) }
+            savedProgress = progress
         }
     }
 

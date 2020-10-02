@@ -86,4 +86,7 @@ class LocalRepository private constructor(appContext: Context) {
     suspend fun getAllFollows(): List<Follow> = withContext(Dispatchers.IO) {
         followDao.getAllFollows()
     }
+    suspend fun getProgressPendingUpload(): List<Progress> = withContext(Dispatchers.IO) {
+        progressDao.getProgressPendingUpload()
+    }
 }

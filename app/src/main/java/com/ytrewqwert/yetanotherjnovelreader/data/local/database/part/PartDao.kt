@@ -35,6 +35,7 @@ abstract class PartDao : BaseDao<Part>() {
      * Returns the most recently released [PartFull] in a series with ID [serieId] that has been
      * fully read.
      */
+    @Transaction
     @Query("SELECT * FROM Part WHERE serieId = :serieId AND EXISTS (" +
             "  SELECT NULL FROM Progress " +
             "  WHERE Part.id = Progress.partId " +
