@@ -1,5 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser
 
+import android.text.SpannableStringBuilder
 import android.util.Log
 import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterface
 
@@ -14,21 +15,18 @@ class HtmlCharCodeConverter(private val partId: String) {
     }
 
     /** Converts html character codes found in the [html] to their respective characters. */
-    fun processHtml(html: String): String {
-        val result = StringBuilder(html)
-
+    fun processHtml(html: SpannableStringBuilder): SpannableStringBuilder {
         val codeRegex = Regex("&[^\\s]*;")
         var curPos = 0
-        var match = codeRegex.find(result, curPos)
+        var match = codeRegex.find(html, curPos)
         while (match != null) {
             val code = match.value.trim('&', ';')
             val converted = convertCharCode(code)
-            result.replace(match.range.first, match.range.last + 1, converted)
+            html.replace(match.range.first, match.range.last + 1, converted)
             curPos = match.range.first + 1
-            match = codeRegex.find(result, curPos)
+            match = codeRegex.find(html, curPos)
         }
-
-        return result.toString()
+        return html
     }
 
     // Should probably generalise the replacements of "#xxx" style codes.

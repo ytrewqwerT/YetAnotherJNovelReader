@@ -14,23 +14,28 @@ object PartHtmlParser {
      * @param[partId] The ID of the part, used for logging unexpected html tags/args.
      */
     fun parse(html: String, partId: String): Spanned {
-        val cleanedHtml = cleanCharCodeNewLine(html, partId)
+        val noNewLines = html.replace("\n", "")
+        val noTags = parseTags(noNewLines, partId)
+        return HtmlCharCodeConverter(partId).processHtml(noTags)
+    }
+
+    private fun parseTags(html: String, partId: String): SpannableStringBuilder {
         val tagApplier = HtmlTagApplier(partId)
         // Initialise with a dummy top-level tag to store processed contents
-        val tagStack = ArrayDeque<IncompleteTag>(listOf(IncompleteTag("")))
+        val tagStack = ArrayDeque(listOf(IncompleteTag("")))
 
         val tagRegex = Regex("<[^>]*>")
         var searchStartIndex = 0
-        var match = tagRegex.find(cleanedHtml, searchStartIndex)
+        var match = tagRegex.find(html, searchStartIndex)
         while (match != null) {
             // Append any skipped text to the parent tag before processing the current match.
-            tagStack.first.contents.append(cleanedHtml.subSequence(searchStartIndex, match.range.first))
+            tagStack.first.contents.append(html.subSequence(searchStartIndex, match.range.first))
 
             val fullTag = match.value.trim('<', '/', '>', ' ')
             val (tagLabel, tagArgs) = extractTagComponents(fullTag)
 
             // Geez, this is disgusting...
-            if (cleanedHtml[match.range.first + 1] == '/') { // Closing tag
+            if (html[match.range.first + 1] == '/') { // Closing tag
                 if (tagStack.first.tagLabel == tagLabel)
                     reduceTagStackPair(tagStack, tagApplier)
                 else // Treat out-of-sequence closing tag as self-closing
@@ -42,10 +47,10 @@ object PartHtmlParser {
                     tagStack.addFirst(IncompleteTag(tagLabel, tagArgs))
             }
             searchStartIndex = match.range.last + 1
-            match = tagRegex.find(cleanedHtml, searchStartIndex)
+            match = tagRegex.find(html, searchStartIndex)
         }
 
-        val tail = cleanedHtml.subSequence(searchStartIndex, cleanedHtml.length)
+        val tail = html.subSequence(searchStartIndex, html.length)
         tagStack.first.contents.append(tail)
         while (tagStack.size > 1) reduceTagStackPair(tagStack, tagApplier)
         return tagStack.first.contents
@@ -84,9 +89,6 @@ object PartHtmlParser {
         }
         return resultList
     }
-
-    private fun cleanCharCodeNewLine(html: String, partId: String): String =
-        HtmlCharCodeConverter(partId).processHtml(html).replace("\n", "")
 
     private data class IncompleteTag(
         val tagLabel: CharSequence,
