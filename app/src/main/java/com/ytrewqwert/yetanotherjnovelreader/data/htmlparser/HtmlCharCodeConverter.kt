@@ -16,7 +16,7 @@ class HtmlCharCodeConverter(private val partId: String) {
 
     /** Converts html character codes found in the [html] to their respective characters. */
     fun processHtml(html: SpannableStringBuilder): SpannableStringBuilder {
-        val codeRegex = Regex("&[^\\s]*;")
+        val codeRegex = Regex("&[^;]*;")
         var curPos = 0
         var match = codeRegex.find(html, curPos)
         while (match != null) {
