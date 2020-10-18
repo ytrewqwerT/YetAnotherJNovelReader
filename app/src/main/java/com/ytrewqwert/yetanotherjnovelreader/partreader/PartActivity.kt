@@ -33,7 +33,7 @@ class PartActivity : AppCompatActivity() {
         const val EXTRA_PART_ID = "PART_ID"
     }
 
-    private val partId: String by lazy { intent.getStringExtra(EXTRA_PART_ID) }
+    private val partId: String by lazy { intent.getStringExtra(EXTRA_PART_ID) ?: "" }
     private val statusBarHeight by lazy {
         with(resources) {
             val resId = getIdentifier("status_bar_height", "dimen", "android")
