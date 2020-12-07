@@ -4,7 +4,6 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ImageSpan
 import android.text.style.LeadingMarginSpan
-import android.util.Log
 import android.widget.TextView
 
 /**
@@ -23,8 +22,6 @@ object Paginator {
     fun paginate(textView: TextView?, text: Spanned, pageHeight: Int): List<CharSequence> {
         if (textView == null) return emptyList()
         if (textView.width <= 0 || pageHeight <= 0) return emptyList()
-
-        Log.d("Paginator", "h/w = ${pageHeight}/${textView.width}")
 
         val pages = ArrayList<CharSequence>()
 
