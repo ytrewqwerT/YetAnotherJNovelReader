@@ -1,6 +1,6 @@
 # YetAnotherJNovelReader
 
-An (unofficial) alternative to [J-Novel Club](https://j-novel.club/about)'s [official reader app](https://play.google.com/store/apps/details?id=com.jnovelapp) for Android since, as of the time of writing, the official app has been riddled with issues with no updates in sight.
+An (unofficial) alternative to [J-Novel Club](https://j-novel.club/about)'s [official reader app](https://play.google.com/store/apps/details?id=com.jnovelapp) for Android ~~since, as of the time of writing, the official app has been riddled with issues with no updates in sight~~. Update: A beta version of an updated official app is currently available [here](https://forums.j-novel.club/topic/3741/new-beta-app-feedback), although as of v0.3.0, I still think this is the better option.
 
 ## Features
 
