@@ -32,25 +32,19 @@ object Paginator {
         for (span in spans) {
             var remainingSpan = span.trim()
             do {
-                textView.text = remainingSpan
-                val layout = textView.layout
+                var nextPageStart = getPageEndIndex(textView, remainingSpan, pageHeight)
+                var pageText = remainingSpan.subSequence(0, nextPageStart).trim()
+                // Due to how justified text alignment works, the first trim may result in the last
+                // word in the page to be pushed into its own line, so trim the page again, this
+                // time using only the currently predicted page's text.
+                nextPageStart = getPageEndIndex(textView, pageText, pageHeight)
+                pageText = remainingSpan.subSequence(0, nextPageStart).trim()
 
-                var lineNum = 0
-                while (
-                    lineNum < layout.lineCount && layout.getLineBottom(lineNum) < pageHeight
-                ) lineNum++
-                // Ensure at least one "line" is displayed.
-                // This is more a stop-gap measure to allow images that cannot fit on the page
-                // to still be at least partially displayed and not cause an infinite loop.
-                if (lineNum == 0) lineNum = 1
+                if (pageText.isNotBlank()) pages.add(pageText)
 
-                val pageText = remainingSpan.subSequence(0, layout.getLineStart(lineNum))
-                if (pageText.isNotBlank()) pages.add(pageText.trim())
-
-                val nextStart = layout.getLineStart(lineNum)
-                val overflowed = paragraphOverflowed(remainingSpan, nextStart)
+                val overflowed = paragraphOverflowed(remainingSpan, nextPageStart)
                 remainingSpan = SpannableString(
-                    remainingSpan.subSequence(nextStart, remainingSpan.length).trim()
+                    remainingSpan.subSequence(nextPageStart, remainingSpan.length).trim()
                 )
                 if (overflowed) {
                     val paragraphEnd = remainingSpan.indexOf('\n')
@@ -62,6 +56,23 @@ object Paginator {
             } while (remainingSpan.isNotEmpty())
         }
         return pages
+    }
+
+    // Returns the index of the character after the last character that can fit in a page.
+    private fun getPageEndIndex(textView: TextView, text: CharSequence, pageHeight: Int): Int {
+        textView.text = text
+        val layout = textView.layout
+
+        var lineNum = 0
+        while (
+            lineNum < layout.lineCount && layout.getLineBottom(lineNum) < pageHeight
+        ) lineNum++
+        // Ensure at least one "line" is displayed.
+        // This is more a stop-gap measure to allow images that cannot fit on the page
+        // to still be at least partially displayed and not cause an infinite loop.
+        if (lineNum == 0) lineNum = 1
+
+        return layout.getLineStart(lineNum)
     }
 
     // Checks if the line of text starting from the given index continues a paragraph from the
