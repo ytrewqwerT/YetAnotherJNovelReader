@@ -1,65 +1,47 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader
 
-import android.graphics.text.LineBreaker
-import android.text.*
+import android.text.SpannableString
+import android.text.Spanned
 import android.text.style.ImageSpan
 import android.text.style.LeadingMarginSpan
-import android.util.Log
+import android.widget.TextView
 
 /**
- * A class used to split a long [Spanned] object into pages.
- *
- * @property[text] The [Spanned] text to split into pages.
- * @property[width] The width of a single page, in px.
- * @property[height] The height of a single page, in px.
- * @property[paint] The paint to be used to draw the text.
+ * A singleton used to split a long [Spanned] object into pages.
  */
-class Paginator(
-    private val text: Spanned,
-    private val width: Int,
-    private val height: Int,
-    private val paint: TextPaint
-) {
-    private val pages = ArrayList<CharSequence>()
-
-    init {
-        Log.d("Paginator", "width/height = $width/$height")
-    }
-
+object Paginator {
     /**
-     * Splits the given [text] into pages.
+     * Splits some text into pages.
+     *
+     * @param[textView] The TextView that will contain each page.
+     * @param[text] The text to be paginated.
+     * @param[pageHeight] The height of each page.
      *
      * @return A resulting list of text to be shown in each page.
      */
-    fun paginateText(): List<CharSequence> {
-        if (width == 0 || height == 0) return emptyList()
+    fun paginate(textView: TextView?, text: Spanned, pageHeight: Int): List<CharSequence> {
+        if (textView == null) return emptyList()
+        if (textView.width <= 0 || pageHeight <= 0) return emptyList()
+
+        val pages = ArrayList<CharSequence>()
 
         val spans = split(text)
         for (span in spans) {
             var remainingSpan = span.trim()
             do {
-                val layout = StaticLayout.Builder.obtain(
-                    remainingSpan, 0, remainingSpan.length, paint, width
-                )
-                    .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_FULL)
-                    .setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD)
-                    .build()
+                var nextPageStart = getPageEndIndex(textView, remainingSpan, pageHeight)
+                var pageText = remainingSpan.subSequence(0, nextPageStart).trim()
+                // Due to how justified text alignment works, the first trim may result in the last
+                // word in the page to be pushed into its own line, so trim the page again, this
+                // time using only the currently predicted page's text.
+                nextPageStart = getPageEndIndex(textView, pageText, pageHeight)
+                pageText = remainingSpan.subSequence(0, nextPageStart).trim()
 
-                var lineNum = 0
-                while (
-                    lineNum < layout.lineCount && layout.getLineBottom(lineNum) < height
-                ) lineNum++
-                // Ensure at least one "line" is displayed.
-                // This is more a stop-gap measure to allow images that cannot fit on the page
-                // to still be at least partially displayed and not cause an infinite loop.
-                if (lineNum == 0) lineNum = 1
+                if (pageText.isNotBlank()) pages.add(pageText)
 
-                addPage(remainingSpan.subSequence(0, layout.getLineStart(lineNum)))
-
-                val nextStart = layout.getLineStart(lineNum)
-                val overflowed = paragraphOverflowed(remainingSpan, nextStart)
+                val overflowed = paragraphOverflowed(remainingSpan, nextPageStart)
                 remainingSpan = SpannableString(
-                    remainingSpan.subSequence(nextStart, remainingSpan.length).trim()
+                    remainingSpan.subSequence(nextPageStart, remainingSpan.length).trim()
                 )
                 if (overflowed) {
                     val paragraphEnd = remainingSpan.indexOf('\n')
@@ -73,11 +55,34 @@ class Paginator(
         return pages
     }
 
-    private fun addPage(text: CharSequence) {
-        // Ignore leading/trailing whitespace
-        if (text.isNotBlank()) pages.add(text.trim())
+    // Returns the index of the character after the last character that can fit in a page. If
+    // splitting at that point would result in a word being split across 2 pages, then the index
+    // after the end of the previous word is returned instead.
+    private fun getPageEndIndex(textView: TextView, text: CharSequence, pageHeight: Int): Int {
+        textView.text = text
+        val layout = textView.layout
+
+        var lineNum = 0
+        while (
+            lineNum < layout.lineCount && layout.getLineBottom(lineNum) < pageHeight
+        ) lineNum++
+        // Ensure at least one "line" is displayed.
+        // This is more a stop-gap measure to allow images that cannot fit on the page
+        // to still be at least partially displayed and not cause an infinite loop.
+        if (lineNum == 0) lineNum = 1
+
+        // Get the index of the end-of-page char and backtrack if necessary to prevent words being
+        // split across pages.
+        var endIndex = layout.getLineStart(lineNum)
+        while (
+            endIndex in (1 until text.length)
+            && !text[endIndex].isWhitespace()
+        ) endIndex--
+        return endIndex
     }
 
+    // Checks if the line of text starting from the given index continues a paragraph from the
+    // previous page
     private fun paragraphOverflowed(text: CharSequence, lineStartPos: Int): Boolean {
         if (lineStartPos == 0) return false
         return text[lineStartPos - 1] != '\n'
