@@ -58,7 +58,9 @@ object Paginator {
         return pages
     }
 
-    // Returns the index of the character after the last character that can fit in a page.
+    // Returns the index of the character after the last character that can fit in a page. If
+    // splitting at that point would result in a word being split across 2 pages, then the index
+    // after the end of the previous word is returned instead.
     private fun getPageEndIndex(textView: TextView, text: CharSequence, pageHeight: Int): Int {
         textView.text = text
         val layout = textView.layout
@@ -72,7 +74,14 @@ object Paginator {
         // to still be at least partially displayed and not cause an infinite loop.
         if (lineNum == 0) lineNum = 1
 
-        return layout.getLineStart(lineNum)
+        // Get the index of the end-of-page char and backtrack if necessary to prevent words being
+        // split across pages.
+        var endIndex = layout.getLineStart(lineNum)
+        while (
+            endIndex in (1 until text.length)
+            && !text[endIndex].isWhitespace()
+        ) endIndex--
+        return endIndex
     }
 
     // Checks if the line of text starting from the given index continues a paragraph from the
