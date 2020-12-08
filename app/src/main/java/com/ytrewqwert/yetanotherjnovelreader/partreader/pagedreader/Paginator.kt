@@ -84,8 +84,8 @@ object Paginator {
     // Checks if the line of text starting from the given index continues a paragraph from the
     // previous page
     private fun paragraphOverflowed(text: CharSequence, lineStartPos: Int): Boolean {
-        if (lineStartPos == 0) return false
-        return text[lineStartPos - 1] != '\n'
+        if (lineStartPos == 0 || lineStartPos >= text.length) return false
+        return text[lineStartPos] != '\n'
     }
 
     // Separates images from the text
