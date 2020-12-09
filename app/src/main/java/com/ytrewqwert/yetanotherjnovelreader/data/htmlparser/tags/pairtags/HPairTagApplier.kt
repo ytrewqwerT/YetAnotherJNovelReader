@@ -22,12 +22,12 @@ class HPairTagApplier(partId: CharSequence, private val headerSize: Int) : PairT
     override fun apply(
         args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
     ) {
-        warnIfArgsNotEmpty(args)
         applySpans(
             contents,
             RelativeSizeSpan(HEADING_SIZES[headerSize - 1]),
             StyleSpan(Typeface.BOLD)
         )
+        applyArgs(contents, args)
         contents.insert(0, "\n")
         contents.append("\n\n")
     }
