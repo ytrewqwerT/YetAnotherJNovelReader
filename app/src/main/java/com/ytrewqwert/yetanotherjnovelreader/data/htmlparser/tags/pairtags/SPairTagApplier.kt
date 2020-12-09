@@ -10,10 +10,12 @@ import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.PairTagApplier
  * @param[partId] The id of the source part to attribute unhandled arguments to.
  */
 class SPairTagApplier(partId: CharSequence) : PairTagApplier(partId) {
+    override val tagString: CharSequence = "s"
+
     override fun apply(
         args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
     ) {
-        warnIfArgsNotEmpty("s", args)
+        warnIfArgsNotEmpty(args)
         applySpans(contents, StrikethroughSpan())
     }
 }

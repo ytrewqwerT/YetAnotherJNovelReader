@@ -12,7 +12,10 @@ import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
  * @param[partId] The id of the source part to attribute unhandled arguments to.
  */
 class HrLoneTagApplier(private val partId: CharSequence) : LoneTagApplier(partId) {
+    override val tagString: CharSequence = "hr"
+
     override fun apply(args: List<Pair<CharSequence, CharSequence>>): SpannableStringBuilder {
+        warnIfArgsNotEmpty(args)
         val result = SpannableStringBuilder("-\n")
         applySpans(result, HrSpan(1f))
         return result

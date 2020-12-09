@@ -10,6 +10,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags.LoneTagApplier
  * @param[partId] The id of the source part to attribute unhandled arguments to.
  */
 class ImgLoneTagApplier(partId: CharSequence) : LoneTagApplier(partId) {
+    override val tagString: CharSequence = "img"
+
     override fun apply(args: List<Pair<CharSequence, CharSequence>>): SpannableStringBuilder {
         // Use the built-in parser to inject a placeholder image.
         val argsCombinedTypeValue = args.map { "${it.first}=${it.second}" }

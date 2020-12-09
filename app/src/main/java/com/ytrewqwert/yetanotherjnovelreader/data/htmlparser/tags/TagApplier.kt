@@ -1,6 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.tags
 
 import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.util.Log
 import com.ytrewqwert.yetanotherjnovelreader.data.firebase.FirestoreDataInterface
 
@@ -21,18 +22,34 @@ abstract class TagApplier(private val partId: CharSequence) {
         }
     }
 
-    /** Logs any unhandled [args] from a given html [tag] to the linked Firestore. */
-    protected fun reportUnhandledArg(tag: CharSequence, vararg args: CharSequence) {
+    /** The html tag's label (e.g. "em") */
+    protected abstract val tagString: CharSequence
+
+    /** Attempts to apply the given [args] to [contents]. Unhandled args are reported to the Firestore. */
+    protected fun applyArgs(contents: SpannableStringBuilder, args: List<Pair<CharSequence, CharSequence>>) {
         for (arg in args) {
-            FirestoreDataInterface.insertUnhandledHtmlArg("$partId", "$tag", "$arg")
+            val (type, value) = arg
+            val applier = TagArgApplier.getApplier(type)
+            if (applier?.applyArg(value, contents) != true) {
+                reportUnhandledArg("$type=$value")
+            } else {
+                Log.w(TAG, "Handled arg for tag \"$tagString\": $args")
+            }
+        }
+    }
+
+    /** Logs any unhandled [args] to the linked Firestore. */
+    protected fun reportUnhandledArg(vararg args: CharSequence) {
+        Log.w(TAG, "Unhandled arg for tag \"$tagString\": $args")
+        for (arg in args) {
+            FirestoreDataInterface.insertUnhandledHtmlArg("$partId", "$tagString", "$arg")
         }
     }
 
     /** Logs a warning and reports any (unhandled) arguments to the linked Firestore. */
-    protected fun warnIfArgsNotEmpty(tag: CharSequence, args: List<Pair<CharSequence, CharSequence>>) {
+    protected fun warnIfArgsNotEmpty(args: List<Pair<CharSequence, CharSequence>>) {
         if (args.isEmpty()) return
-        Log.w(TAG, "Unhandled args for tag \"$tag\": $args")
         val combinedTypeValue = args.map { "${it.first}=${it.second}" }
-        reportUnhandledArg(tag, *combinedTypeValue.toTypedArray())
+        reportUnhandledArg(tagString, *combinedTypeValue.toTypedArray())
     }
 }
