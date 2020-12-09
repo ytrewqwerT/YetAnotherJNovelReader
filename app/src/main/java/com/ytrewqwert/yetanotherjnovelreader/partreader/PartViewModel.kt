@@ -8,7 +8,7 @@ import android.text.style.ImageSpan
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.ReaderPreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
@@ -43,7 +43,7 @@ class PartViewModel(
     private val _horizontalReader = MutableLiveData<Boolean>()
     private val _fontSize = MutableLiveData<Int>()
     private val _fontStyle = MutableLiveData<Typeface>()
-    private val _margin = MutableLiveData<PreferenceStore.Margins>()
+    private val _margin = MutableLiveData<ReaderPreferenceStore.Margins>()
     /** Whether the activity should use a paginated, horizontally scrolling reader. */
     val horizontalReader: LiveData<Boolean> = _horizontalReader
     /** The size to make the reader's normal text, in sp. */
@@ -51,7 +51,7 @@ class PartViewModel(
     /** The typeface to use in drawing the text in the reader. */
     val fontStyle: LiveData<Typeface> = _fontStyle
     /** How much space to leave around each edge of the reader. */
-    val margin: LiveData<PreferenceStore.Margins> = _margin
+    val margin: LiveData<ReaderPreferenceStore.Margins> = _margin
 
     private var savedProgress = 0.0
     /** The user's current reading progress through the part. */

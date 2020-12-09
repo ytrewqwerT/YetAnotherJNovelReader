@@ -13,6 +13,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.ReaderPreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -31,6 +32,7 @@ class Repository private constructor(appContext: Context) {
     }
 
     private val prefStore = PreferenceStore.getInstance(appContext)
+    private val readerPrefStore = ReaderPreferenceStore.getInstance(appContext)
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
     private val workManager = WorkManager.getInstance(appContext)
@@ -40,7 +42,7 @@ class Repository private constructor(appContext: Context) {
     /** Set whether lists should filter items to only show followed items. */
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
-    fun getReaderSettingsFlow() = prefStore.readerSettings
+    fun getReaderSettingsFlow() = readerPrefStore.readerSettings
 
     suspend fun getImage(source: String): Drawable? = remote.getImage(source)
     suspend fun getPartContent(partId: String): Spanned? {
