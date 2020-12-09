@@ -20,14 +20,13 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
 
     private val sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext)
 
+    /** Preferences applied via Android Views. */
     private var paginated: Boolean = sharedPref.getBoolean(PrefKeys.IS_HORIZONTAL, PrefDefaults.IS_HORIZONTAL)
     private var fontSize = sharedPref.getInt(PrefKeys.FONT_SIZE, PrefDefaults.FONT_SIZE)
     private var fontStyle = getTypeface()
     private var readerMargins = getMargins()
     private var lineSpacing: Float = sharedPref.getFloat(PrefKeys.LINE_SPACING, PrefDefaults.LINE_SPACING)
-
-    /** Aggregates a number of preferences for styling the app's part reader. */
-    val readerSettings = channelFlow {
+    val viewSettings = channelFlow {
         offer(ViewPreferences(paginated, fontSize, fontStyle, readerMargins, lineSpacing))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
             with (PrefKeys) {
@@ -51,6 +50,29 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
                 }
             }
             offer(ViewPreferences(paginated, fontSize, fontStyle, readerMargins, lineSpacing))
+        }
+        sharedPref.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose { sharedPref.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+
+    /** Preferences applied via Android Spans. */
+    private var paraIndentation: Int = sharedPref.getInt(PrefKeys.PARA_INDENT, PrefDefaults.PARA_INDENT)
+    private var paraSpacing: Float = sharedPref.getFloat(PrefKeys.PARA_SPACING, PrefDefaults.PARA_SPACING)
+    val spanSettings = channelFlow {
+        offer(SpanPreferences(paraIndentation, paraSpacing))
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
+            with (PrefKeys) {
+                when (changedKey) {
+                    PARA_INDENT -> {
+                        paraIndentation = sharedPref.getInt(PARA_INDENT, PrefDefaults.PARA_INDENT)
+                    }
+                    PARA_SPACING -> {
+                        paraSpacing = sharedPref.getFloat(PARA_SPACING, PrefDefaults.PARA_SPACING)
+                    }
+                    else -> return@OnSharedPreferenceChangeListener
+                }
+            }
+            offer(SpanPreferences(paraIndentation, paraSpacing))
         }
         sharedPref.registerOnSharedPreferenceChangeListener(listener)
         awaitClose { sharedPref.unregisterOnSharedPreferenceChangeListener(listener) }
@@ -83,5 +105,8 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
     )
 
     /** Aggregates preferences applied via Spans. */
-//    data class SpanPreferences()
+    data class SpanPreferences(
+        val paraIndent: Int,
+        val paraSpacing: Float
+    )
 }

@@ -17,4 +17,6 @@
     <string name="cover_image">Cover Image</string>
     <string name="followed">Followed</string>
     <string name="line_spacing">Line Spacing</string>
+    <string name="paragraph_spacing">Paragraph Spacing</string>
+    <string name="paragraph_indentation">Paragraph Indentation</string>
 </resources>

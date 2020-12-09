@@ -24,4 +24,5 @@ object PrefKeys {
 
     const val LINE_SPACING = "LINE_SPACING"
     const val PARA_SPACING = "PARA_SPACING"
+    const val PARA_INDENT = "PARA_INDENT"
 }

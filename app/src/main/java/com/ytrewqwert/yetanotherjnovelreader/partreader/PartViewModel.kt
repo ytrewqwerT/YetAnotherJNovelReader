@@ -76,7 +76,7 @@ class PartViewModel(
         }
 
         viewModelScope.launch {
-            repository.getReaderSettingsFlow().collect {
+            repository.getReaderViewSettingsFlow().collect {
                 _horizontalReader.value = it.isHorizontal
                 _fontSize.value = it.fontSize
                 _fontStyle.value = it.fontStyle
