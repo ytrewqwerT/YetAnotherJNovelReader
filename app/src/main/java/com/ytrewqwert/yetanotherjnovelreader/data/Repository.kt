@@ -2,10 +2,8 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.text.Spanned
 import androidx.work.*
 import com.ytrewqwert.yetanotherjnovelreader.ProgressUploadWorker
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
@@ -48,7 +46,7 @@ class Repository private constructor(appContext: Context) {
     suspend fun getImage(source: String): Drawable? = remote.getImage(source)
     suspend fun getPartContent(partId: String): String? {
         refreshLoginIfAuthExpired()
-        return remote.getPartHtml(partId) ?: return null
+        return remote.getPartHtml(partId)
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
@@ -86,7 +84,7 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getUpNextPartsFlow(): Flow<List<PartFull>> = local.getUpNextParts()
-    suspend fun fetchUpNextParts(): FetchResult? {
+    suspend fun fetchUpNextParts(): FetchResult {
         val follows = local.getAllFollows()
         val pairs = follows.map { Pair(it.serieId, it.nextPartNum) }
         val parts = remote.getUpNextParts(pairs)
