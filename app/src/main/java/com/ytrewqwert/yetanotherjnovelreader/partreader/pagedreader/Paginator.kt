@@ -44,7 +44,8 @@ object Paginator {
                     remainingSpan.subSequence(nextPageStart, remainingSpan.length).trim()
                 )
                 if (overflowed) {
-                    val paragraphEnd = remainingSpan.indexOf('\n')
+                    var paragraphEnd = remainingSpan.indexOf('\n')
+                    if (paragraphEnd == -1) paragraphEnd = remainingSpan.length
                     val leadingMarginSpan = remainingSpan.getSpans(
                         0, paragraphEnd, LeadingMarginSpan::class.java
                     ).firstOrNull()
