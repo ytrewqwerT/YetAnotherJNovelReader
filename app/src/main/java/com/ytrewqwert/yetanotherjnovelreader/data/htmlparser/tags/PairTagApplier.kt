@@ -17,13 +17,14 @@ abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
     companion object {
         /** Returns the [PairTagApplier] for [tag], injecting [partId] as its source part. */
         fun getApplier(tag: CharSequence, partId: CharSequence): PairTagApplier = when(tag) {
-            "h1", "h2", "h3", "h4", "h5", "h6" -> HPairTagApplier(partId, tag[1] - '0')
-            "p" -> PPairTagApplier(partId)
             "b" -> BPairTagApplier(partId)
             "em" -> EmPairTagApplier(partId)
-            "u" -> UPairTagApplier(partId)
+            "h1", "h2", "h3", "h4", "h5", "h6" -> HPairTagApplier(partId, tag[1] - '0')
+            "p" -> PPairTagApplier(partId)
             "s" -> SPairTagApplier(partId)
+            "sub" -> SubPairTagApplier(partId)
             "sup" -> SupPairTagApplier(partId)
+            "u" -> UPairTagApplier(partId)
             else -> DummyPairTagApplier(partId, tag)
         }
     }

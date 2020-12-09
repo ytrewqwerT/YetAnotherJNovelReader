@@ -13,7 +13,7 @@ class UPairTagApplier(partId: CharSequence) : PairTagApplier(partId) {
     override fun apply(
         args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
     ) {
-        warnIfArgsNotEmpty("b", args)
+        warnIfArgsNotEmpty("u", args)
         applySpans(contents, UnderlineSpan())
     }
 }
