@@ -46,10 +46,9 @@ class Repository private constructor(appContext: Context) {
     fun getReaderSpanSettings() = readerPrefStore.spanSettings
 
     suspend fun getImage(source: String): Drawable? = remote.getImage(source)
-    suspend fun getPartContent(partId: String): Spanned? {
+    suspend fun getPartContent(partId: String): String? {
         refreshLoginIfAuthExpired()
-        val partHtml = remote.getPartHtml(partId) ?: return null
-        return PartHtmlParser.parse(partHtml, partId)
+        return remote.getPartHtml(partId) ?: return null
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()

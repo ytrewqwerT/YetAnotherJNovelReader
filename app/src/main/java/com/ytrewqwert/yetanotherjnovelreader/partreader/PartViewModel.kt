@@ -8,6 +8,7 @@ import android.text.style.ImageSpan
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.ReaderPreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
 import kotlinx.coroutines.coroutineScope
@@ -35,6 +36,7 @@ class PartViewModel(
     /** Notifies an observer of whether the top app bar should be shown. */
     val showAppBar = SingleLiveEvent<Boolean>()
 
+    private var contentsHtml: String? = null
     private var contentsNoImages: Spanned? = null
     private val _contents = MutableLiveData<Spanned>()
     /** The content of the part, to be displayed to the user. */
@@ -111,10 +113,19 @@ class PartViewModel(
     }
 
     private suspend fun getPartData() {
-        contentsNoImages = repository.getPartContent(partId)
-        if (contentsNoImages != null) {
-            _contents.value = replaceTempImages(contentsNoImages ?: return)
+        contentsHtml = repository.getPartContent(partId)
+        processContentsHtml()
+    }
+
+    private suspend fun processContentsHtml() {
+        val curContents = contentsHtml
+        if (curContents != null) {
+            contentsNoImages = PartHtmlParser.parse(curContents, partId)
+            if (contentsNoImages != null) {
+                _contents.value = replaceTempImages(contentsNoImages ?: return)
+            } else errorEvent.value = "Failed to process part data"
         } else errorEvent.value = "Failed to get part data"
+
     }
 
     private suspend fun replaceTempImages(spanned: Spanned): Spanned {
