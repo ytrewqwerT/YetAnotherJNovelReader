@@ -44,6 +44,7 @@ class PartViewModel(
     private val _fontSize = MutableLiveData<Int>()
     private val _fontStyle = MutableLiveData<Typeface>()
     private val _margin = MutableLiveData<ReaderPreferenceStore.Margins>()
+    private val _lineSpacing = MutableLiveData<Float>()
     /** Whether the activity should use a paginated, horizontally scrolling reader. */
     val horizontalReader: LiveData<Boolean> = _horizontalReader
     /** The size to make the reader's normal text, in sp. */
@@ -52,6 +53,8 @@ class PartViewModel(
     val fontStyle: LiveData<Typeface> = _fontStyle
     /** How much space to leave around each edge of the reader. */
     val margin: LiveData<ReaderPreferenceStore.Margins> = _margin
+    /** A multiplier for the spacing to place between lines. */
+    val lineSpacing: LiveData<Float> = _lineSpacing
 
     private var savedProgress = 0.0
     /** The user's current reading progress through the part. */
@@ -78,6 +81,7 @@ class PartViewModel(
                 _fontSize.value = it.fontSize
                 _fontStyle.value = it.fontStyle
                 _margin.value = it.margin
+                _lineSpacing.value = it.lineSpacing
             }
         }
     }

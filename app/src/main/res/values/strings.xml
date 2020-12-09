@@ -16,4 +16,5 @@
     <string name="filter_followed_series">Filter Followed Series</string>
     <string name="cover_image">Cover Image</string>
     <string name="followed">Followed</string>
+    <string name="line_spacing">Line Spacing</string>
 </resources>

@@ -24,10 +24,11 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
     private var fontSize = sharedPref.getInt(PrefKeys.FONT_SIZE, PrefDefaults.FONT_SIZE)
     private var fontStyle = getTypeface()
     private var readerMargins = getMargins()
+    private var lineSpacing: Float = sharedPref.getFloat(PrefKeys.LINE_SPACING, PrefDefaults.LINE_SPACING)
 
     /** Aggregates a number of preferences for styling the app's part reader. */
     val readerSettings = channelFlow {
-        offer(ReaderPreferences(paginated, fontSize, fontStyle, readerMargins))
+        offer(ViewPreferences(paginated, fontSize, fontStyle, readerMargins, lineSpacing))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
             with (PrefKeys) {
                 when (changedKey) {
@@ -43,10 +44,13 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
                     MARGIN_TOP, MARGIN_BOTTOM, MARGIN_LEFT, MARGIN_RIGHT -> {
                         readerMargins = getMargins()
                     }
+                    LINE_SPACING -> {
+                        lineSpacing = sharedPref.getFloat(LINE_SPACING, PrefDefaults.LINE_SPACING)
+                    }
                     else -> return@OnSharedPreferenceChangeListener
                 }
             }
-            offer(ReaderPreferences(paginated, fontSize, fontStyle, readerMargins))
+            offer(ViewPreferences(paginated, fontSize, fontStyle, readerMargins, lineSpacing))
         }
         sharedPref.registerOnSharedPreferenceChangeListener(listener)
         awaitClose { sharedPref.unregisterOnSharedPreferenceChangeListener(listener) }
@@ -69,11 +73,15 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
     /** A collection of values defining how large the margins around each edge should be. */
     data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)
 
-    /** Aggregates a number of preferences relating to the app's part reader. */
-    data class ReaderPreferences(
+    /** Aggregates preferences applied via Android View components. */
+    data class ViewPreferences(
         val isHorizontal: Boolean,
         val fontSize: Int,
         val fontStyle: Typeface,
-        val margin: Margins
+        val margin: Margins,
+        val lineSpacing: Float
     )
+
+    /** Aggregates preferences applied via Spans. */
+//    data class SpanPreferences()
 }

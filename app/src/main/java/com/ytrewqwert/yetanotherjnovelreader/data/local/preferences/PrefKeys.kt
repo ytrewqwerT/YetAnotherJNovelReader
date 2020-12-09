@@ -21,4 +21,7 @@ object PrefKeys {
     const val MARGIN_BOTTOM = "READER_MARGIN_BOTTOM"
     const val MARGIN_LEFT = "READER_MARGIN_LEFT"
     const val MARGIN_RIGHT = "READER_MARGIN_RIGHT"
+
+    const val LINE_SPACING = "LINE_SPACING"
+    const val PARA_SPACING = "PARA_SPACING"
 }
