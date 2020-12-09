@@ -43,7 +43,7 @@ class Repository private constructor(appContext: Context) {
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
     fun getReaderViewSettingsFlow() = readerPrefStore.viewSettings
-    fun getReaderSpanSettingsFlow() = readerPrefStore.spanSettings
+    fun getReaderSpanSettings() = readerPrefStore.spanSettings
 
     suspend fun getImage(source: String): Drawable? = remote.getImage(source)
     suspend fun getPartContent(partId: String): Spanned? {

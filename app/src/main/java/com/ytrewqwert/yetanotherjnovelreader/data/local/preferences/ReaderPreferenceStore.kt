@@ -58,24 +58,23 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
     /** Preferences applied via Android Spans. */
     private var paraIndentation: Int = sharedPref.getInt(PrefKeys.PARA_INDENT, PrefDefaults.PARA_INDENT)
     private var paraSpacing: Float = sharedPref.getFloat(PrefKeys.PARA_SPACING, PrefDefaults.PARA_SPACING)
-    val spanSettings = channelFlow {
-        offer(SpanPreferences(paraIndentation, paraSpacing))
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
-            with (PrefKeys) {
-                when (changedKey) {
-                    PARA_INDENT -> {
-                        paraIndentation = sharedPref.getInt(PARA_INDENT, PrefDefaults.PARA_INDENT)
-                    }
-                    PARA_SPACING -> {
-                        paraSpacing = sharedPref.getFloat(PARA_SPACING, PrefDefaults.PARA_SPACING)
-                    }
-                    else -> return@OnSharedPreferenceChangeListener
+    val spanSettings: SpanPreferences
+        get() = SpanPreferences(paraIndentation, paraSpacing)
+    private val spanListener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
+        with (PrefKeys) {
+            when (changedKey) {
+                PARA_INDENT -> {
+                    paraIndentation = sharedPref.getInt(PARA_INDENT, PrefDefaults.PARA_INDENT)
                 }
+                PARA_SPACING -> {
+                    paraSpacing = sharedPref.getFloat(PARA_SPACING, PrefDefaults.PARA_SPACING)
+                }
+                else -> return@OnSharedPreferenceChangeListener
             }
-            offer(SpanPreferences(paraIndentation, paraSpacing))
         }
-        sharedPref.registerOnSharedPreferenceChangeListener(listener)
-        awaitClose { sharedPref.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+    init {
+        sharedPref.registerOnSharedPreferenceChangeListener(spanListener)
     }
 
     private fun getTypeface(): Typeface {
