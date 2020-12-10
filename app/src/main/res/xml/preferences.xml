@@ -27,8 +27,8 @@
         <com.ytrewqwert.yetanotherjnovelreader.settings.FloatSeekBarPreference
             android:key="PARA_SPACING"
             android:title="@string/paragraph_spacing"
-            android:defaultValue="1.0"
-            app:minValue="0.5"
+            android:defaultValue="0.0"
+            app:minValue="0.0"
             app:maxValue="2.0"
             app:valueSpacing="0.1"
             app:format="%.1f" />

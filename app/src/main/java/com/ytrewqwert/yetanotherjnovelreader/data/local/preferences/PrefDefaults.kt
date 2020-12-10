@@ -6,6 +6,6 @@ object PrefDefaults {
     const val FONT_SIZE = 15
     const val MARGIN = 16
     const val LINE_SPACING = 1.0f
-    const val PARA_SPACING = 1.0f
+    const val PARA_SPACING = 0.0f
     const val PARA_INDENT = 100
 }

@@ -26,7 +26,7 @@ class PPairTagApplier(partId: CharSequence) : PairTagApplier(partId) {
         applyArgs(contents, args)
         contents.append("\n\n") // Extra '\n' for applying paragraph spacing
 
-        val paragraphSpacing = (readerSpanSettings?.paraSpacing ?: PrefDefaults.PARA_SPACING) - 1
+        val paragraphSpacing = readerSpanSettings?.paraSpacing ?: PrefDefaults.PARA_SPACING
         contents.setSpan(
             RelativeSizeSpan(paragraphSpacing),
             contents.length-1,
