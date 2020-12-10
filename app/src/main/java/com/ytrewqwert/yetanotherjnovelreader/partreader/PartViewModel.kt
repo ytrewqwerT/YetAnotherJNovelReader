@@ -5,6 +5,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
+import android.util.Log
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
@@ -79,11 +80,22 @@ class PartViewModel(
 
         viewModelScope.launch {
             repository.getReaderViewSettingsFlow().collect {
+                Log.d("PartViewModel", "Updating ReaderViewSettings")
                 _horizontalReader.value = it.isHorizontal
                 _fontSize.value = it.fontSize
                 _fontStyle.value = it.fontStyle
                 _margin.value = it.margin
                 _lineSpacing.value = it.lineSpacing
+                Log.d("PartViewModel", "Updated ReaderViewSettings")
+            }
+        }
+
+        viewModelScope.launch {
+            var skipped = false
+            repository.getReaderSpanSettingsFlow().collect {
+                if (!skipped) skipped = true // Skip first since it's called by getPartData() above.
+                else processContentsHtml()
+                Log.d("PartViewModel", "Processed Html")
             }
         }
     }

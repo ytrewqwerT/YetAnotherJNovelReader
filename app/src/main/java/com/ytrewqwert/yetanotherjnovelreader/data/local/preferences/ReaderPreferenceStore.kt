@@ -26,7 +26,7 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
     private var fontStyle = getTypeface()
     private var readerMargins = getMargins()
     private var lineSpacing: Float = sharedPref.getFloat(PrefKeys.LINE_SPACING, PrefDefaults.LINE_SPACING)
-    val viewSettings = channelFlow {
+    val viewSettingsFlow = channelFlow {
         offer(ViewPreferences(paginated, fontSize, fontStyle, readerMargins, lineSpacing))
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
             with (PrefKeys) {
@@ -58,24 +58,27 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
     /** Preferences applied via Android Spans. */
     private var paraIndentation: Int = sharedPref.getInt(PrefKeys.PARA_INDENT, PrefDefaults.PARA_INDENT)
     private var paraSpacing: Float = sharedPref.getFloat(PrefKeys.PARA_SPACING, PrefDefaults.PARA_SPACING)
+    val spanSettingsFlow = channelFlow {
+        offer(SpanPreferences(paraIndentation, paraSpacing))
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
+            with (PrefKeys) {
+                when (changedKey) {
+                    PARA_INDENT -> {
+                        paraIndentation = sharedPref.getInt(PARA_INDENT, PrefDefaults.PARA_INDENT)
+                    }
+                    PARA_SPACING -> {
+                        paraSpacing = sharedPref.getFloat(PARA_SPACING, PrefDefaults.PARA_SPACING)
+                    }
+                    else -> return@OnSharedPreferenceChangeListener
+                }
+            }
+            offer(SpanPreferences(paraIndentation, paraSpacing))
+        }
+        sharedPref.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose { sharedPref.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
     val spanSettings: SpanPreferences
         get() = SpanPreferences(paraIndentation, paraSpacing)
-    private val spanListener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
-        with (PrefKeys) {
-            when (changedKey) {
-                PARA_INDENT -> {
-                    paraIndentation = sharedPref.getInt(PARA_INDENT, PrefDefaults.PARA_INDENT)
-                }
-                PARA_SPACING -> {
-                    paraSpacing = sharedPref.getFloat(PARA_SPACING, PrefDefaults.PARA_SPACING)
-                }
-                else -> return@OnSharedPreferenceChangeListener
-            }
-        }
-    }
-    init {
-        sharedPref.registerOnSharedPreferenceChangeListener(spanListener)
-    }
 
     private fun getTypeface(): Typeface {
         val fontStr = sharedPref.getString(PrefKeys.FONT_STYLE, "default")!!
