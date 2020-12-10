@@ -40,9 +40,8 @@ class Repository private constructor(appContext: Context) {
     /** Set whether lists should filter items to only show followed items. */
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
-    fun getReaderViewSettingsFlow() = readerPrefStore.viewSettingsFlow
-    fun getReaderSpanSettingsFlow() = readerPrefStore.spanSettingsFlow
-    fun getReaderSpanSettings() = readerPrefStore.spanSettings
+    fun getReaderSettingsFlow() = readerPrefStore.readerSettingsFlow
+    fun getReaderSettings() = readerPrefStore.readerSettings
 
     suspend fun getImage(source: String): Drawable? = remote.getImage(source)
     suspend fun getPartContent(partId: String): String? {

@@ -19,7 +19,7 @@ class PPairTagApplier(partId: CharSequence) : PairTagApplier(partId) {
     override fun apply(
         args: List<Pair<CharSequence, CharSequence>>, contents: SpannableStringBuilder
     ) {
-        val readerSpanSettings = Repository.getInstance()?.getReaderSpanSettings()
+        val readerSpanSettings = Repository.getInstance()?.getReaderSettings()
 
         val indentation = readerSpanSettings?.paraIndent ?: PrefDefaults.PARA_INDENT
         applySpans(contents, LeadingMarginSpan.Standard(indentation, 0)) // Paragraph indentation

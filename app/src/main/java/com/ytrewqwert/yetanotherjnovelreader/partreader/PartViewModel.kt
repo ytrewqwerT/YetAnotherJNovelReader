@@ -79,7 +79,8 @@ class PartViewModel(
         }
 
         viewModelScope.launch {
-            repository.getReaderViewSettingsFlow().collect {
+            var skipped = false
+            repository.getReaderSettingsFlow().collect {
                 Log.d("PartViewModel", "Updating ReaderViewSettings")
                 _horizontalReader.value = it.isHorizontal
                 _fontSize.value = it.fontSize
@@ -87,12 +88,8 @@ class PartViewModel(
                 _margin.value = it.margin
                 _lineSpacing.value = it.lineSpacing
                 Log.d("PartViewModel", "Updated ReaderViewSettings")
-            }
-        }
 
-        viewModelScope.launch {
-            var skipped = false
-            repository.getReaderSpanSettingsFlow().collect {
+                Log.d("PartViewModel", "Processing Html")
                 if (!skipped) skipped = true // Skip first since it's called by getPartData() above.
                 else processContentsHtml()
                 Log.d("PartViewModel", "Processed Html")
