@@ -50,15 +50,17 @@ class PagedReaderPageFragment : Fragment() {
         }
 
         pagedReaderViewModel.fullContent.observe(viewLifecycleOwner) {
-            val margins = partViewModel.margin.value
-            val vMargin = if (margins != null) {
-                margins.bottom + margins.top
-            } else 0
-            val viewHeight = view?.height ?: 0
-            val pageHeight = (viewHeight - vMargin).coerceAtLeast(0)
+            textView?.post {
+                val margins = partViewModel.margin.value
+                val vMargin = if (margins != null) {
+                    margins.bottom + margins.top
+                } else 0
+                val viewHeight = view?.height ?: 0
+                val pageHeight = (viewHeight - vMargin).coerceAtLeast(0)
 
-            val pages = Paginator.paginate(textView, it, pageHeight)
-            pagedReaderViewModel.setPages(pages)
+                val pages = Paginator.paginate(textView, it, pageHeight)
+                pagedReaderViewModel.setPages(pages)
+            }
         }
 
         return view
