@@ -5,19 +5,19 @@
     <PreferenceCategory
         app:title="@string/reader">
         <SwitchPreference
-            android:key="HORIZONTAL_READER"
-            android:title="Paged Reader"
-            android:defaultValue="false"
-            android:summary="Swipe horizontally to change pages" />
+            android:key="@string/i_horizontal_reader"
+            android:title="@string/paged_reader"
+            android:defaultValue="@bool/d_horizontal_reader"
+            android:summary="@string/paged_reader_preference_hint" />
         <SeekBarPreference
-            app:key="FONT_SIZE"
+            app:key="@string/i_font_size"
             app:title="@string/font_size"
-            app:defaultValue="15"
+            app:defaultValue="@integer/d_font_size"
             app:min="8"
             android:max="32"
             app:showSeekBarValue="true" />
         <com.ytrewqwert.yetanotherjnovelreader.settings.FloatSeekBarPreference
-            android:key="LINE_SPACING"
+            android:key="@string/i_line_spacing"
             android:title="@string/line_spacing"
             android:defaultValue="1.0"
             app:minValue="0.5"
@@ -25,7 +25,7 @@
             app:valueSpacing="0.1"
             app:format="%.1f" />
         <com.ytrewqwert.yetanotherjnovelreader.settings.FloatSeekBarPreference
-            android:key="PARA_SPACING"
+            android:key="@string/i_para_spacing"
             android:title="@string/paragraph_spacing"
             android:defaultValue="0.0"
             app:minValue="0.0"
@@ -33,15 +33,15 @@
             app:valueSpacing="0.1"
             app:format="%.1f" />
         <SeekBarPreference
-            app:key="PARA_INDENT"
+            app:key="@string/i_para_indent"
             app:title="@string/paragraph_indentation"
-            app:defaultValue="100"
+            app:defaultValue="@integer/d_para_indent"
             app:min="0"
             android:max="500"
             app:showSeekBarValue="true" />
         <ListPreference
-            android:key="FONT_STYLE"
-            android:title="Font"
+            android:key="@string/i_font_style"
+            android:title="@string/font"
             android:summary="%s"
             android:defaultValue="1"
             android:entries="@array/font_names"

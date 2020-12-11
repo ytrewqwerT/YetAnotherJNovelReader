@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="i_horizontal_reader">HORIZONTAL_READER</string>
+    <string name="i_font_style">FONT_STYLE</string>
+    <string name="i_font_size">FONT_SIZE</string>
+    <string name="i_margin_top">READER_MARGIN_TOP</string>
+    <string name="i_margin_bottom">READER_MARGIN_BOTTOM</string>
+    <string name="i_margin_left">READER_MARGIN_LEFT</string>
+    <string name="i_margin_right">READER_MARGIN_RIGHT</string>
+    <string name="i_line_spacing">LINE_SPACING</string>
+    <string name="i_para_spacing">PARA_SPACING</string>
+    <string name="i_para_indent">PARA_INDENT</string>
+    
+    <bool name="d_horizontal_reader">false</bool>
+    <integer name="d_font_size">15</integer>
+    <integer name="d_margin">16</integer>
+    <item name="d_line_spacing" format="float" type="dimen">1.0</item>
+    <item name="d_para_spacing" format="float" type="dimen">0.0</item>
+    <integer name="d_para_indent">100</integer>
+</resources>
