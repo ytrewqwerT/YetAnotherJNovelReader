@@ -127,12 +127,6 @@ class PartActivity : AppCompatActivity() {
             }
         }
 
-        // Indirectly notify the ReaderFragment to refresh its position after rendering has
-        // completed since it may have responded to the value before rendering finished, resulting
-        // in possible mis-positioning.
-        layoutRoot.post {
-            viewModel.currentProgress.value = viewModel.currentProgress.value
-        }
         // Notify viewModel once the reader's dimensions are known
         readerContainer.post {
             updatePageDimens()

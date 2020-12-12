@@ -84,10 +84,13 @@ class PagedReaderFragment : Fragment() {
 
         pager?.addOnPageSelectedListener { position ->
             val numPages = pagerAdapter.itemCount
-            partViewModel.currentProgress.value = if (numPages > 1) {
-                position.toDouble() / (numPages - 1)
-            } else {
-                1.0
+            // Ignore the one-page scenario which would only result from a really small part
+            // displayed on a really large device with an unreasonably small font size and
+            // line/paragraph spacing. This is done to allow for a lone page being used in the
+            // pagination process without unintentionally setting changing the user's part progress.
+            // TODO: Fix this issue, probably via. some separate invisible dummy page.
+            if (numPages > 1) {
+                partViewModel.currentProgress.value = position.toDouble() / (numPages - 1)
             }
         }
     }
