@@ -27,8 +27,6 @@ class PartViewModel(
 ) : ViewModel() {
     /** The width of the page in which the part's text can be drawn. */
     var pageWidthPx: Int private set
-    /** The height of the page in which the part's text can be drawn. */
-    var pageHeightPx: Int private set
 
     /** Notifies an observer of when something goes wrong, with a message of what went wrong. */
     val errorEvent = SingleLiveEvent<String>()
@@ -69,7 +67,6 @@ class PartViewModel(
 
     init {
         pageWidthPx = 0
-        pageHeightPx = 0
 
         viewModelScope.launch {
             getPartData()
@@ -104,7 +101,6 @@ class PartViewModel(
     /** Sets the dimensions of the drawable region for a single page. */
     fun setPageDimens(widthPx: Int, heightPx: Int) {
         pageWidthPx = widthPx
-        pageHeightPx = heightPx
         // Update contents to have correctly sized images
         viewModelScope.launch {
             _contents.value = replaceTempImages(contentsNoImages ?: return@launch)
