@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
+import com.ytrewqwert.yetanotherjnovelreader.BindingAdapters
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderBinding
@@ -76,6 +77,9 @@ class PagedReaderFragment : Fragment() {
 
         pagedReaderViewModel.pageCount.observe(pageUpdateLifecycleOwner) {
             pagerAdapter.setNumPages(it)
+            pager?.let { pager ->
+                BindingAdapters.setPagedReaderPosition(pager, partViewModel.currentProgress.value ?: 0.0)
+            }
         }
 
         pager?.addOnPageSelectedListener { position ->
