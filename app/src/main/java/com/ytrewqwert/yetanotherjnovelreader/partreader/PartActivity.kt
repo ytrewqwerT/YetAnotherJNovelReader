@@ -18,7 +18,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.commit
-import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.Utils
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
@@ -153,6 +152,8 @@ class PartActivity : AppCompatActivity() {
             (window.decorView.systemUiVisibility or visFlags)
         }
     }
+
+    // Changes the status bar's text color to suit light/dark backgrounds.
     private fun setStatusBarTextColor(isLight: Boolean) {
         var uiVisibility = window.decorView.systemUiVisibility
         var mask = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
@@ -168,14 +169,14 @@ class PartActivity : AppCompatActivity() {
     private fun setAppBarVisibility(visible: Boolean) {
         when (visible) {
             true -> {
-                setStatusBarTextColor(false)
+                setStatusBarTextColor(false) // Set status bar color to suit app bar's background.
                 val animator = AnimatorInflater.loadAnimator(this, R.animator.show_top_app_bar)
                 animator.setTarget(toolbar)
                 animator.doOnStart { toolbar.visibility = View.VISIBLE }
                 animator.start()
             }
             else -> {
-                setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode))
+                setStatusBarTextColor(resources.getBoolean(R.bool.isLightMode)) // Reset status bar color.
                 val animator = AnimatorInflater.loadAnimator(this, R.animator.hide_top_app_bar)
                 animator.setTarget(toolbar)
                 animator.doOnEnd { toolbar.visibility = View.GONE }
@@ -203,15 +204,11 @@ class PartActivity : AppCompatActivity() {
     }
 
     private fun updatePageDimens() {
-        var pageWidth = readerContainer.width
-        var pageHeight = readerContainer.height
-
         val margins = viewModel.margin.value ?: return
-        pageHeight -= Utils.dpToPx(margins.top, resources.displayMetrics)
-        pageHeight -= Utils.dpToPx(margins.bottom, resources.displayMetrics)
+        var pageWidth = readerContainer.width
         pageWidth -= Utils.dpToPx(margins.left, resources.displayMetrics)
         pageWidth -= Utils.dpToPx(margins.right, resources.displayMetrics)
 
-        viewModel.setPageDimens(pageWidth, pageHeight)
+        viewModel.setPageDimens(pageWidth)
     }
 }

@@ -5,7 +5,6 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
-import android.util.Log
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
@@ -78,18 +77,14 @@ class PartViewModel(
         viewModelScope.launch {
             var skipped = false
             repository.getReaderSettingsFlow().collect {
-                Log.d("PartViewModel", "Updating ReaderViewSettings")
                 _horizontalReader.value = it.isHorizontal
                 _fontSize.value = it.fontSize
                 _fontStyle.value = it.fontStyle
                 _margin.value = it.margin
                 _lineSpacing.value = it.lineSpacing
-                Log.d("PartViewModel", "Updated ReaderViewSettings")
 
-                Log.d("PartViewModel", "Processing Html")
                 if (!skipped) skipped = true // Skip first since it's called by getPartData() above.
                 else processContentsHtml()
-                Log.d("PartViewModel", "Processed Html")
             }
         }
     }
@@ -99,7 +94,7 @@ class PartViewModel(
     }
 
     /** Sets the dimensions of the drawable region for a single page. */
-    fun setPageDimens(widthPx: Int, heightPx: Int) {
+    fun setPageDimens(widthPx: Int) {
         pageWidthPx = widthPx
         // Update contents to have correctly sized images
         viewModelScope.launch {
