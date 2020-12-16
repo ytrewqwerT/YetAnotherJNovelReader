@@ -8,7 +8,8 @@ import android.text.style.ImageSpan
 import androidx.lifecycle.*
 import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
+import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.ReaderPreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
@@ -25,8 +26,6 @@ class PartViewModel(
 ) : ViewModel() {
     /** The width of the page in which the part's text can be drawn. */
     var pageWidthPx: Int private set
-    /** The height of the page in which the part's text can be drawn. */
-    var pageHeightPx: Int private set
 
     /** Notifies an observer of when something goes wrong, with a message of what went wrong. */
     val errorEvent = SingleLiveEvent<String>()
@@ -35,6 +34,7 @@ class PartViewModel(
     /** Notifies an observer of whether the top app bar should be shown. */
     val showAppBar = SingleLiveEvent<Boolean>()
 
+    private var contentsHtml: String? = null
     private var contentsNoImages: Spanned? = null
     private val _contents = MutableLiveData<Spanned>()
     /** The content of the part, to be displayed to the user. */
@@ -43,7 +43,8 @@ class PartViewModel(
     private val _horizontalReader = MutableLiveData<Boolean>()
     private val _fontSize = MutableLiveData<Int>()
     private val _fontStyle = MutableLiveData<Typeface>()
-    private val _margin = MutableLiveData<PreferenceStore.Margins>()
+    private val _margin = MutableLiveData<ReaderPreferenceStore.Margins>()
+    private val _lineSpacing = MutableLiveData<Float>()
     /** Whether the activity should use a paginated, horizontally scrolling reader. */
     val horizontalReader: LiveData<Boolean> = _horizontalReader
     /** The size to make the reader's normal text, in sp. */
@@ -51,7 +52,9 @@ class PartViewModel(
     /** The typeface to use in drawing the text in the reader. */
     val fontStyle: LiveData<Typeface> = _fontStyle
     /** How much space to leave around each edge of the reader. */
-    val margin: LiveData<PreferenceStore.Margins> = _margin
+    val margin: LiveData<ReaderPreferenceStore.Margins> = _margin
+    /** A multiplier for the spacing to place between lines. */
+    val lineSpacing: LiveData<Float> = _lineSpacing
 
     private var savedProgress = 0.0
     /** The user's current reading progress through the part. */
@@ -63,7 +66,6 @@ class PartViewModel(
 
     init {
         pageWidthPx = 0
-        pageHeightPx = 0
 
         viewModelScope.launch {
             getPartData()
@@ -73,11 +75,16 @@ class PartViewModel(
         }
 
         viewModelScope.launch {
+            var skipped = false
             repository.getReaderSettingsFlow().collect {
                 _horizontalReader.value = it.isHorizontal
                 _fontSize.value = it.fontSize
                 _fontStyle.value = it.fontStyle
                 _margin.value = it.margin
+                _lineSpacing.value = it.lineSpacing
+
+                if (!skipped) skipped = true // Skip first since it's called by getPartData() above.
+                else processContentsHtml()
             }
         }
     }
@@ -87,9 +94,8 @@ class PartViewModel(
     }
 
     /** Sets the dimensions of the drawable region for a single page. */
-    fun setPageDimens(widthPx: Int, heightPx: Int) {
+    fun setPageDimens(widthPx: Int) {
         pageWidthPx = widthPx
-        pageHeightPx = heightPx
         // Update contents to have correctly sized images
         viewModelScope.launch {
             _contents.value = replaceTempImages(contentsNoImages ?: return@launch)
@@ -107,10 +113,19 @@ class PartViewModel(
     }
 
     private suspend fun getPartData() {
-        contentsNoImages = repository.getPartContent(partId)
-        if (contentsNoImages != null) {
-            _contents.value = replaceTempImages(contentsNoImages ?: return)
+        contentsHtml = repository.getPartContent(partId)
+        processContentsHtml()
+    }
+
+    private suspend fun processContentsHtml() {
+        val curContents = contentsHtml
+        if (curContents != null) {
+            contentsNoImages = PartHtmlParser.parse(curContents, partId)
+            if (contentsNoImages != null) {
+                _contents.value = replaceTempImages(contentsNoImages ?: return)
+            } else errorEvent.value = "Failed to process part data"
         } else errorEvent.value = "Failed to get part data"
+
     }
 
     private suspend fun replaceTempImages(spanned: Spanned): Spanned {

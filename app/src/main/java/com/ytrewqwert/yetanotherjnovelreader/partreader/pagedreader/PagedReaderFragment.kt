@@ -8,8 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.viewpager2.widget.ViewPager2
+import com.ytrewqwert.yetanotherjnovelreader.BindingAdapters
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderBinding
@@ -20,7 +20,6 @@ import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
  * through horizontally.
  */
 class PagedReaderFragment : Fragment() {
-
     private val partViewModel by activityViewModels<PartViewModel>()
     private val pagedReaderViewModel by viewModels<PagedReaderViewModel>()
 
@@ -58,14 +57,20 @@ class PagedReaderFragment : Fragment() {
 
         pagedReaderViewModel.pageCount.observe(viewLifecycleOwner) {
             pagerAdapter.setNumPages(it)
+            pager?.let { pager ->
+                BindingAdapters.setPagedReaderPosition(pager, partViewModel.currentProgress.value ?: 0.0)
+            }
         }
 
         pager?.addOnPageSelectedListener { position ->
             val numPages = pagerAdapter.itemCount
-            partViewModel.currentProgress.value = if (numPages > 1) {
-                position.toDouble() / (numPages - 1)
-            } else {
-                1.0
+            // Ignore the one-page scenario which would only result from a really small part
+            // displayed on a really large device with an unreasonably small font size and
+            // line/paragraph spacing. This is done to allow for a lone page being used in the
+            // pagination process without unintentionally setting changing the user's part progress.
+            // TODO: Fix this issue, probably via. some separate invisible dummy page.
+            if (numPages > 1) {
+                partViewModel.currentProgress.value = position.toDouble() / (numPages - 1)
             }
         }
     }

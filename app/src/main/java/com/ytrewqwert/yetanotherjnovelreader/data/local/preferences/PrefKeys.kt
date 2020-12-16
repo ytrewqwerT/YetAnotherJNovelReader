@@ -1,7 +1,11 @@
 package com.ytrewqwert.yetanotherjnovelreader.data.local.preferences
 
+import com.ytrewqwert.yetanotherjnovelreader.App
+import com.ytrewqwert.yetanotherjnovelreader.R
+
 /** Defines keys for user preferences. */
 object PrefKeys {
+    /** Hidden preferences */
     const val EMAIL = "EMAIL"
     const val PASSWORD = "PASSWORD"
 
@@ -13,12 +17,18 @@ object PrefKeys {
 
     const val IS_FOLLOW = "IS_FOLLOW"
 
-    const val IS_HORIZONTAL = "HORIZONTAL_READER"
-    const val FONT_STYLE = "FONT_STYLE"
-    const val FONT_SIZE = "FONT_SIZE"
+    /** User preferences */
 
-    const val MARGIN_TOP = "READER_MARGIN_TOP"
-    const val MARGIN_BOTTOM = "READER_MARGIN_BOTTOM"
-    const val MARGIN_LEFT = "READER_MARGIN_LEFT"
-    const val MARGIN_RIGHT = "READER_MARGIN_RIGHT"
+    val IS_HORIZONTAL = App.getString(R.string.i_horizontal_reader)
+    val FONT_STYLE = App.getString(R.string.i_font_style)
+    val FONT_SIZE = App.getString(R.string.i_font_size)
+
+    val MARGIN_TOP = App.getString(R.string.i_margin_top)
+    val MARGIN_BOTTOM = App.getString(R.string.i_margin_bottom)
+    val MARGIN_LEFT = App.getString(R.string.i_margin_left)
+    val MARGIN_RIGHT = App.getString(R.string.i_margin_right)
+
+    val LINE_SPACING = App.getString(R.string.i_line_spacing)
+    val PARA_SPACING = App.getString(R.string.i_para_spacing)
+    val PARA_INDENT = App.getString(R.string.i_para_indent)
 }

@@ -61,6 +61,7 @@ object Paginator {
     // after the end of the previous word is returned instead.
     private fun getPageEndIndex(textView: TextView, text: CharSequence, pageHeight: Int): Int {
         textView.text = text
+        textView.onPreDraw()
         val layout = textView.layout
 
         var lineNum = 0

@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderPageBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
@@ -49,8 +48,8 @@ class PagedReaderPageFragment : Fragment() {
             textView?.text = it
         }
 
-        if (pageNum == 0) {
-            pagedReaderViewModel.fullContent.observe(viewLifecycleOwner) {
+        pagedReaderViewModel.fullContent.observe(viewLifecycleOwner) {
+            textView?.post {
                 val margins = partViewModel.margin.value
                 val vMargin = if (margins != null) {
                     margins.bottom + margins.top

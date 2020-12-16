@@ -14,12 +14,14 @@
         android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         tools:context=".partreader.pagedreader.PagedReaderPageFragment">
 
         <TextView
             android:id="@+id/page_contents"
             android:textSize="@{viewModel.fontSize}"
             android:typeface="@{viewModel.fontStyle}"
+            android:lineSpacingMultiplier="@{viewModel.lineSpacing}"
             android:hyphenationFrequency="full"
             android:justificationMode="inter_word"
             android:layout_width="match_parent"

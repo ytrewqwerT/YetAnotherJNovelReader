@@ -2,10 +2,8 @@ package com.ytrewqwert.yetanotherjnovelreader.data
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.text.Spanned
 import androidx.work.*
 import com.ytrewqwert.yetanotherjnovelreader.ProgressUploadWorker
-import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.LocalRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.follow.Follow
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
@@ -13,6 +11,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.ReaderPreferenceStore
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -31,6 +30,7 @@ class Repository private constructor(appContext: Context) {
     }
 
     private val prefStore = PreferenceStore.getInstance(appContext)
+    private val readerPrefStore = ReaderPreferenceStore.getInstance(appContext)
     private val local = LocalRepository.getInstance(appContext)
     private val remote = RemoteRepository.getInstance(appContext, prefStore.authToken)
     private val workManager = WorkManager.getInstance(appContext)
@@ -40,13 +40,13 @@ class Repository private constructor(appContext: Context) {
     /** Set whether lists should filter items to only show followed items. */
     fun setIsFilterFollowing(value: Boolean) { prefStore.setIsFilterFollowing(value) }
 
-    fun getReaderSettingsFlow() = prefStore.readerSettings
+    fun getReaderSettingsFlow() = readerPrefStore.readerSettingsFlow
+    fun getReaderSettings() = readerPrefStore.readerSettings
 
     suspend fun getImage(source: String): Drawable? = remote.getImage(source)
-    suspend fun getPartContent(partId: String): Spanned? {
+    suspend fun getPartContent(partId: String): String? {
         refreshLoginIfAuthExpired()
-        val partHtml = remote.getPartHtml(partId) ?: return null
-        return PartHtmlParser.parse(partHtml, partId)
+        return remote.getPartHtml(partId)
     }
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
@@ -84,7 +84,7 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getUpNextPartsFlow(): Flow<List<PartFull>> = local.getUpNextParts()
-    suspend fun fetchUpNextParts(): FetchResult? {
+    suspend fun fetchUpNextParts(): FetchResult {
         val follows = local.getAllFollows()
         val pairs = follows.map { Pair(it.serieId, it.nextPartNum) }
         val parts = remote.getUpNextParts(pairs)

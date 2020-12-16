@@ -5,7 +5,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.PreferenceStore
+import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.ReaderPreferenceStore
 import kotlin.math.roundToInt
 
 /** Custom databinding binding adapters used by the app. */
@@ -20,7 +20,7 @@ object BindingAdapters {
     /** Sets the size of the horizontal margins around a [TextView]. */
     @BindingAdapter("readerMarginHorizontal")
     @JvmStatic
-    fun textViewReaderMarginHorizontal(textView: TextView, marginsDP: PreferenceStore.Margins) {
+    fun textViewReaderMarginHorizontal(textView: TextView, marginsDP: ReaderPreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
         val marginLeft = Utils.dpToPx(marginsDP.left, displayMetrics)
         val marginRight = Utils.dpToPx(marginsDP.right, displayMetrics)
@@ -30,7 +30,7 @@ object BindingAdapters {
     /** Sets the size of the vertical margins around a [TextView]. */
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
-    fun textViewReaderMarginVertical(textView: TextView, marginsDP: PreferenceStore.Margins) {
+    fun textViewReaderMarginVertical(textView: TextView, marginsDP: ReaderPreferenceStore.Margins) {
         val displayMetrics = textView.resources.displayMetrics
         val marginTop = Utils.dpToPx(marginsDP.top, displayMetrics)
         val marginBottom = Utils.dpToPx(marginsDP.bottom, displayMetrics)
@@ -40,7 +40,7 @@ object BindingAdapters {
     /** Sets the size of the vertical margins around a [ScrollView]. */
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
-    fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDP: PreferenceStore.Margins) {
+    fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDP: ReaderPreferenceStore.Margins) {
         val displayMetrics = scrollView.resources.displayMetrics
         val marginTop = Utils.dpToPx(marginsDP.top, displayMetrics)
         val marginBottom = Utils.dpToPx(marginsDP.bottom, displayMetrics)
