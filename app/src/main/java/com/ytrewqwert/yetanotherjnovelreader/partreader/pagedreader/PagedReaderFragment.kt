@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
 import androidx.viewpager2.widget.ViewPager2
 import com.ytrewqwert.yetanotherjnovelreader.BindingAdapters
 import com.ytrewqwert.yetanotherjnovelreader.R
@@ -21,31 +20,12 @@ import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
  * through horizontally.
  */
 class PagedReaderFragment : Fragment() {
-    // LifecycleOwner for when it is safe to update the pages/page count, since the Fragment /
-    // viewLifecycleOwner can transition to the "STARTED" state before a FragmentManager Transaction
-    // has completed which can clash with the ViewPager2 transaction.
-    // Switches straight between CREATED and RESUMED in-line with this fragment's RESUMED state.
-    private val pageUpdateLifecycleOwner = object : LifecycleOwner {
-        val lifecycle = LifecycleRegistry(this).apply { currentState = Lifecycle.State.CREATED }
-        override fun getLifecycle(): Lifecycle = lifecycle
-    }
-
     private val partViewModel by activityViewModels<PartViewModel>()
     private val pagedReaderViewModel by viewModels<PagedReaderViewModel>()
 
     private var binding: FragmentPagedReaderBinding? = null
     private var pager: ViewPager2? = null
     private val pagerAdapter by lazy { PagedReaderAdapter(this) }
-
-    override fun onResume() {
-        super.onResume()
-        pageUpdateLifecycleOwner.lifecycle.currentState = Lifecycle.State.RESUMED
-    }
-
-    override fun onPause() {
-        pageUpdateLifecycleOwner.lifecycle.currentState = Lifecycle.State.CREATED
-        super.onPause()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,7 +55,7 @@ class PagedReaderFragment : Fragment() {
             pagedReaderViewModel.fullContent.value = it
         }
 
-        pagedReaderViewModel.pageCount.observe(pageUpdateLifecycleOwner) {
+        pagedReaderViewModel.pageCount.observe(viewLifecycleOwner) {
             pagerAdapter.setNumPages(it)
             pager?.let { pager ->
                 BindingAdapters.setPagedReaderPosition(pager, partViewModel.currentProgress.value ?: 0.0)
