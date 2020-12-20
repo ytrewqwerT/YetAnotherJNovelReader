@@ -87,7 +87,7 @@ class ExplorerFragment : Fragment() {
             }
         }
     }
-    private fun onVolumesListItemInteraction(volume: VolumeFull) {
+    fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
 
         listItemViewModel.setSource(ListTypes.PARTS.ordinal, viewModel.getVolumePartsSource(volume))

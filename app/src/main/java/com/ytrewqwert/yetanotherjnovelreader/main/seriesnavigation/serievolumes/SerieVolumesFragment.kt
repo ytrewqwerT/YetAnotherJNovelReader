@@ -4,6 +4,7 @@ import androidx.fragment.app.viewModels
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListFragment
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
 // TODO: Add header that allows for series follow/unfollow.
 // TODO: Ensure all parts in a volume is loaded to the database for showing volume progress.
@@ -21,7 +22,7 @@ class SerieVolumesFragment
 
 
     override fun onVolumeClick(volume: VolumeFull) {
-        TODO("Not yet implemented")
+        (parentFragment as? ExplorerFragment)?.onVolumesListItemInteraction(volume) // Hmmm...
     }
 
     companion object {
