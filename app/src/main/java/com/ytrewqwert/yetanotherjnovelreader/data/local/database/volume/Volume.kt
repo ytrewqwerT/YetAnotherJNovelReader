@@ -49,7 +49,7 @@ data class Volume(
                 volumeNum = volumeRaw.volumeNumber,
                 description = volumeRaw.description,
                 descriptionShort = volumeRaw.descriptionShort,
-                coverUrl = coverUrl,
+                coverUrl = "${RemoteRepository.IMG_ADDR}/$coverUrl",
                 tags = volumeRaw.tags,
                 created = volumeRaw.created
             )
@@ -58,7 +58,7 @@ data class Volume(
 
     override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
         title, descriptionShort,
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
+        coverUrl,
         null, true
     )
 

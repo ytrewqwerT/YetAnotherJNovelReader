@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
@@ -19,6 +18,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes.SerieVolumesFragment
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
 /** Displays lists of series, volumes and parts allowing for exploration of available content. */
@@ -27,7 +27,7 @@ class ExplorerFragment : Fragment() {
         private const val TAG = "NavigationFragment"
     }
 
-    private enum class ListTypes { SERIES, VOLUMES, PARTS }
+    private enum class ListTypes { SERIES, PARTS }
 
     private val viewModel by viewModels<ExplorerViewModel> {
         RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
@@ -74,9 +74,18 @@ class ExplorerFragment : Fragment() {
     private fun onSeriesListItemInteraction(serie: SerieFull) {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
 
-        listItemViewModel.setSource(ListTypes.VOLUMES.ordinal, viewModel.getSerieVolumesSource(serie))
-        listItemViewModel.setHeader(ListTypes.VOLUMES.ordinal, serie)
-        setListItemFragment(ListTypes.VOLUMES.ordinal, ListTypes.VOLUMES.name)
+        childFragmentManager.commit {
+            val args = Bundle()
+            args.putString(SerieVolumesFragment.ARG_SERIE_ID, serie.serie.id)
+            setCustomAnimations(
+                R.animator.slide_from_right, R.animator.slide_to_left,
+                R.animator.slide_from_left, R.animator.slide_to_right
+            )
+            replace(R.id.fragment_container, SerieVolumesFragment::class.java, args)
+            if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
+                addToBackStack(null)
+            }
+        }
     }
     private fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")

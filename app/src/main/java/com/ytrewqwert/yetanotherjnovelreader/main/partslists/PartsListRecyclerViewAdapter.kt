@@ -72,18 +72,9 @@ class PartsListRecyclerViewAdapter(
     }
     
     interface ClickListener {
-        /**
-         * Called when a [PartFull] is clicked by the user.
-         *
-         * @param[part] The [PartFull] that was clicked.
-         */
+        /** Called when a [PartFull] is clicked by the user. */
         fun onPartClick(part: PartFull)
-
-        /**
-         * Called when a [PartFull]'s 'follow' button is clicked by the user.
-         *
-         * @param[part] The [PartFull] that had it's 'follow' button clicked.
-         */
+        /** Called when a [PartFull]'s 'follow' button is clicked by the user. */
         fun onPartFollowClick(part: PartFull)
     }
 }
