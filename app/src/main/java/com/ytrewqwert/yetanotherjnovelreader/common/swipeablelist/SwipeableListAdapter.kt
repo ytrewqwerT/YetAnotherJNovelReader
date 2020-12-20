@@ -6,9 +6,9 @@ abstract class SwipeableListAdapter<T : Any, VH : RecyclerView.ViewHolder>
     : RecyclerView.Adapter<VH>() {
 
     private var items: List<T> = emptyList()
-    override fun getItemCount(): Int = items.size
+    final override fun getItemCount(): Int = items.size
 
-    override fun onBindViewHolder(holder: VH, position: Int) {
+    final override fun onBindViewHolder(holder: VH, position: Int) {
         onBindViewHolder(holder, items[position])
     }
 

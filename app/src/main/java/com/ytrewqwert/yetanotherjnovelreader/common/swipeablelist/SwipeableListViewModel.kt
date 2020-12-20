@@ -12,8 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-abstract class SwipeableListViewModel<T : Any>(private val repository: Repository)
-    : ViewModel() {
+abstract class SwipeableListViewModel<T : Any>(private val repository: Repository) : ViewModel() {
 
     private val mItems = MutableLiveData<List<T>>(emptyList())
     private val mRefreshing = MutableLiveData(false)
@@ -33,7 +32,8 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
     /** A Flow for the list of items that are to be displayed. */
     abstract val itemsSourceFlow: Flow<List<T>>
 
-    init {
+    /** Call in subclasses after [itemsSourceFlow] has been initialised. (Blegh) */
+    protected fun collectListData() {
         viewModelScope.launch {
             itemsSourceFlow.collect {
                 latestItems = it
@@ -60,7 +60,7 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
 
         itemsCap += PAGE_SIZE
         itemsFetcher = viewModelScope.launch {
-            mHasMorePages.value = when(performPageFetch()) {
+            mHasMorePages.value = when(performPageFetch(PAGE_SIZE, itemsCap - PAGE_SIZE)) {
                 FetchResult.FULL_PAGE -> true
                 FetchResult.PART_PAGE -> false
                 null -> {
@@ -73,7 +73,7 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
         }
     }
 
-    abstract suspend fun performPageFetch(): FetchResult?
+    abstract suspend fun performPageFetch(amount: Int, offset: Int): FetchResult?
 
     /**
      * Retrieves an image.

@@ -50,7 +50,7 @@ data class Part(
                 title = partRaw.title,
                 titleslug = partRaw.titleslug,
                 seriesPartNum = partRaw.partNumber,
-                coverUrl = coverUrl,
+                coverUrl = "${RemoteRepository.IMG_ADDR}/$coverUrl",
                 tags = partRaw.tags,
                 launchDate = partRaw.launchDate,
                 expired = partRaw.expired,
@@ -61,11 +61,11 @@ data class Part(
 
     override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
         title, null,
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
+        coverUrl,
         null, readable()
     )
 
-    private fun readable(): Boolean {
+    fun readable(): Boolean {
         if (expired) return false
         if (preview) return true
         return Repository.getInstance()?.isMember() ?: false

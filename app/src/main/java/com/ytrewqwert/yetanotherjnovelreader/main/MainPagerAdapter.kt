@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.partslists.recentpartslist.RecentPartsListFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
 /** An adapter for the ViewPager in the [MainActivity]. */
@@ -19,7 +20,7 @@ class MainPagerAdapter(fm: FragmentManager)
     }
 
     private val recentPartsFragment by lazy {
-        createListItemFragment(ChildFragments.RECENT_PARTS.ordinal)
+        RecentPartsListFragment()
     }
     private val explorerFragment by lazy { ExplorerFragment() }
     private val upNextPartsFragment by lazy {

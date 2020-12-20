@@ -17,16 +17,16 @@ import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooter
 import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooterRecyclerViewAdapter
 
 /** A RecyclerView container fragment that allows for swipe-refreshing. */
-abstract class SwipeableListFragment : Fragment(), ImageSource, ListFooter.InteractionListener {
+abstract class SwipeableListFragment<T : Any> : Fragment(), ImageSource, ListFooter.InteractionListener {
 
     /** The adapter that manages each item in the recycler view */
-    protected abstract val listContentsAdapter: SwipeableListAdapter<Any, RecyclerView.ViewHolder>
+    protected abstract val listContentsAdapter: SwipeableListAdapter<T, out RecyclerView.ViewHolder>
 
     private val listFooterAdapter by lazy { ListFooterRecyclerViewAdapter(this) }
     private val recyclerViewAdapter by lazy { ConcatAdapter(listContentsAdapter, listFooterAdapter) }
 
     /** Manages refreshes and image retrieval. */
-    protected abstract val viewModel: SwipeableListViewModel<Any>
+    protected abstract val viewModel: SwipeableListViewModel<out T>
 
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null
@@ -47,6 +47,9 @@ abstract class SwipeableListFragment : Fragment(), ImageSource, ListFooter.Inter
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
+        viewModel.items.observe(viewLifecycleOwner) {
+            listContentsAdapter.setItems(it)
+        }
         viewModel.refreshing.observe(viewLifecycleOwner) {
             swipeRefreshLayout?.isRefreshing = it
         }
