@@ -14,7 +14,7 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
-import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModelFactory
+import com.ytrewqwert.yetanotherjnovelreader.common.RepositoriedViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
@@ -30,10 +30,10 @@ class ExplorerFragment : Fragment() {
     private enum class ListTypes { SERIES, VOLUMES, PARTS }
 
     private val viewModel by viewModels<ExplorerViewModel> {
-        ExplorerViewModelFactory(Repository.getInstance(requireContext()))
+        RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
     }
     private val listItemViewModel by viewModels<ListItemViewModel> {
-        ListItemViewModelFactory(Repository.getInstance(requireContext()))
+        RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

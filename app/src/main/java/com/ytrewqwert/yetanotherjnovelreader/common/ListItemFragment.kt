@@ -43,7 +43,7 @@ class ListItemFragment : Fragment(),
 
     private val viewModel by viewModels<ListItemViewModel>(
         ownerProducer = { parentFragment ?: requireActivity() },
-        factoryProducer = { ListItemViewModelFactory(Repository.getInstance(requireContext())) }
+        factoryProducer = { RepositoriedViewModelFactory(Repository.getInstance(requireContext())) }
     )
 
     private val uid by lazy { requireArguments().getInt(ARG_ID, 0) }
