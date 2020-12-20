@@ -6,20 +6,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
+import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooter
+import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooterRecyclerViewAdapter
 
 /** A RecyclerView container fragment that allows for swipe-refreshing. */
-abstract class SwipeableListFragment : Fragment(), ImageSource {
+abstract class SwipeableListFragment : Fragment(), ImageSource, ListFooter.InteractionListener {
 
     /** The adapter that manages each item in the recycler view */
-    protected abstract val recyclerViewAdapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>
+    protected abstract val listContentsAdapter: SwipeableListAdapter<Any, RecyclerView.ViewHolder>
+
+    private val listFooterAdapter by lazy { ListFooterRecyclerViewAdapter(this) }
+    private val recyclerViewAdapter by lazy { ConcatAdapter(listContentsAdapter, listFooterAdapter) }
+
     /** Manages refreshes and image retrieval. */
-    protected abstract val viewModel: SwipeableListViewModel
+    protected abstract val viewModel: SwipeableListViewModel<Any>
 
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var recyclerView: RecyclerView? = null
@@ -43,6 +50,9 @@ abstract class SwipeableListFragment : Fragment(), ImageSource {
         viewModel.refreshing.observe(viewLifecycleOwner) {
             swipeRefreshLayout?.isRefreshing = it
         }
+        viewModel.hasMorePages.observe(viewLifecycleOwner) {
+            listFooterAdapter.isVisible = it
+        }
 
         return view
     }
@@ -53,6 +63,7 @@ abstract class SwipeableListFragment : Fragment(), ImageSource {
         recyclerView = null
     }
 
+    final override fun onFooterReached() { viewModel.fetchNextPage() }
     final override fun getImage(source: String, callback: (source: String, image: Drawable?) -> Unit) {
         viewModel.getImage(source, callback)
     }
