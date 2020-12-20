@@ -32,8 +32,8 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
     /** A Flow for the list of items that are to be displayed. */
     abstract val itemsSourceFlow: Flow<List<T>>
 
-    /** Call in subclasses after [itemsSourceFlow] has been initialised. (Blegh) */
-    protected fun collectListData() {
+    /** Call in subclasses after they have been initialised/constructed. (Blegh) */
+    protected fun postInitialisationTasks() {
         viewModelScope.launch {
             itemsSourceFlow.collect {
                 latestItems = it

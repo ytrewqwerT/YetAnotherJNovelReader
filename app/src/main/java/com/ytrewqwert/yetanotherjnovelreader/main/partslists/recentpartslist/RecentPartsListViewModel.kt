@@ -21,9 +21,12 @@ class RecentPartsListViewModel(
 
     init {
         viewModelScope.launch {
-            repository.isFilterFollowing.collect { isFilterFollowing = it }
+            repository.isFilterFollowing.collect {
+                isFilterFollowing = it
+                refresh() // Refresh on follow-filter enable/disable
+            }
         }
-        collectListData()
+        postInitialisationTasks()
     }
 
     fun toggleFollow(part: PartFull) {

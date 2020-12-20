@@ -1,11 +1,10 @@
 package com.ytrewqwert.yetanotherjnovelreader.main
 
-import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.partslists.recentpartslist.RecentPartsListFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.partslists.upnextpartslist.UpNextPartsListFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
 /** An adapter for the ViewPager in the [MainActivity]. */
@@ -19,13 +18,9 @@ class MainPagerAdapter(fm: FragmentManager)
         UP_NEXT_PARTS
     }
 
-    private val recentPartsFragment by lazy {
-        RecentPartsListFragment()
-    }
+    private val recentPartsFragment by lazy { RecentPartsListFragment() }
     private val explorerFragment by lazy { ExplorerFragment() }
-    private val upNextPartsFragment by lazy {
-        createListItemFragment(ChildFragments.UP_NEXT_PARTS.ordinal)
-    }
+    private val upNextPartsFragment by lazy { UpNextPartsListFragment() }
 
     override fun getCount(): Int = ChildFragments.values().size
 
@@ -43,17 +38,5 @@ class MainPagerAdapter(fm: FragmentManager)
             ChildFragments.EXPLORER -> "Explore"
             ChildFragments.UP_NEXT_PARTS -> "Up Next"
         }
-    }
-
-    private fun createListItemFragment(id: Int): ListItemFragment {
-        val fragment = ListItemFragment()
-        val args = Bundle()
-        args.putInt(ListItemFragment.ARG_ID, id)
-
-        // Make part lists compact. (Both calls of this function are for part lists.)
-        args.putBoolean(ListItemFragment.ARG_COMPACT, true)
-
-        fragment.arguments = args
-        return fragment
     }
 }
