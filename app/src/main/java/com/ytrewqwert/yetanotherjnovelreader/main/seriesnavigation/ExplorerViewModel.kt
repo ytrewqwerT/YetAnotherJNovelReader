@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.seriesnavigation
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation
 
 import androidx.lifecycle.ViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel

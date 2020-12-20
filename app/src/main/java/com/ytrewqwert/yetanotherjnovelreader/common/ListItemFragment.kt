@@ -78,7 +78,7 @@ class ListItemFragment : Fragment(),
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_listitem_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_swipable_list, container, false)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         recyclerView = view.findViewById(R.id.list)
 

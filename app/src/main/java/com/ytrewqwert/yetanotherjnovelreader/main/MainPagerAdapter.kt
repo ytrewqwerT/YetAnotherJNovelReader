@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
-import com.ytrewqwert.yetanotherjnovelreader.seriesnavigation.ExplorerFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
 /** An adapter for the ViewPager in the [MainActivity]. */
 class MainPagerAdapter(fm: FragmentManager)

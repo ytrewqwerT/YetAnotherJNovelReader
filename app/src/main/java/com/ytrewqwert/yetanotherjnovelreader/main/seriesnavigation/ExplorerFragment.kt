@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.seriesnavigation
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation
 
 import android.content.Intent
 import android.os.Bundle
