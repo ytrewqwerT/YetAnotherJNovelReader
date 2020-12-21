@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.data.FetchResult
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import kotlinx.coroutines.Job
@@ -17,6 +18,7 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
     private val mItems = MutableLiveData<List<T>>(emptyList())
     private val mRefreshing = MutableLiveData(false)
     private val mHasMorePages = MutableLiveData(false)
+    private val mHeader = MutableLiveData<ListHeader>()
 
     /** Contains the items to be shown in the list */
     val items: LiveData<List<T>> = mItems
@@ -24,6 +26,8 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
     val refreshing: LiveData<Boolean> = mRefreshing
     /** Indicates whether more pages are available for loading in. */
     val hasMorePages: LiveData<Boolean> = mHasMorePages
+    /** Contains the optional header to be shown at the top of the list. */
+    val header: LiveData<ListHeader> = mHeader
 
     private var itemsCap = PAGE_SIZE
     private var itemsFetcher: Job? = null
@@ -43,6 +47,11 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
             }
         }
         refresh()
+    }
+
+    /** Optionally sets a header to be shown at the top of the list. */
+    protected fun setHeader(newHeader: ListHeader) {
+        mHeader.value = newHeader
     }
 
     /** Reloads/resets the data shown in the list. */

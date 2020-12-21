@@ -22,5 +22,6 @@ data class VolumeFull(
         return contents
     }
 
-    override fun getListHeaderContents(): ListHeader.Contents = volume.getListHeaderContents()
+    override fun getListHeaderContents(): ListHeader.Contents =
+        volume.getListHeaderContents().copy(mFollowing = isFollowed())
 }

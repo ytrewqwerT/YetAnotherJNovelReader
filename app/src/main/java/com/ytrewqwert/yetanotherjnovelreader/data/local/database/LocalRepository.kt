@@ -69,6 +69,7 @@ class LocalRepository private constructor(appContext: Context) {
         withContext(Dispatchers.IO) { followDao.delete(*follows) }
     }
 
+    fun getSerie(serieId: String): Flow<SerieFull> = serieDao.getSerie(serieId)
     fun getSeries(): Flow<List<SerieFull>> = serieDao.getAllSeries()
     fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>> = volumeDao.getSerieVolumes(serieId)
     fun getVolumeParts(volumeId: String): Flow<List<PartFull>> = partDao.getVolumeParts(volumeId)

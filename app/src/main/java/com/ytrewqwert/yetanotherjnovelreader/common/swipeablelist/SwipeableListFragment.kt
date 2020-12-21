@@ -15,15 +15,20 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooter
 import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooterRecyclerViewAdapter
+import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
+import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecyclerViewAdapter
 
 /** A RecyclerView container fragment that allows for swipe-refreshing. */
-abstract class SwipeableListFragment<T : Any> : Fragment(), ImageSource, ListFooter.InteractionListener {
+abstract class SwipeableListFragment<T : Any> : Fragment(), ImageSource, ListHeader.InteractionListener, ListFooter.InteractionListener {
 
     /** The adapter that manages each item in the recycler view */
     protected abstract val listContentsAdapter: SwipeableListAdapter<T, out RecyclerView.ViewHolder>
 
+    private val listHeaderAdapter by lazy { ListHeaderRecyclerViewAdapter(this, this) }
     private val listFooterAdapter by lazy { ListFooterRecyclerViewAdapter(this) }
-    private val recyclerViewAdapter by lazy { ConcatAdapter(listContentsAdapter, listFooterAdapter) }
+    private val recyclerViewAdapter by lazy {
+        ConcatAdapter(listHeaderAdapter, listContentsAdapter, listFooterAdapter)
+    }
 
     /** Manages refreshes and image retrieval. */
     protected abstract val viewModel: SwipeableListViewModel<out T>
@@ -56,6 +61,9 @@ abstract class SwipeableListFragment<T : Any> : Fragment(), ImageSource, ListFoo
         viewModel.hasMorePages.observe(viewLifecycleOwner) {
             listFooterAdapter.isVisible = it
         }
+        viewModel.header.observe(viewLifecycleOwner) {
+            listHeaderAdapter.setItems(listOf(it))
+        }
 
         return view
     }
@@ -70,4 +78,6 @@ abstract class SwipeableListFragment<T : Any> : Fragment(), ImageSource, ListFoo
     final override fun getImage(source: String, callback: (source: String, image: Drawable?) -> Unit) {
         viewModel.getImage(source, callback)
     }
+
+    override fun onFollowClick() {}
 }

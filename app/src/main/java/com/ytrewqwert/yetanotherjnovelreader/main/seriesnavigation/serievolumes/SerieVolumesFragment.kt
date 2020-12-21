@@ -6,7 +6,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
-// TODO: Add header that allows for series follow/unfollow.
 // TODO: Ensure all parts in a volume is loaded to the database for showing volume progress.
 class SerieVolumesFragment
     : SwipeableListFragment<VolumeFull>(), ListVolumeRecyclerViewAdapter.ClickListener {
@@ -23,6 +22,10 @@ class SerieVolumesFragment
 
     override fun onVolumeClick(volume: VolumeFull) {
         (parentFragment as? ExplorerFragment)?.onVolumesListItemInteraction(volume) // Hmmm...
+    }
+
+    override fun onFollowClick() {
+        viewModel.toggleFollow()
     }
 
     companion object {

@@ -19,5 +19,6 @@ data class SerieFull(
         return contents
     }
 
-    override fun getListHeaderContents(): ListHeader.Contents = serie.getListHeaderContents()
+    override fun getListHeaderContents(): ListHeader.Contents =
+        serie.getListHeaderContents().copy(mFollowing = isFollowed())
 }

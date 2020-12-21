@@ -37,15 +37,12 @@ class SegmentedProgressViewManager {
             }
 
             for (i in 0 until size) {
-                // Technically not a ClassCastException since the expected view layout doesn't have
-                // a dedicated class. If it did, then a cast would've been used instead.
                 val progressView = layout.getChildAt(i).progress
                     ?: throw NullPointerException("Invalid view found in attached layout")
 
                 val partProgressPercent = (progress?.getOrNull(i) ?: 0.0) * 100
                 progressView.progress = partProgressPercent.toInt()
             }
-            layout.invalidate()
         }
     }
 }
