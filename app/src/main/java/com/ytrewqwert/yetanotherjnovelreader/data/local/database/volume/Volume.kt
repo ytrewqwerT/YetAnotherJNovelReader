@@ -63,7 +63,7 @@ data class Volume(
     )
 
     override fun getListHeaderContents(): ListHeader.Contents = ListHeader.Contents(
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
+        coverUrl,
         title,
         description
     )
