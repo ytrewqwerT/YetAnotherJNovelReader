@@ -6,9 +6,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
-// TODO: Ensure all parts in a volume is loaded to the database for showing volume progress.
 class SerieVolumesFragment
-    : SwipeableListFragment<VolumeFull>(), ListVolumeRecyclerViewAdapter.ClickListener {
+    : SwipeableListFragment<VolumeFull>(), ListVolumeRecyclerViewAdapter.Listener {
 
     private val serieId by lazy { arguments?.getString(ARG_SERIE_ID) ?: "" }
 
@@ -22,6 +21,10 @@ class SerieVolumesFragment
 
     override fun onVolumeClick(volume: VolumeFull) {
         (parentFragment as? ExplorerFragment)?.onVolumesListItemInteraction(volume) // Hmmm...
+    }
+
+    override fun onBindVolume(volume: VolumeFull) {
+        viewModel.fetchVolumeParts(volume.volume.id)
     }
 
     override fun onFollowClick() {

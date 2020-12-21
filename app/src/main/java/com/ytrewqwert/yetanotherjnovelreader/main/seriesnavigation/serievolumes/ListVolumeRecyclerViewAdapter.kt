@@ -14,7 +14,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFu
 import kotlinx.android.synthetic.main.list_volume.view.*
 
 class ListVolumeRecyclerViewAdapter(
-    private val listener: ClickListener? = null,
+    private val listener: Listener? = null,
     private val imageSource: ImageSource? = null
 ) : SwipeableListAdapter<VolumeFull, ListVolumeRecyclerViewAdapter.ViewHolder>() {
 
@@ -25,6 +25,8 @@ class ListVolumeRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, item: VolumeFull) {
+        listener?.onBindVolume(item)
+
         val volume = item.volume
         val parts = item.parts
 
@@ -58,8 +60,10 @@ class ListVolumeRecyclerViewAdapter(
         val progressManager = SegmentedProgressViewManager().apply { setLayout(progressBar) }
     }
 
-    interface ClickListener {
+    interface Listener {
         /** Called when a [VolumeFull] is clicked by the user. */
         fun onVolumeClick(volume: VolumeFull)
+        /** Called when a [VolumeFull] is bound to a ViewHolder */
+        fun onBindVolume(volume: VolumeFull)
     }
 }

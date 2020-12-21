@@ -15,6 +15,8 @@ class SerieVolumesViewModel(
 
     override val itemsSourceFlow = repository.getSerieVolumesFlow(serieId)
 
+    private val fetchedVolumes = HashSet<String>()
+
     init {
         postInitialisationTasks()
         viewModelScope.launch {
@@ -31,6 +33,18 @@ class SerieVolumesViewModel(
         viewModelScope.launch {
             if (repository.isFollowed(serieId)) repository.unfollowSeries(serieId)
             else repository.followSeries(serieId)
+        }
+    }
+
+    fun fetchVolumeParts(volumeId: String) {
+        // Maayyybbbbeeeee also reset [fetchedVolumes] on refresh (?) so that freshly released parts
+        // would get loaded in, though at that point, new series and volumes would also need to be
+        // accounted for for consistency.
+        if (!fetchedVolumes.contains(volumeId)) {
+            fetchedVolumes.add(volumeId)
+            viewModelScope.launch {
+                repository.fetchVolumeParts(volumeId, 0, 0)
+            }
         }
     }
 }
