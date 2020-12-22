@@ -70,6 +70,8 @@ class LocalRepository private constructor(appContext: Context) {
     }
 
     fun getSerie(serieId: String): Flow<SerieFull> = serieDao.getSerie(serieId)
+    fun getVolume(volumeId: String): Flow<VolumeFull> = volumeDao.getVolume(volumeId)
+
     fun getSeries(): Flow<List<SerieFull>> = serieDao.getAllSeries()
     fun getSerieVolumes(serieId: String): Flow<List<VolumeFull>> = volumeDao.getSerieVolumes(serieId)
     fun getVolumeParts(volumeId: String): Flow<List<PartFull>> = partDao.getVolumeParts(volumeId)
@@ -78,6 +80,9 @@ class LocalRepository private constructor(appContext: Context) {
     /** Retrieves the next part for the user to read, for each of their followed series. */
     fun getUpNextParts(): Flow<List<PartFull>> = partDao.getUpNextParts()
 
+    suspend fun getVolumes(vararg volumeId: String): List<VolumeFull> = withContext(Dispatchers.IO) {
+        volumeDao.getVolumes(*volumeId)
+    }
     suspend fun getParts(vararg partId: String): List<PartFull> = withContext(Dispatchers.IO) {
         partDao.getParts(*partId)
     }

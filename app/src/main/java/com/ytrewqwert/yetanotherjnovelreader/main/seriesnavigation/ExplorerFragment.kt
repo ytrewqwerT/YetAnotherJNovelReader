@@ -19,6 +19,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes.SerieVolumesFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumeparts.VolumePartsFragment
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
 /** Displays lists of series, volumes and parts allowing for exploration of available content. */
@@ -27,7 +28,7 @@ class ExplorerFragment : Fragment() {
         private const val TAG = "NavigationFragment"
     }
 
-    private enum class ListTypes { SERIES, PARTS }
+    private enum class ListTypes { SERIES }
 
     private val viewModel by viewModels<ExplorerViewModel> {
         RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
@@ -90,9 +91,18 @@ class ExplorerFragment : Fragment() {
     fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
 
-        listItemViewModel.setSource(ListTypes.PARTS.ordinal, viewModel.getVolumePartsSource(volume))
-        listItemViewModel.setHeader(ListTypes.PARTS.ordinal, volume)
-        setListItemFragment(ListTypes.PARTS.ordinal, ListTypes.PARTS.name)
+        childFragmentManager.commit {
+            val args = Bundle()
+            args.putString(VolumePartsFragment.ARG_VOLUME_ID, volume.volume.id)
+            setCustomAnimations(
+                R.animator.slide_from_right, R.animator.slide_to_left,
+                R.animator.slide_from_left, R.animator.slide_to_right
+            )
+            replace(R.id.fragment_container, VolumePartsFragment::class.java, args)
+            if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
+                addToBackStack(null)
+            }
+        }
     }
     private fun onPartsListItemInteraction(part: PartFull) {
         Log.d(TAG, "Part clicked: ${part.part.title}")

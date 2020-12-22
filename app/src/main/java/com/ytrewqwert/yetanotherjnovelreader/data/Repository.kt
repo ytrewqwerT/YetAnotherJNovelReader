@@ -50,6 +50,7 @@ class Repository private constructor(appContext: Context) {
     }
 
     fun getSerieFlow(serieId: String): Flow<SerieFull> = local.getSerie(serieId)
+    fun getVolumeFlow(volumeId: String): Flow<VolumeFull> = local.getVolume(volumeId)
 
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
     suspend fun fetchSeries(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
@@ -94,6 +95,7 @@ class Repository private constructor(appContext: Context) {
         return FetchResult.PART_PAGE // No more "pages" since the function doesn't paginate fetches
     }
 
+    suspend fun getVolumes(vararg volumeId: String): List<VolumeFull> = local.getVolumes(*volumeId)
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
     /** Returns true if the series with ID [serieId] is being followed by the user. */
