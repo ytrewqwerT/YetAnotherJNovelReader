@@ -6,18 +6,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
-import com.ytrewqwert.yetanotherjnovelreader.common.ListItemFragment
 import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.RepositoriedViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.series.SeriesFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes.SerieVolumesFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumeparts.VolumePartsFragment
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
@@ -39,7 +40,7 @@ class ExplorerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setListItemFragment(ListTypes.SERIES.ordinal, ListTypes.SERIES.name)
+        setChildFragment(SeriesFragment::class.java)
         observeViewModels()
     }
 
@@ -72,37 +73,21 @@ class ExplorerFragment : Fragment() {
         }
     }
 
-    private fun onSeriesListItemInteraction(serie: SerieFull) {
+    fun onSeriesListItemInteraction(serie: SerieFull) {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
 
-        childFragmentManager.commit {
-            val args = Bundle()
-            args.putString(SerieVolumesFragment.ARG_SERIE_ID, serie.serie.id)
-            setCustomAnimations(
-                R.animator.slide_from_right, R.animator.slide_to_left,
-                R.animator.slide_from_left, R.animator.slide_to_right
-            )
-            replace(R.id.fragment_container, SerieVolumesFragment::class.java, args)
-            if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
-                addToBackStack(null)
-            }
-        }
+        setChildFragment(
+            SerieVolumesFragment::class.java,
+            bundleOf(SerieVolumesFragment.ARG_SERIE_ID to serie.serie.id)
+        )
     }
     fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
 
-        childFragmentManager.commit {
-            val args = Bundle()
-            args.putString(VolumePartsFragment.ARG_VOLUME_ID, volume.volume.id)
-            setCustomAnimations(
-                R.animator.slide_from_right, R.animator.slide_to_left,
-                R.animator.slide_from_left, R.animator.slide_to_right
-            )
-            replace(R.id.fragment_container, VolumePartsFragment::class.java, args)
-            if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
-                addToBackStack(null)
-            }
-        }
+        setChildFragment(
+            VolumePartsFragment::class.java,
+            bundleOf(VolumePartsFragment.ARG_VOLUME_ID to volume.volume.id)
+        )
     }
     private fun onPartsListItemInteraction(part: PartFull) {
         Log.d(TAG, "Part clicked: ${part.part.title}")
@@ -112,15 +97,13 @@ class ExplorerFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun setListItemFragment(fragmentId: Int, fragmentTag: String?) {
+    private fun setChildFragment(fragmentClass: Class<out Fragment>, args: Bundle? = null) {
         childFragmentManager.commit {
-            val args = Bundle()
-            args.putInt(ListItemFragment.ARG_ID, fragmentId)
             setCustomAnimations(
                 R.animator.slide_from_right, R.animator.slide_to_left,
                 R.animator.slide_from_left, R.animator.slide_to_right
             )
-            replace(R.id.fragment_container, ListItemFragment::class.java, args, fragmentTag)
+            replace(R.id.fragment_container, fragmentClass, args)
             if (childFragmentManager.findFragmentById(R.id.fragment_container) != null) {
                 addToBackStack(null)
             }

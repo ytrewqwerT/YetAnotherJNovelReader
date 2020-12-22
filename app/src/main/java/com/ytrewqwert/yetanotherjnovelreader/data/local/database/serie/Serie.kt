@@ -45,7 +45,7 @@ data class Serie(
                 titleslug = serieRaw.titleslug,
                 description = serieRaw.description,
                 descriptionShort = serieRaw.descriptionShort,
-                coverUrl = coverUrl,
+                coverUrl = "${RemoteRepository.IMG_ADDR}/$coverUrl",
                 tags = serieRaw.tags,
                 created = serieRaw.created,
                 overrideExpiration = serieRaw.overrideExpiration
@@ -55,12 +55,12 @@ data class Serie(
 
     override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
         title, descriptionShort,
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
+        coverUrl,
         null, true
     )
 
     override fun getListHeaderContents(): ListHeader.Contents = ListHeader.Contents(
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
+        coverUrl,
         title,
         description
     )
