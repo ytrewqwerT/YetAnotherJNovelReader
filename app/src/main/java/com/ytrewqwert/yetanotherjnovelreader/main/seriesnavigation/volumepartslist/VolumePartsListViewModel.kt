@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumeparts
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumepartslist
 
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListViewModel
@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class VolumePartsViewModel(
+/** ViewModel companion for the VolumePartsListFragment. */
+class VolumePartsListViewModel(
     private val repository: Repository,
     private val volumeId: String
 ) : SwipeableListViewModel<PartFull>(repository) {
@@ -38,6 +39,7 @@ class VolumePartsViewModel(
     override suspend fun performPageFetch(amount: Int, offset: Int): FetchResult? =
         repository.fetchVolumeParts(volumeId, 0, 0)
 
+    /** Toggles the follow status of the series whose volume parts are being listed. */
     fun toggleFollow() {
         viewModelScope.launch {
             val serieId = repository.getVolumes(volumeId).first().volume.serieId

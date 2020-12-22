@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.series
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serieslist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -14,10 +14,16 @@ import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListA
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import kotlinx.android.synthetic.main.list_item.view.*
 
-class SeriesAdapter(
+/**
+ * A SwipeableListAdapter for lists containing series.
+ *
+ * @param[listener] A handler for events that occur on a serie in the list.
+ * @param[imageSource] A source for fetching images.
+ */
+class SeriesListAdapter(
     private val listener: Listener? = null,
     private val imageSource: ImageSource? = null
-) : SwipeableListAdapter<SerieFull, SeriesAdapter.ViewHolder>() {
+) : SwipeableListAdapter<SerieFull, SeriesListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -48,7 +54,8 @@ class SeriesAdapter(
         holder.view.setOnClickListener { listener?.onSerieClick(item) }
     }
 
-    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    /** RecyclerView.ViewHolder for the SeriesListAdapter. */
+    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
         val imageView: ImageView = view.image
         val progressBar: ProgressBar = view.progress
@@ -56,6 +63,7 @@ class SeriesAdapter(
         var imageUrl: String? = null
     }
 
+    /** Interface for objects that wish to respond to events acting on items in the list. */
     interface Listener {
         /** Called when a [SerieFull] is clicked by the user. */
         fun onSerieClick(serie: SerieFull)

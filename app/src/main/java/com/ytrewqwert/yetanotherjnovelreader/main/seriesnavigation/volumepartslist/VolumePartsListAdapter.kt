@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumeparts
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumepartslist
 
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
@@ -12,9 +12,14 @@ import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListA
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import kotlinx.android.synthetic.main.list_part_title.view.*
 
-class VolumePartsAdapter(
+/**
+ * A SwipeableListAdapter for lists containing parts for a single volume.
+ *
+ * @param[listener] A handler for events that occur on a part in the list.
+ */
+class VolumePartsListAdapter(
     private val listener: Listener? = null
-) : SwipeableListAdapter<PartFull, VolumePartsAdapter.ViewHolder>() {
+) : SwipeableListAdapter<PartFull, VolumePartsListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -44,12 +49,14 @@ class VolumePartsAdapter(
         }
     }
 
+    /** RecyclerView.ViewHolder for the VolumePartsListAdapter. */
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
         val completedProgress: View = view.progressCompleted
         val remainingProgress: View = view.progressRemaining
     }
 
+    /** Interface for objects that wish to respond to events acting on items in the list. */
     interface Listener {
         /** Called when a [PartFull] is clicked by the user. */
         fun onPartClick(part: PartFull)

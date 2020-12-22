@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +13,16 @@ import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListA
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import kotlinx.android.synthetic.main.list_volume.view.*
 
-class ListVolumeRecyclerViewAdapter(
+/**
+ * A SwipeableListAdapter for lists containing volumes.
+ *
+ * @param[listener] A handler for events that occur on a volume in the list.
+ * @param[imageSource] A source for fetching images.
+ */
+class VolumesListAdapter(
     private val listener: Listener? = null,
     private val imageSource: ImageSource? = null
-) : SwipeableListAdapter<VolumeFull, ListVolumeRecyclerViewAdapter.ViewHolder>() {
+) : SwipeableListAdapter<VolumeFull, VolumesListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -52,7 +58,8 @@ class ListVolumeRecyclerViewAdapter(
         holder.view.setOnClickListener { listener?.onVolumeClick(item) }
     }
 
-    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    /** RecyclerView.ViewHolder for the VolumesListAdapter. */
+    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
         val imageView: ImageView = view.image
         val progressBar: LinearLayout = view.progress
@@ -60,6 +67,7 @@ class ListVolumeRecyclerViewAdapter(
         val progressManager = SegmentedProgressViewManager().apply { setLayout(progressBar) }
     }
 
+    /** Interface for objects that wish to respond to events acting on items in the list. */
     interface Listener {
         /** Called when a [VolumeFull] is clicked by the user. */
         fun onVolumeClick(volume: VolumeFull)

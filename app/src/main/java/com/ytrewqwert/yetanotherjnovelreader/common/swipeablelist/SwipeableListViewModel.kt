@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+/** ViewModel companion for a SwipeableListFragment. */
 abstract class SwipeableListViewModel<T : Any>(private val repository: Repository) : ViewModel() {
 
     private val mItems = MutableLiveData<List<T>>(emptyList())
@@ -82,6 +83,7 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
         }
     }
 
+    /** Fetches items for the shown list in the range [offset,offset+amount). */
     abstract suspend fun performPageFetch(amount: Int, offset: Int): FetchResult?
 
     /**

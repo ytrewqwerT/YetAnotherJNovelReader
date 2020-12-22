@@ -15,11 +15,17 @@ import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListA
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import kotlinx.android.synthetic.main.list_item.view.*
 
-class PartsListRecyclerViewAdapter(
-    private val listener: ClickListener? = null,
+/**
+ * A SwipeableListAdapter for lists containing parts mixed across series/volumes.
+ *
+ * @param[listener] A handler for events that occur on a part in the list.
+ * @param[imageSource] A source for fetching images.
+ */
+class PartsListAdapter(
+    private val listener: Listener? = null,
     private val imageSource: ImageSource? = null
-) : SwipeableListAdapter<PartFull, PartsListRecyclerViewAdapter.ViewHolder>() {
-    
+) : SwipeableListAdapter<PartFull, PartsListAdapter.ViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_item_compact, parent, false)
@@ -27,7 +33,6 @@ class PartsListRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, item: PartFull) {
-
         holder.titleText.text = item.part.title
         holder.imageUrl = item.part.coverUrl
 
@@ -62,16 +67,18 @@ class PartsListRecyclerViewAdapter(
             holder.view.isClickable = false
         }
     }
-    
-    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+
+    /** RecyclerView.ViewHolder for the PartsListAdapter. */
+    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.title
         val imageView: ImageView = view.image
         val progressBar: ProgressBar = view.progress
         val following: ImageView = view.following
         var imageUrl: String? = null
     }
-    
-    interface ClickListener {
+
+    /** Interface for objects that wish to respond to events acting on items in the list. */
+    interface Listener {
         /** Called when a [PartFull] is clicked by the user. */
         fun onPartClick(part: PartFull)
         /** Called when a [PartFull]'s 'follow' button is clicked by the user. */

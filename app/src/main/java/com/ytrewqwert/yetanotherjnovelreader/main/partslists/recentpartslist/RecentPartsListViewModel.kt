@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
+/** ViewModel companion for the RecentPartsListFragment. */
 class RecentPartsListViewModel(
     private val repository: Repository
 ) : SwipeableListViewModel<PartFull>(repository) {
+
     override val itemsSourceFlow = repository.getRecentPartsFlow()
         .combine(repository.isFilterFollowing) { parts, filterOn ->
             parts.filter { !filterOn || it.isFollowed() }
@@ -29,7 +31,9 @@ class RecentPartsListViewModel(
         postInitialisationTasks()
     }
 
+    /** Toggles the follow status of the series that [part] belongs to. */
     fun toggleFollow(part: PartFull) {
+        // TODO: Highly similar/duplicated code across the different lists under the 'main' package.
         val following: Boolean = part.isFollowed()
         val serieId = part.part.serieId
         viewModelScope.launch {

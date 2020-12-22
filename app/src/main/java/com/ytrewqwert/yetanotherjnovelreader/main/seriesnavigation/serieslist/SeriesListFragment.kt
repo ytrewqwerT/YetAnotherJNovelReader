@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.series
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serieslist
 
 import androidx.fragment.app.viewModels
 import com.ytrewqwert.yetanotherjnovelreader.common.RepositoriedViewModelFactory
@@ -7,12 +7,14 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
-class SeriesFragment : SwipeableListFragment<SerieFull>(), SeriesAdapter.Listener {
+/** SwipeableListFragment for showing available series. */
+class SeriesListFragment : SwipeableListFragment<SerieFull>(), SeriesListAdapter.Listener {
 
     override val listContentsAdapter by lazy {
-        SeriesAdapter(this, this)
+        SeriesListAdapter(this, this)
     }
-    override val viewModel by viewModels<SeriesViewModel> {
+
+    override val viewModel by viewModels<SeriesListViewModel> {
         RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
     }
 

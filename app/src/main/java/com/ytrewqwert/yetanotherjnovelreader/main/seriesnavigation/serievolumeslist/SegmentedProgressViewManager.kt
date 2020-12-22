@@ -1,19 +1,25 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist
 
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
 import kotlinx.android.synthetic.main.list_volume_part_progress.view.*
 
+/** Handles the children in a [LinearLayout] to create a segmented progress bar. */
 class SegmentedProgressViewManager {
     private var layout: LinearLayout? = null
     private var progress: List<Double>? = null
 
+    /** Sets the [LinearLayout] to be handled. [newLayout] should have no children. */
     fun setLayout(newLayout: LinearLayout?) {
         layout = newLayout
         refreshLayout()
     }
 
+    /**
+     * Sets the progress to be shown in each segment. The number of segments is automatically
+     * changed to match the size of the list.
+     */
     fun setProgress(newProgress: List<Double>?) {
         progress = newProgress
         refreshLayout()

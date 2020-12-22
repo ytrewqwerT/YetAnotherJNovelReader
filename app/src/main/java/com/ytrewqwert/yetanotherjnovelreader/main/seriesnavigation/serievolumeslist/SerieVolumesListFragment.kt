@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist
 
 import androidx.fragment.app.viewModels
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListFragment
@@ -6,16 +6,17 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
-class SerieVolumesFragment
-    : SwipeableListFragment<VolumeFull>(), ListVolumeRecyclerViewAdapter.Listener {
+/** SwipeableListFragment for showing the volumes in a series. */
+class SerieVolumesListFragment
+    : SwipeableListFragment<VolumeFull>(), VolumesListAdapter.Listener {
 
     private val serieId by lazy { arguments?.getString(ARG_SERIE_ID) ?: "" }
 
     override val listContentsAdapter by lazy {
-        ListVolumeRecyclerViewAdapter(this, this)
+        VolumesListAdapter(this, this)
     }
-    override val viewModel by viewModels<SerieVolumesViewModel> {
-        SerieVolumesViewModelFactory(Repository.getInstance(requireContext()), serieId)
+    override val viewModel by viewModels<SerieVolumesListViewModel> {
+        SerieVolumesListViewModelFactory(Repository.getInstance(requireContext()), serieId)
     }
 
 

@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.series
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serieslist
 
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListViewModel
@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class SeriesViewModel(
+/** ViewModel companion for the SeriesListFragment. */
+class SeriesListViewModel(
     private val repository: Repository
 ): SwipeableListViewModel<SerieFull>(repository) {
 
@@ -30,6 +31,7 @@ class SeriesViewModel(
     override suspend fun performPageFetch(amount: Int, offset: Int): FetchResult? =
         repository.fetchSeries(amount, offset, isFilterFollowing)
 
+    /** Toggles the follow status of the [serie]. */
     fun toggleFollow(serie: SerieFull) {
         val following: Boolean = serie.isFollowed()
         val serieId = serie.serie.id

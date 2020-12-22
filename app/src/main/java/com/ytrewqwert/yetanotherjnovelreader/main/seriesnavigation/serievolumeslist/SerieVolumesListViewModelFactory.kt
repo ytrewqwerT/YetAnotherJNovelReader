@@ -1,17 +1,18 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumeparts
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 
-class VolumePartsViewModelFactory(
+/** ViewModelProvider.Factory for creating a SerieVolumesListViewModel. */
+class SerieVolumesListViewModelFactory(
     private val repository: Repository,
-    private val volumeId: String
+    private val serieId: String
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(VolumePartsViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(SerieVolumesListViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return VolumePartsViewModel(repository, volumeId) as T
+            return SerieVolumesListViewModel(repository, serieId) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

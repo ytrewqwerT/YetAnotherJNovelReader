@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist
 
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListViewModel
@@ -8,7 +8,8 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFu
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class SerieVolumesViewModel(
+/** ViewModel companion for the SerieVolumesListFragment. */
+class SerieVolumesListViewModel(
     private val repository: Repository,
     private val serieId: String
 ) : SwipeableListViewModel<VolumeFull>(repository) {
@@ -29,6 +30,7 @@ class SerieVolumesViewModel(
     override suspend fun performPageFetch(amount: Int, offset: Int): FetchResult? =
         repository.fetchSerieVolumes(serieId, amount, offset)
 
+    /** Toggles the follow status of the series whose volumes are being listed. */
     fun toggleFollow() {
         viewModelScope.launch {
             if (repository.isFollowed(serieId)) repository.unfollowSeries(serieId)
@@ -36,6 +38,10 @@ class SerieVolumesViewModel(
         }
     }
 
+    /**
+     * Fetches the parts that belong to the volume with id [volumeId] to the repository. Only
+     * performs the fetch once for each given volume id.
+     */
     fun fetchVolumeParts(volumeId: String) {
         // Maayyybbbbeeeee also reset [fetchedVolumes] on refresh (?) so that freshly released parts
         // would get loaded in, though at that point, new series and volumes would also need to be

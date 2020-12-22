@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumeparts
+package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumepartslist
 
 import android.content.Intent
 import androidx.fragment.app.viewModels
@@ -7,14 +7,15 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
-class VolumePartsFragment : SwipeableListFragment<PartFull>(), VolumePartsAdapter.Listener {
+/** SwipeableListFragment for showing the parts in a volume. */
+class VolumePartsListFragment : SwipeableListFragment<PartFull>(), VolumePartsListAdapter.Listener {
 
     private val volumeId by lazy { arguments?.getString(ARG_VOLUME_ID) ?: "" }
 
-    override val listContentsAdapter by lazy { VolumePartsAdapter(this) }
+    override val listContentsAdapter by lazy { VolumePartsListAdapter(this) }
 
-    override val viewModel by viewModels<VolumePartsViewModel> {
-        VolumePartsViewModelFactory(Repository.getInstance(requireContext()), volumeId)
+    override val viewModel by viewModels<VolumePartsListViewModel> {
+        VolumePartsListViewModelFactory(Repository.getInstance(requireContext()), volumeId)
     }
 
     override fun onPartClick(part: PartFull) {

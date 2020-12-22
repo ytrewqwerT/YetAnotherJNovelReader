@@ -6,13 +6,16 @@ import com.ytrewqwert.yetanotherjnovelreader.common.RepositoriedViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListFragment
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
-import com.ytrewqwert.yetanotherjnovelreader.main.partslists.PartsListRecyclerViewAdapter
+import com.ytrewqwert.yetanotherjnovelreader.main.partslists.PartsListAdapter
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
-class UpNextPartsListFragment : SwipeableListFragment<PartFull>(), PartsListRecyclerViewAdapter.ClickListener {
+/** SwipeableListFragment for showing the up-next parts for followed series. */
+class UpNextPartsListFragment : SwipeableListFragment<PartFull>(), PartsListAdapter.Listener {
+
     override val listContentsAdapter by lazy {
-        PartsListRecyclerViewAdapter(this, this)
+        PartsListAdapter(this, this)
     }
+
     override val viewModel by viewModels<UpNextPartsListViewModel> {
         RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
     }

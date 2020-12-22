@@ -18,9 +18,9 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
-import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.series.SeriesFragment
-import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumes.SerieVolumesFragment
-import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumeparts.VolumePartsFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serieslist.SeriesListFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist.SerieVolumesListFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumepartslist.VolumePartsListFragment
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
 /** Displays lists of series, volumes and parts allowing for exploration of available content. */
@@ -40,7 +40,7 @@ class ExplorerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setChildFragment(SeriesFragment::class.java)
+        setChildFragment(SeriesListFragment::class.java)
         observeViewModels()
     }
 
@@ -77,16 +77,16 @@ class ExplorerFragment : Fragment() {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
 
         setChildFragment(
-            SerieVolumesFragment::class.java,
-            bundleOf(SerieVolumesFragment.ARG_SERIE_ID to serie.serie.id)
+            SerieVolumesListFragment::class.java,
+            bundleOf(SerieVolumesListFragment.ARG_SERIE_ID to serie.serie.id)
         )
     }
     fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
 
         setChildFragment(
-            VolumePartsFragment::class.java,
-            bundleOf(VolumePartsFragment.ARG_VOLUME_ID to volume.volume.id)
+            VolumePartsListFragment::class.java,
+            bundleOf(VolumePartsListFragment.ARG_VOLUME_ID to volume.volume.id)
         )
     }
     private fun onPartsListItemInteraction(part: PartFull) {
