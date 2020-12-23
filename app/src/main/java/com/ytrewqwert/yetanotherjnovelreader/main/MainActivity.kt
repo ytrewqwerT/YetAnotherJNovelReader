@@ -1,37 +1,26 @@
 package com.ytrewqwert.yetanotherjnovelreader.main
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import androidx.lifecycle.observe
 import androidx.viewpager.widget.ViewPager
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.addOnPageSelectedListener
-import com.ytrewqwert.yetanotherjnovelreader.common.ListItemViewModel
 import com.ytrewqwert.yetanotherjnovelreader.common.RepositoriedViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
-import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
-import com.ytrewqwert.yetanotherjnovelreader.partreader.PartActivity
 
 /** The app's entry point. Shows the user lists of available parts for reading. */
 class MainActivity : AppCompatActivity(), LoginResultListener {
-    companion object {
-        private const val TAG = "MainActivity"
-    }
 
-    private val mainViewModel by viewModels<MainViewModel> {
-        RepositoriedViewModelFactory(Repository.getInstance(this))
-    }
-    private val listItemViewModel by viewModels<ListItemViewModel> {
+    private val viewModel by viewModels<MainViewModel> {
         RepositoriedViewModelFactory(Repository.getInstance(this))
     }
 
@@ -40,9 +29,6 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
     private val activePagerFragment: Fragment? get() = supportFragmentManager.findFragmentByTag(
         "android:switcher:${R.id.pager}:${viewPager.currentItem}"
     )
-
-    private val recentPartsFragId = MainPagerAdapter.ChildFragments.RECENT_PARTS.ordinal
-    private val upNextPartsFragId = MainPagerAdapter.ChildFragments.UP_NEXT_PARTS.ordinal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,32 +45,28 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             }
         }
 
-        mainViewModel.logoutEvent.observe(this) { loggedOut ->
+        viewModel.logoutEvent.observe(this) { loggedOut ->
+            // TODO: Extract string resources.
             if (loggedOut) onLoginResult(false)
             else Toast.makeText(this, "Logout failed", Toast.LENGTH_LONG).show()
         }
-        mainViewModel.isFilterFollowing.observe(this) {
+        viewModel.isFilterFollowing.observe(this) {
             val followMenuItem = appBarMenu?.findItem(R.id.following)
             followMenuItem?.isChecked = it
             updateMenu()
         }
-        listItemViewModel.itemClickedEvent.observe(this) {
-            onPartsListItemInteraction(it.item as? PartFull)
-        }
-
-        listItemViewModel.setSource(recentPartsFragId, mainViewModel.getRecentPartsSource())
-        listItemViewModel.setSource(upNextPartsFragId, mainViewModel.getUpNextPartsSource())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         appBarMenu = menu
-        menu.findItem(R.id.following)?.isChecked = mainViewModel.isFilterFollowing.value ?: false
+        menu.findItem(R.id.following)?.isChecked = viewModel.isFilterFollowing.value ?: false
         updateMenu()
         return true
     }
 
     override fun onLoginResult(loggedIn: Boolean) {
+        // TODO: Extract string resources.
         val loginStatusText = if (loggedIn) "Logged in" else "Logged out"
         Toast.makeText(this, loginStatusText, Toast.LENGTH_LONG).show()
         updateMenu()
@@ -97,31 +79,22 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.account_login -> {
-            if (mainViewModel.isLoggedIn()) mainViewModel.logout()
+            if (viewModel.isLoggedIn()) viewModel.logout()
             else LoginDialog().show(supportFragmentManager, "LOGIN_DIALOG")
             true
         }
         R.id.following -> {
-            mainViewModel.toggleFilterFollowing()
+            viewModel.toggleFilterFollowing()
             true
         }
         else -> super.onOptionsItemSelected(item)
     }
 
-    private fun onPartsListItemInteraction(part: PartFull?) {
-        Log.d(TAG, "Part clicked: ${part?.part?.title}")
-        if (part != null) {
-            val intent = Intent(this, PartActivity::class.java)
-            intent.putExtra(PartActivity.EXTRA_PART_ID, part.part.id)
-            startActivity(intent)
-        } else Log.e(TAG, "Clicked item handled by MainActivity was null")
-    }
-
     private fun updateMenu() {
         val nameHolder = appBarMenu?.findItem(R.id.account_name)
         val loginItem = appBarMenu?.findItem(R.id.account_login)
-        if (mainViewModel.isLoggedIn()) {
-            nameHolder?.title = mainViewModel.getUsername()
+        if (viewModel.isLoggedIn()) {
+            nameHolder?.title = viewModel.getUsername()
             loginItem?.title = getString(R.string.logout)
         } else {
             nameHolder?.title = getString(R.string.not_logged_in)
@@ -130,9 +103,9 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
 
         val followMenuItem = appBarMenu?.findItem(R.id.following)
         followMenuItem?.icon = if (followMenuItem?.isChecked == true) {
-            resources.getDrawable(R.drawable.ic_star_24dp, null)
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_star_24dp, null)
         } else {
-            resources.getDrawable(R.drawable.ic_star_border_24dp, null)
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_star_border_24dp, null)
         }
     }
 }
