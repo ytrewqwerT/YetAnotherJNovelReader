@@ -2,7 +2,6 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.part
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.PartRaw
@@ -34,7 +33,7 @@ data class Part(
     val launchDate: String,
     val expired: Boolean,
     val preview: Boolean
-) : ListItem {
+) {
     companion object {
         /** Converts the given [partRaw] into a [Part]. */
         fun fromPartRaw(partRaw: PartRaw): Part {

@@ -3,7 +3,6 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
-import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.SerieRaw
 
@@ -30,7 +29,7 @@ data class Serie(
     val tags: String,
     val created: String,
     val overrideExpiration: Boolean
-) : ListItem, ListHeader {
+) : ListHeader {
     companion object {
         /** Converts the given [serieRaw] into a [Serie]. */
         fun fromSerieRaw(serieRaw: SerieRaw): Serie {
