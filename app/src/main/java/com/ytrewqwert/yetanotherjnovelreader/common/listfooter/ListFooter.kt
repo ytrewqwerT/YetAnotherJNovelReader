@@ -1,11 +1,10 @@
 package com.ytrewqwert.yetanotherjnovelreader.common.listfooter
 
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
-import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 
 /**
- * A container interface for [InteractionListener] to mimic the structure of the [ListHeader] and
- * [ListItem] interfaces.
+ * A container interface for [InteractionListener] to mimic the structure of the [ListHeader]
+ * interface.
  */
 interface ListFooter {
     /** Interface for handling of events relating to a [ListFooter]. */

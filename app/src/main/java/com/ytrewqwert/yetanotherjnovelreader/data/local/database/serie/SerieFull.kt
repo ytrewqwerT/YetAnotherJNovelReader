@@ -13,12 +13,6 @@ data class SerieFull(
 ) : ListItem, ListHeader {
     override fun isFollowed(): Boolean = following != null
 
-    override fun getListItemContents(): ListItem.Contents {
-        var contents = serie.getListItemContents()
-        if (isFollowed()) contents = contents.copy(isFollowing = true)
-        return contents
-    }
-
     override fun getListHeaderContents(): ListHeader.Contents =
         serie.getListHeaderContents().copy(mFollowing = isFollowed())
 }

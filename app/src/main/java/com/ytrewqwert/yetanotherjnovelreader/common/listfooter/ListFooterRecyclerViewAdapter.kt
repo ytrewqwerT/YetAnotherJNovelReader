@@ -9,8 +9,8 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 
 /**
  * A [RecyclerView.Adapter] exposing 0 or 1 items containing a loading indicator, for use as the
- * last adapter in a [MergeAdapter] to signal to a [listener] (via the
- * [ListFooter.InteractionListener.onFooterReached] method), when the user scrolls near the end of
+ * last adapter in a [ConcatAdapter] to signal to a [listener] (via the
+ * [ListFooter.InteractionListener.onFooterReached] method) when the user scrolls near the end of
  * the MergeAdapter.
  */
 class ListFooterRecyclerViewAdapter(
@@ -34,5 +34,5 @@ class ListFooterRecyclerViewAdapter(
         return ViewHolder(view)
     }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }

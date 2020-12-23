@@ -16,12 +16,6 @@ data class VolumeFull(
 ) : ListItem, ListHeader {
     override fun isFollowed(): Boolean = following != null
 
-    override fun getListItemContents(): ListItem.Contents {
-        var contents = volume.getListItemContents()
-        if (isFollowed()) contents = contents.copy(isFollowing = true)
-        return contents
-    }
-
     override fun getListHeaderContents(): ListHeader.Contents =
         volume.getListHeaderContents().copy(mFollowing = isFollowed())
 }

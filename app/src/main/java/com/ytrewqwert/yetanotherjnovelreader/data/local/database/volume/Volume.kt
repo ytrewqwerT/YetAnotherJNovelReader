@@ -56,12 +56,6 @@ data class Volume(
         }
     }
 
-    override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
-        title, descriptionShort,
-        coverUrl,
-        null, true
-    )
-
     override fun getListHeaderContents(): ListHeader.Contents = ListHeader.Contents(
         coverUrl,
         title,

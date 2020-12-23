@@ -59,12 +59,6 @@ data class Part(
         }
     }
 
-    override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
-        title, null,
-        coverUrl,
-        null, readable()
-    )
-
     fun readable(): Boolean {
         if (expired) return false
         if (preview) return true

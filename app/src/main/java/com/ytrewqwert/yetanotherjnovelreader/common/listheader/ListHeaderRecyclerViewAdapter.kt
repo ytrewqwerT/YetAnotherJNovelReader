@@ -61,7 +61,7 @@ class ListHeaderRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.image
         val titleText: TextView = view.title
         val descText: TextView = view.description

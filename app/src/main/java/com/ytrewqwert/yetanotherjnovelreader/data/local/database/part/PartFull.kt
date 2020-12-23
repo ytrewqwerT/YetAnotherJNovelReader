@@ -14,10 +14,4 @@ data class PartFull(
 ) : ListItem {
     override fun isFollowed(): Boolean = following != null
 
-    override fun getListItemContents(): ListItem.Contents {
-        var contents = part.getListItemContents()
-        if (progress != null) contents = contents.copy(progress = progress.progress)
-        if (isFollowed()) contents = contents.copy(isFollowing = true)
-        return contents
-    }
 }
