@@ -49,6 +49,9 @@ class Repository private constructor(appContext: Context) {
         return remote.getPartHtml(partId)
     }
 
+    fun getSerieFlow(serieId: String): Flow<SerieFull> = local.getSerie(serieId)
+    fun getVolumeFlow(volumeId: String): Flow<VolumeFull> = local.getVolume(volumeId)
+
     fun getSeriesFlow(): Flow<List<SerieFull>> = local.getSeries()
     suspend fun fetchSeries(amount: Int, offset: Int, followedOnly: Boolean): FetchResult? {
         val follows = if (followedOnly) local.getAllFollows().map { it.serieId} else null
@@ -92,8 +95,12 @@ class Repository private constructor(appContext: Context) {
         return FetchResult.PART_PAGE // No more "pages" since the function doesn't paginate fetches
     }
 
+    suspend fun getVolumes(vararg volumeId: String): List<VolumeFull> = local.getVolumes(*volumeId)
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
+    /** Returns true if the series with ID [serieId] is being followed by the user. */
+    suspend fun isFollowed(serieId: String): Boolean =
+        local.getAllFollows().find { it.serieId == serieId } != null
     /** Sets a series with ID [serieId] as being followed by the user. */
     suspend fun followSeries(serieId: String) {
         val latestFinishedPart = local.getLatestFinishedPart(serieId)

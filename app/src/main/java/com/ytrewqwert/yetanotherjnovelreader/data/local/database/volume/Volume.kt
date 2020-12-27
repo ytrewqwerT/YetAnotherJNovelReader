@@ -3,7 +3,6 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
-import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.VolumeRaw
 
@@ -32,7 +31,7 @@ data class Volume(
     val coverUrl: String,
     val tags: String,
     val created: String
-) : ListItem, ListHeader {
+) : ListHeader {
     companion object {
         /** Converts the given [volumeRaw] into a [Volume]. */
         fun fromVolumeRaw(volumeRaw: VolumeRaw): Volume {
@@ -49,21 +48,15 @@ data class Volume(
                 volumeNum = volumeRaw.volumeNumber,
                 description = volumeRaw.description,
                 descriptionShort = volumeRaw.descriptionShort,
-                coverUrl = coverUrl,
+                coverUrl = "${RemoteRepository.IMG_ADDR}/$coverUrl",
                 tags = volumeRaw.tags,
                 created = volumeRaw.created
             )
         }
     }
 
-    override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
-        title, descriptionShort,
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
-        null, true
-    )
-
     override fun getListHeaderContents(): ListHeader.Contents = ListHeader.Contents(
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
+        coverUrl,
         title,
         description
     )

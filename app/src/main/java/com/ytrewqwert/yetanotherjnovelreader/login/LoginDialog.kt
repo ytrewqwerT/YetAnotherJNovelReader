@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.common.RepositoriedViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.DialogLoginBinding
 
@@ -23,7 +24,7 @@ class LoginDialog : DialogFragment() {
 
     private lateinit var binding: DialogLoginBinding
     private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModelFactory(Repository.getInstance(requireContext()))
+        RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
     }
 
     override fun onAttach(context: Context) {

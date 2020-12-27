@@ -2,7 +2,6 @@ package com.ytrewqwert.yetanotherjnovelreader.data.local.database.part
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ytrewqwert.yetanotherjnovelreader.common.listitem.ListItem
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.RemoteRepository
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.PartRaw
@@ -34,7 +33,7 @@ data class Part(
     val launchDate: String,
     val expired: Boolean,
     val preview: Boolean
-) : ListItem {
+) {
     companion object {
         /** Converts the given [partRaw] into a [Part]. */
         fun fromPartRaw(partRaw: PartRaw): Part {
@@ -50,7 +49,7 @@ data class Part(
                 title = partRaw.title,
                 titleslug = partRaw.titleslug,
                 seriesPartNum = partRaw.partNumber,
-                coverUrl = coverUrl,
+                coverUrl = "${RemoteRepository.IMG_ADDR}/$coverUrl",
                 tags = partRaw.tags,
                 launchDate = partRaw.launchDate,
                 expired = partRaw.expired,
@@ -59,13 +58,7 @@ data class Part(
         }
     }
 
-    override fun getListItemContents(): ListItem.Contents = ListItem.Contents(
-        title, null,
-        "${RemoteRepository.IMG_ADDR}/$coverUrl",
-        null, readable()
-    )
-
-    private fun readable(): Boolean {
+    fun readable(): Boolean {
         if (expired) return false
         if (preview) return true
         return Repository.getInstance()?.isMember() ?: false

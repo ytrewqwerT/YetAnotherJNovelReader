@@ -114,13 +114,13 @@ class RemoteRepository private constructor(
      * Fetches a list of the parts in a volume.
      *
      * @param[volumeId] The id of the volume to fetch parts from.
-     * @param[amount] The maximum number of parts to fetch.
+     * @param[amount] The maximum number of parts to fetch. No limit if 0.
      * @param[offset] An offset for how many parts in the list to skip (for pagination).
      * @return A list of parts with size no greater than [amount].
      */
     suspend fun getVolumeParts(volumeId: String, amount: Int, offset: Int): List<Part>? {
         val filters = UrlParameterBuilder().apply {
-            addLimit(amount)
+            if (amount > 0) addLimit(amount)
             addOffset(offset)
             addWhere("volumeId", "\"$volumeId\"")
         }.toString()

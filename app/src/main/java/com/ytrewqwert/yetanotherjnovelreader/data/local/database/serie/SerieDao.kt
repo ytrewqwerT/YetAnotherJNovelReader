@@ -11,4 +11,8 @@ abstract class SerieDao : BaseDao<Serie>() {
     @Transaction
     @Query("SELECT * FROM Serie ORDER BY created DESC")
     abstract fun getAllSeries(): Flow<List<SerieFull>>
+
+    @Transaction
+    @Query("SELECT * FROM Serie WHERE id = :serieId")
+    abstract fun getSerie(serieId: String): Flow<SerieFull>
 }
