@@ -21,6 +21,7 @@ interface ListHeader {
         val mFollowing: Boolean = false
     )
 
+    // TODO: Perhaps more suited to being moved to [ListHeaderRecyclerViewAdapter].
     /** Interface for handling of events relating to a [ListHeader]. */
     interface InteractionListener {
         /** Called when a [ListHeader]'s 'follow' button is clicked by the user. */

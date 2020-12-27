@@ -13,13 +13,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
-import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooter
 import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooterRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecyclerViewAdapter
 
-/** A RecyclerView container fragment that allows for swipe-refreshing. */
-abstract class SwipeableListFragment<T : Any> : Fragment(), ImageSource, ListHeader.InteractionListener, ListFooter.InteractionListener {
+/** A RecyclerView container fragment that allows for swipe-up refreshing of the list. */
+abstract class SwipeableListFragment<T : Any>
+    : Fragment(), ImageSource, ListHeader.InteractionListener
+    , ListFooterRecyclerViewAdapter.Listener {
 
     /** The adapter that manages each item in the recycler view */
     protected abstract val listContentsAdapter: SwipeableListAdapter<T, out RecyclerView.ViewHolder>
@@ -52,18 +53,10 @@ abstract class SwipeableListFragment<T : Any> : Fragment(), ImageSource, ListHea
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
-        viewModel.items.observe(viewLifecycleOwner) {
-            listContentsAdapter.setItems(it)
-        }
-        viewModel.refreshing.observe(viewLifecycleOwner) {
-            swipeRefreshLayout?.isRefreshing = it
-        }
-        viewModel.hasMorePages.observe(viewLifecycleOwner) {
-            listFooterAdapter.isVisible = it
-        }
-        viewModel.header.observe(viewLifecycleOwner) {
-            listHeaderAdapter.setItems(listOf(it))
-        }
+        viewModel.items.observe(viewLifecycleOwner) { listContentsAdapter.setItems(it) }
+        viewModel.refreshing.observe(viewLifecycleOwner) { swipeRefreshLayout?.isRefreshing = it }
+        viewModel.hasMorePages.observe(viewLifecycleOwner) { listFooterAdapter.isVisible = it }
+        viewModel.header.observe(viewLifecycleOwner) { listHeaderAdapter.setItems(listOf(it)) }
 
         return view
     }

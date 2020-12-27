@@ -9,12 +9,11 @@ import com.ytrewqwert.yetanotherjnovelreader.R
 
 /**
  * A [RecyclerView.Adapter] exposing 0 or 1 items containing a loading indicator, for use as the
- * last adapter in a [ConcatAdapter] to signal to a [listener] (via the
- * [ListFooter.InteractionListener.onFooterReached] method) when the user scrolls near the end of
+ * last adapter in a [ConcatAdapter] to signal to a [Listener] when the user scrolls near the end of
  * the MergeAdapter.
  */
 class ListFooterRecyclerViewAdapter(
-    private val listener: ListFooter.InteractionListener? = null
+    private val listener: Listener? = null
 ) : RecyclerView.Adapter<ListFooterRecyclerViewAdapter.ViewHolder>() {
     /**
      * Set's whether to show the loading item. If set to false, then the [listener] will not be
@@ -35,4 +34,10 @@ class ListFooterRecyclerViewAdapter(
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+
+    /** Interface for handling the end of the list being reached. */
+    interface Listener {
+        /** Called whenever the end of the list has been reached. */
+        fun onFooterReached()
+    }
 }

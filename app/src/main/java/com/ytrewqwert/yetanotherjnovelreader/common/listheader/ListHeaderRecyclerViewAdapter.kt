@@ -12,9 +12,8 @@ import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import kotlinx.android.synthetic.main.list_header.view.*
 
 /**
- * A [RecyclerView.Adapter] for displaying [ListHeader]s.
- *
- * @property[imageSource] An object from which referenced images can be retrieved.
+ * A [RecyclerView.Adapter] for displaying [ListHeader]s. If necessary, will attempt to fetch images
+ * from the [imageSource] and notify the [listener] of interaction events.
  */
 class ListHeaderRecyclerViewAdapter(
     private val imageSource: ImageSource? = null,
@@ -56,6 +55,10 @@ class ListHeaderRecyclerViewAdapter(
         return ViewHolder(view)
     }
 
+    /**
+     * Sets what is shown in the header. Note that it is intended for there to only be one header,
+     * although multiple headers are possible.
+     */
     fun setItems(newItems: List<ListHeader>) {
         items = newItems
         notifyDataSetChanged()
