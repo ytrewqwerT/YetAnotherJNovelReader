@@ -9,6 +9,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderPageBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
@@ -19,6 +22,12 @@ class PagedReaderPageFragment : Fragment() {
         const val ARG_PAGE_NUM = "PAGED_READER_PAGE_NUM"
     }
 
+    // Delayed lifecycle that only triggers LiveData after the fragment has RESUMED.
+    private val delayedLifecycleOwner = object : LifecycleOwner {
+        val lifecycle = LifecycleRegistry(this)
+        override fun getLifecycle(): Lifecycle = lifecycle
+    }
+
     private val partViewModel by activityViewModels<PartViewModel>()
     private val pagedReaderViewModel by viewModels<PagedReaderViewModel>(
         ownerProducer = { requireParentFragment() }
@@ -26,6 +35,35 @@ class PagedReaderPageFragment : Fragment() {
 
     private var binding: FragmentPagedReaderPageBinding? = null
     private var textView: TextView? = null
+
+    override fun onResume() {
+        super.onResume()
+        delayedLifecycleOwner.lifecycle.currentState = Lifecycle.State.RESUMED
+    }
+
+    override fun onPause() {
+        delayedLifecycleOwner.lifecycle.currentState = Lifecycle.State.CREATED
+        super.onPause()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Receive via a delayed lifecycle to ensure that the posted code will be executed
+        pagedReaderViewModel.fullContent.observe(delayedLifecycleOwner) {
+            textView?.post {
+                val margins = partViewModel.margin.value
+                val vMargin = if (margins != null) {
+                    margins.bottom + margins.top
+                } else 0
+                val viewHeight = view?.height ?: 0
+                val pageHeight = (viewHeight - vMargin).coerceAtLeast(0)
+
+                val pages = Paginator.paginate(textView, it, pageHeight)
+                pagedReaderViewModel.setPages(pages)
+            } ?: throw IllegalStateException("No view set")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,20 +84,6 @@ class PagedReaderPageFragment : Fragment() {
         val pageNum = requireArguments().getInt(ARG_PAGE_NUM, 0)
         pagedReaderViewModel.getPageContent(pageNum).observe(viewLifecycleOwner) {
             textView?.text = it
-        }
-
-        pagedReaderViewModel.fullContent.observe(viewLifecycleOwner) {
-            textView?.post {
-                val margins = partViewModel.margin.value
-                val vMargin = if (margins != null) {
-                    margins.bottom + margins.top
-                } else 0
-                val viewHeight = view?.height ?: 0
-                val pageHeight = (viewHeight - vMargin).coerceAtLeast(0)
-
-                val pages = Paginator.paginate(textView, it, pageHeight)
-                pagedReaderViewModel.setPages(pages)
-            }
         }
 
         return view
