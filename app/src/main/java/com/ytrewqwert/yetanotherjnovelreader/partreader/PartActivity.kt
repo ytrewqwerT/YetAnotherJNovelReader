@@ -25,6 +25,7 @@ import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader.ScrollReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
+import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsDialogFragment
 
 /** Displays the contents of a part for the user to read. */
 class PartActivity : AppCompatActivity() {
@@ -87,8 +88,9 @@ class PartActivity : AppCompatActivity() {
             true
         }
         R.id.settings_button -> {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this, SettingsActivity::class.java)
+//            startActivity(intent)
+            SettingsDialogFragment().show(supportFragmentManager, "SettingsDialogFragment")
             true
         }
         else -> super.onOptionsItemSelected(item)
