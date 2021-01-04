@@ -14,9 +14,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".settings.SettingsActivity"
-            android:label="@string/settings" />
-        <activity
             android:name=".partreader.PartActivity"
             android:theme="@style/ReaderTheme" />
         <activity android:name=".main.MainActivity">

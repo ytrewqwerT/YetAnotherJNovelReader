@@ -15,7 +15,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ytrewqwert.yetanotherjnovelreader.R
 
-/** [SettingsActivity] in Dialog format. */
+/** A dialog for viewing and modifying the user's settings/preferences. */
 class SettingsDialogFragment : DialogFragment(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     private lateinit var contentView: View
 
