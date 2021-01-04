@@ -1,7 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader
 
 import android.animation.AnimatorInflater
-import android.content.Intent
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -24,11 +24,10 @@ import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.databinding.ActivityPartBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader.PagedReaderFragment
 import com.ytrewqwert.yetanotherjnovelreader.partreader.scrollreader.ScrollReaderFragment
-import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsActivity
 import com.ytrewqwert.yetanotherjnovelreader.settings.SettingsDialogFragment
 
 /** Displays the contents of a part for the user to read. */
-class PartActivity : AppCompatActivity() {
+class PartActivity : AppCompatActivity(), DialogInterface.OnDismissListener {
     companion object {
         const val EXTRA_PART_ID = "PART_ID"
     }
@@ -88,9 +87,10 @@ class PartActivity : AppCompatActivity() {
             true
         }
         R.id.settings_button -> {
-//            val intent = Intent(this, SettingsActivity::class.java)
-//            startActivity(intent)
             SettingsDialogFragment().show(supportFragmentManager, "SettingsDialogFragment")
+            // App bar is visible when settings button is pressed.
+            // Hide it while dialog is shown, then bring it back when done (via onDismiss).
+            viewModel.toggleAppBarVisibility()
             true
         }
         else -> super.onOptionsItemSelected(item)
@@ -104,6 +104,10 @@ class PartActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         setNavigationBarVisibility(viewModel.showAppBar.value ?: false)
+    }
+
+    override fun onDismiss(dialog: DialogInterface?) {
+        viewModel.toggleAppBarVisibility()
     }
 
     private fun initialiseObserversListeners() {

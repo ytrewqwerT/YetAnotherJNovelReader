@@ -3,6 +3,7 @@ package com.ytrewqwert.yetanotherjnovelreader.settings
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,7 @@ class SettingsDialogFragment : DialogFragment(), PreferenceFragmentCompat.OnPref
             val dialog = MaterialAlertDialogBuilder(activity)
                 .setTitle("Settings")
                 .setView(contentView)
-                .setPositiveButton("Done", null)
+                .setPositiveButton("Back", null)
                 .create()
 
             dialog.setOnShowListener {
@@ -68,5 +69,11 @@ class SettingsDialogFragment : DialogFragment(), PreferenceFragmentCompat.OnPref
             childFragmentManager.popBackStack()
         else
             dialog?.dismiss()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        val parent = parentFragment ?: activity
+        (parent as? DialogInterface.OnDismissListener)?.onDismiss(dialog)
     }
 }
