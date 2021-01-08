@@ -1,9 +1,11 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -15,6 +17,7 @@ import androidx.lifecycle.LifecycleRegistry
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderPageBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
+import com.ytrewqwert.yetanotherjnovelreader.partreader.TapListener
 
 /** An individual page in the [PagedReaderFragment]. */
 class PagedReaderPageFragment : Fragment() {
@@ -77,9 +80,18 @@ class PagedReaderPageFragment : Fragment() {
 
         val view = binding?.root
         textView = view?.findViewById(R.id.page_contents)
-        textView?.setOnClickListener {
-            partViewModel.toggleAppBarVisibility()
-        }
+
+        // Detect Screen taps and send the tap location to be processed.
+        val scrollView = view?.findViewById<ScrollView>(R.id.content_scroll_container)
+        scrollView?.setOnTouchListener(TapListener { _, event ->
+            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+            val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+            // The values sometimes go slightly over 1.0, so coerce to the expected range.
+            val x = ((event?.rawX ?: 0f) / screenWidth).coerceIn(0f, 1f)
+            val y = ((event?.rawY ?: 0f) / screenHeight).coerceIn(0f, 1f)
+            partViewModel.processScreenTap(x, y)
+            true
+        })
 
         val pageNum = requireArguments().getInt(ARG_PAGE_NUM, 0)
         pagedReaderViewModel.getPageContent(pageNum).observe(viewLifecycleOwner) {

@@ -10,6 +10,7 @@
     </data>
 
     <ScrollView
+        android:id="@+id/content_scroll_container"
         android:scrollbars="none"
         android:overScrollMode="never"
         android:layout_width="match_parent"

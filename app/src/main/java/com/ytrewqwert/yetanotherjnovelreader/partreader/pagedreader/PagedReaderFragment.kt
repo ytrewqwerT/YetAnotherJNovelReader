@@ -55,6 +55,17 @@ class PagedReaderFragment : Fragment() {
             pagedReaderViewModel.fullContent.value = it
         }
 
+        partViewModel.pageTurn.observe(viewLifecycleOwner) {
+            val totalPages = pagerAdapter.itemCount
+            val currentPage = pager?.currentItem ?: 0
+            val newPage = currentPage + when (it) {
+                PartViewModel.PageTurn.TURN_FORWARD -> 1
+                PartViewModel.PageTurn.TURN_BACKWARD -> -1
+                else -> 0
+            }
+            pager?.setCurrentItem(newPage.coerceIn(0, totalPages-1), true)
+        }
+
         pagedReaderViewModel.pageCount.observe(viewLifecycleOwner) {
             pagerAdapter.setNumPages(it)
             pager?.let { pager ->

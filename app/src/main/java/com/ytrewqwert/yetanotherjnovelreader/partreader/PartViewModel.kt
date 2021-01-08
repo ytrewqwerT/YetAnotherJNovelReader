@@ -33,6 +33,11 @@ class PartViewModel(
     val partReady = SingleLiveEvent<Boolean>()
     /** Notifies an observer of whether the top app bar should be shown. */
     val showAppBar = SingleLiveEvent<Boolean>()
+    /** Notifies an observer to go forward/back a page. */
+    val pageTurn = SingleLiveEvent<PageTurn>()
+
+    /** Enum for the different page turn events possible. */
+    enum class PageTurn { TURN_FORWARD, TURN_BACKWARD }
 
     private var contentsHtml: String? = null
     private var contentsNoImages: Spanned? = null
@@ -109,6 +114,18 @@ class PartViewModel(
         if (progress != savedProgress) {
             viewModelScope.launch { repository.setPartProgress(partId, progress) }
             savedProgress = progress
+        }
+    }
+
+    /**
+     * Executes an action based on where a screen tap occurred, with the [xPos] and [yPos] being
+     * proportions along the screen from the top left corner indicating the tap location.
+     */
+    fun processScreenTap(xPos: Float, yPos: Float) {
+        when {
+            xPos > 0.67 -> pageTurn.value = PageTurn.TURN_FORWARD
+            xPos < 0.33 -> pageTurn.value = PageTurn.TURN_BACKWARD
+            else -> toggleAppBarVisibility()
         }
     }
 
