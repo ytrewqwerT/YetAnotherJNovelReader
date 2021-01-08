@@ -83,7 +83,7 @@ class PagedReaderPageFragment : Fragment() {
 
         // Detect Screen taps and send the tap location to be processed.
         val scrollView = view?.findViewById<ScrollView>(R.id.content_scroll_container)
-        scrollView?.setOnTouchListener(TapListener { _, event ->
+        scrollView?.setOnTouchListener(TapListener(requireContext()) { event ->
             val screenHeight = Resources.getSystem().displayMetrics.heightPixels
             val screenWidth = Resources.getSystem().displayMetrics.widthPixels
             // The values sometimes go slightly over 1.0, so coerce to the expected range.

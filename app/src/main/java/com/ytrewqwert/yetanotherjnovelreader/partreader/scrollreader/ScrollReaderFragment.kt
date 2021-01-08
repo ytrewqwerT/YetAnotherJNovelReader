@@ -48,8 +48,9 @@ class ScrollReaderFragment : Fragment() {
         // Ignore the tap if it was done to stop the scrollView's scrolling (or rather, ignore if
         // the scroll position changed recently.
         scrollView?.setOnTouchListener(TapListener(
+            requireContext(),
             ignoreTapCondition = { System.currentTimeMillis() - lastScrollTime < 50 },
-            onTap = { _, event ->
+            onTap = { event ->
                 val screenHeight = Resources.getSystem().displayMetrics.heightPixels
                 val screenWidth = Resources.getSystem().displayMetrics.widthPixels
                 // The values sometimes go slightly over 1.0, so coerce to the expected range.
