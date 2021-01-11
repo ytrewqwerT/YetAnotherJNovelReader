@@ -1,31 +1,31 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <SeekBarPreference
-        app:key="READER_MARGIN_TOP"
-        app:title="Top Margin"
-        app:defaultValue="16"
-        app:min="0"
+        android:key="@string/i_margin_top"
+        android:title="@string/top_margin"
+        android:defaultValue="@integer/d_margin"
+        android:min="0"
         android:max="64"
         app:showSeekBarValue="true" />
     <SeekBarPreference
-        app:key="READER_MARGIN_BOTTOM"
-        app:title="Bottom Margin"
-        app:defaultValue="16"
-        app:min="0"
+        android:key="@string/i_margin_bottom"
+        android:title="@string/bottom_margin"
+        android:defaultValue="@integer/d_margin"
+        android:min="0"
         android:max="64"
         app:showSeekBarValue="true" />
     <SeekBarPreference
-        app:key="READER_MARGIN_LEFT"
-        app:title="Left Margin"
-        app:defaultValue="16"
-        app:min="0"
+        android:key="@string/i_margin_left"
+        android:title="@string/left_margin"
+        android:defaultValue="@integer/d_margin"
+        android:min="0"
         android:max="64"
         app:showSeekBarValue="true" />
     <SeekBarPreference
-        app:key="READER_MARGIN_RIGHT"
-        app:title="Right Margin"
-        app:defaultValue="16"
-        app:min="0"
+        android:key="@string/i_margin_right"
+        android:title="@string/right_margin"
+        android:defaultValue="@integer/d_margin"
+        android:min="0"
         android:max="64"
         app:showSeekBarValue="true" />
 </PreferenceScreen>

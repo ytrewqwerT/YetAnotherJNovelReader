@@ -8,6 +8,8 @@
     <string name="i_margin_left">READER_MARGIN_LEFT</string>
     <string name="i_margin_right">READER_MARGIN_RIGHT</string>
     <string name="i_line_spacing">LINE_SPACING</string>
+    <string name="i_page_turn_area_left">PAGE_TURN_AREA_LEFT</string>
+    <string name="i_page_turn_area_right">PAGE_TURN_AREA_RIGHT</string>
     <string name="i_para_spacing">PARA_SPACING</string>
     <string name="i_para_indent">PARA_INDENT</string>
     
@@ -15,6 +17,7 @@
     <integer name="d_font_size">15</integer>
     <integer name="d_margin">16</integer>
     <item name="d_line_spacing" format="float" type="dimen">1.0</item>
+    <integer name="d_page_turn_area">33</integer>
     <item name="d_para_spacing" format="float" type="dimen">0.0</item>
     <integer name="d_para_indent">100</integer>
 </resources>

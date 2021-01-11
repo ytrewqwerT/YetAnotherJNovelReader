@@ -11,4 +11,5 @@ object PrefDefaults {
     val LINE_SPACING = App.getFloat(R.dimen.d_line_spacing)
     val PARA_SPACING = App.getFloat(R.dimen.d_para_spacing)
     val PARA_INDENT = App.getInt(R.integer.d_para_indent)
+    val PAGE_TURN_AREA = App.getInt(R.integer.d_page_turn_area)
 }

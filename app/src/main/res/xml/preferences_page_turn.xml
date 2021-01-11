@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SeekBarPreference
+        android:key="@string/i_page_turn_area_left"
+        android:title="@string/left_tap_area_size"
+        android:defaultValue="@integer/d_page_turn_area"
+        android:min="0"
+        android:max="45"
+        app:showSeekBarValue="true" />
+    <SeekBarPreference
+        android:key="@string/i_page_turn_area_right"
+        android:title="@string/right_tap_area_size"
+        android:defaultValue="@integer/d_page_turn_area"
+        android:min="0"
+        android:max="45"
+        app:showSeekBarValue="true" />
+</PreferenceScreen>

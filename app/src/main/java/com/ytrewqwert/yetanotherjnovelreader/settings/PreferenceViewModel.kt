@@ -10,4 +10,8 @@ class PreferenceViewModel(repository: Repository) : ViewModel() {
     val marginsDp = repository.getReaderSettingsFlow().map {
         it.marginsDp
     }.asLiveData(viewModelScope.coroutineContext)
+
+    val pageTurnAreasPc = repository.getReaderSettingsFlow().map {
+        it.pageTurnAreasPc
+    }.asLiveData(viewModelScope.coroutineContext)
 }

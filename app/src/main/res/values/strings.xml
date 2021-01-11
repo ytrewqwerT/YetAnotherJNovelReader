@@ -1,15 +1,21 @@
 <resources>
+    <string name="app_name">YetAnotherJNovelReader</string>
+
     <string name="account">Account</string>
+    <string name="bottom_margin">Bottom Margin</string>
     <string name="cover_image">Cover Image</string>
     <string name="email">Email</string>
     <string name="filter_followed_series">Filter Followed Series</string>
     <string name="followed">Followed</string>
     <string name="font">Font</string>
     <string name="font_size">Font Size</string>
+    <string name="left_margin">Left Margin</string>
+    <string name="left_tap_area_size">Left Tap Area Size</string>
     <string name="line_spacing">Line Spacing</string>
     <string name="login">Login</string>
     <string name="login_failed">Login Failed</string>
     <string name="logout">Logout</string>
+    <string name="margins">Margins</string>
     <string name="not_logged_in">Not Logged In</string>
     <string name="paged_reader">Paged Reader</string>
     <string name="paragraph_indentation">Paragraph Indentation</string>
@@ -17,7 +23,13 @@
     <string name="password">Password</string>
     <string name="reader">Reader</string>
     <string name="reader_margin">Reader Margin</string>
+    <string name="right_margin">Right Margin</string>
+    <string name="right_tap_area_size">Right Tap Area Size</string>
     <string name="settings">Settings</string>
-    <string name="app_name">YetAnotherJNovelReader</string>
-    <string name="paged_reader_preference_hint">Swipe horizontally to change pages</string>
+    <string name="tap_regions">Tap Regions</string>
+    <string name="top_margin">Top Margin</string>
+
+    <string name="hint_adjust_margins">Adjust margins around the reader</string>
+    <string name="hint_adjust_tap_regions">Adjust the tappable regions around the reader for page turning</string>
+    <string name="hint_paged_reader_preference">Swipe horizontally to change pages</string>
 </resources>

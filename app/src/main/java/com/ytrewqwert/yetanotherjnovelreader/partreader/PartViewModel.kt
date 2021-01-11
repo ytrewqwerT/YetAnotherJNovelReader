@@ -50,7 +50,7 @@ class PartViewModel(
     private val _horizontalReader = MutableLiveData<Boolean>()
     private val _fontSize = MutableLiveData<Int>()
     private val _fontStyle = MutableLiveData<Typeface>()
-    private val _marginsDp = MutableLiveData<ReaderPreferenceStore.MarginsDp>()
+    private val _marginsDp = MutableLiveData<ReaderPreferenceStore.Margins>()
     private val _lineSpacing = MutableLiveData<Float>()
     /** Whether the activity should use a paginated, horizontally scrolling reader. */
     val horizontalReader: LiveData<Boolean> = _horizontalReader
@@ -59,7 +59,7 @@ class PartViewModel(
     /** The typeface to use in drawing the text in the reader. */
     val fontStyle: LiveData<Typeface> = _fontStyle
     /** How much space to leave around each edge of the reader. */
-    val marginsDp: LiveData<ReaderPreferenceStore.MarginsDp> = _marginsDp
+    val marginsDp: LiveData<ReaderPreferenceStore.Margins> = _marginsDp
     /** A multiplier for the spacing to place between lines. */
     val lineSpacing: LiveData<Float> = _lineSpacing
 
@@ -126,10 +126,13 @@ class PartViewModel(
      * proportions along the screen from the top left corner indicating the tap location.
      */
     fun processScreenTap(xPos: Float, yPos: Float) {
-        // TODO: Customisable tap regions, including utilising yPos?
+        // TODO: Utilise yPos?
+        val pageTurnAreasPc = repository.getReaderSettings().pageTurnAreasPc
+        val leftBoundPx = pageTurnAreasPc.left.toFloat() / 100
+        val rightBoundPx = (100 - pageTurnAreasPc.right).toFloat() / 100
         when {
-            xPos > 0.67 -> pageTurn.value = PageTurn.TURN_FORWARD
-            xPos < 0.33 -> pageTurn.value = PageTurn.TURN_BACKWARD
+            xPos < leftBoundPx  -> pageTurn.value = PageTurn.TURN_BACKWARD
+            xPos > rightBoundPx -> pageTurn.value = PageTurn.TURN_FORWARD
             else -> toggleAppBarVisibility()
         }
     }

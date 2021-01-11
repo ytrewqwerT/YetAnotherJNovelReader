@@ -14,6 +14,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.settings.preferencefragments.MainFragment
 
 /** A dialog for viewing and modifying the user's settings/preferences. */
 class SettingsDialogFragment : DialogFragment(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {

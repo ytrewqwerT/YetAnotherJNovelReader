@@ -1,8 +1,8 @@
-package com.ytrewqwert.yetanotherjnovelreader.settings
+package com.ytrewqwert.yetanotherjnovelreader.settings.preferencefragments
 
 import android.os.Bundle
-import androidx.preference.PreferenceFragmentCompat
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.settings.ChildPreferenceFragment
 
 /** The main settings fragment allowing the setting of user preferences. */
 class MainFragment : ChildPreferenceFragment() {

@@ -27,9 +27,12 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
     private var lineSpacing: Float = sharedPref.getFloat(PrefKeys.LINE_SPACING, PrefDefaults.LINE_SPACING)
     private var paraIndentation: Int = sharedPref.getInt(PrefKeys.PARA_INDENT, PrefDefaults.PARA_INDENT)
     private var paraSpacing: Float = sharedPref.getFloat(PrefKeys.PARA_SPACING, PrefDefaults.PARA_SPACING)
+    private var pageTurnAreas = getPageTurnAreasPc()
 
-    val readerSettings: ReaderPreferences
-        get() = ReaderPreferences(paginated, fontSize, fontStyle, readerMargins, lineSpacing, paraIndentation, paraSpacing)
+    val readerSettings: ReaderPreferences get() = ReaderPreferences(
+        paginated, fontSize, fontStyle, readerMargins,
+        lineSpacing, paraIndentation, paraSpacing, pageTurnAreas
+    )
     val readerSettingsFlow = channelFlow {
         offer(readerSettings)
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
@@ -56,6 +59,9 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
                     PARA_SPACING -> {
                         paraSpacing = sharedPref.getFloat(PARA_SPACING, PrefDefaults.PARA_SPACING)
                     }
+                    PAGE_TURN_AREA_LEFT, PAGE_TURN_AREA_RIGHT -> {
+                        pageTurnAreas = getPageTurnAreasPc()
+                    }
                     else -> return@OnSharedPreferenceChangeListener
                 }
             }
@@ -71,25 +77,32 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
         return appContext.resources.getFont(fontResId)
     }
 
-    private fun getMargins(): MarginsDp {
+    private fun getMargins(): Margins {
         val top = sharedPref.getInt(PrefKeys.MARGIN_TOP, PrefDefaults.MARGIN)
         val bottom = sharedPref.getInt(PrefKeys.MARGIN_BOTTOM, PrefDefaults.MARGIN)
         val left = sharedPref.getInt(PrefKeys.MARGIN_LEFT, PrefDefaults.MARGIN)
         val right = sharedPref.getInt(PrefKeys.MARGIN_RIGHT, PrefDefaults.MARGIN)
-        return MarginsDp(top, bottom, left, right)
+        return Margins(top, bottom, left, right)
     }
 
-    /** A POJO defining how large the margins around each edge should be, measured in DP. */
-    data class MarginsDp(val top: Int, val bottom: Int, val left: Int, val right: Int)
+    private fun getPageTurnAreasPc(): Margins {
+        val left = sharedPref.getInt(PrefKeys.PAGE_TURN_AREA_LEFT, PrefDefaults.PAGE_TURN_AREA)
+        val right = sharedPref.getInt(PrefKeys.PAGE_TURN_AREA_RIGHT, PrefDefaults.PAGE_TURN_AREA)
+        return Margins(0, 0, left, right)
+    }
+
+    /** A POJO defining the size of margins around each edge. */
+    data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)
 
     /** Aggregates reader preferences to a single object. */
     data class ReaderPreferences(
         val isHorizontal: Boolean,
         val fontSize: Int,
         val fontStyle: Typeface,
-        val marginsDp: MarginsDp,
+        val marginsDp: Margins,
         val lineSpacing: Float,
         val paraIndent: Int,
-        val paraSpacing: Float
+        val paraSpacing: Float,
+        val pageTurnAreasPc: Margins
     )
 }

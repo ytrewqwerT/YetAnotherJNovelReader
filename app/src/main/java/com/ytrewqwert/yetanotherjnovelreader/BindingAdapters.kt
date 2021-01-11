@@ -21,7 +21,7 @@ object BindingAdapters {
     @BindingAdapter("readerMarginHorizontal")
     @JvmStatic
     fun textViewReaderMarginHorizontal(
-        textView: TextView, marginsDp: ReaderPreferenceStore.MarginsDp
+        textView: TextView, marginsDp: ReaderPreferenceStore.Margins
     ) {
         val displayMetrics = textView.resources.displayMetrics
         val marginLeft = Utils.dpToPx(marginsDp.left, displayMetrics)
@@ -33,7 +33,7 @@ object BindingAdapters {
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun textViewReaderMarginVertical(
-        textView: TextView, marginsDp: ReaderPreferenceStore.MarginsDp
+        textView: TextView, marginsDp: ReaderPreferenceStore.Margins
     ) {
         val displayMetrics = textView.resources.displayMetrics
         val marginTop = Utils.dpToPx(marginsDp.top, displayMetrics)
@@ -45,7 +45,7 @@ object BindingAdapters {
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
     fun scrollViewReaderMarginVertical(
-        scrollView: ScrollView, marginsDp: ReaderPreferenceStore.MarginsDp
+        scrollView: ScrollView, marginsDp: ReaderPreferenceStore.Margins
     ) {
         val displayMetrics = scrollView.resources.displayMetrics
         val marginTop = Utils.dpToPx(marginsDp.top, displayMetrics)

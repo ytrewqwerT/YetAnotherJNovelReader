@@ -31,4 +31,7 @@ object PrefKeys {
     val LINE_SPACING = App.getString(R.string.i_line_spacing)
     val PARA_SPACING = App.getString(R.string.i_para_spacing)
     val PARA_INDENT = App.getString(R.string.i_para_indent)
+
+    val PAGE_TURN_AREA_LEFT = App.getString(R.string.i_page_turn_area_left)
+    val PAGE_TURN_AREA_RIGHT = App.getString(R.string.i_page_turn_area_right)
 }

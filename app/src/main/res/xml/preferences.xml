@@ -8,12 +8,12 @@
             android:key="@string/i_horizontal_reader"
             android:title="@string/paged_reader"
             android:defaultValue="@bool/d_horizontal_reader"
-            android:summary="@string/paged_reader_preference_hint" />
+            android:summary="@string/hint_paged_reader_preference" />
         <SeekBarPreference
-            app:key="@string/i_font_size"
-            app:title="@string/font_size"
-            app:defaultValue="@integer/d_font_size"
-            app:min="8"
+            android:key="@string/i_font_size"
+            android:title="@string/font_size"
+            android:defaultValue="@integer/d_font_size"
+            android:min="8"
             android:max="32"
             app:showSeekBarValue="true" />
         <com.ytrewqwert.yetanotherjnovelreader.settings.FloatSeekBarPreference
@@ -33,10 +33,10 @@
             app:valueSpacing="0.1"
             app:format="%.1f" />
         <SeekBarPreference
-            app:key="@string/i_para_indent"
-            app:title="@string/paragraph_indentation"
-            app:defaultValue="@integer/d_para_indent"
-            app:min="0"
+            android:key="@string/i_para_indent"
+            android:title="@string/paragraph_indentation"
+            android:defaultValue="@integer/d_para_indent"
+            android:min="0"
             android:max="500"
             app:showSeekBarValue="true" />
         <ListPreference
@@ -49,8 +49,13 @@
     </PreferenceCategory>
 
     <Preference
-        android:title="Margins"
-        android:summary="Adjust margins around the reader"
-        android:fragment="com.ytrewqwert.yetanotherjnovelreader.settings.MarginFragment" />
+        android:title="@string/margins"
+        android:summary="@string/hint_adjust_margins"
+        android:fragment="com.ytrewqwert.yetanotherjnovelreader.settings.preferencefragments.MarginFragment" />
+
+    <Preference
+        android:title="@string/tap_regions"
+        android:summary="@string/hint_adjust_tap_regions"
+        android:fragment="com.ytrewqwert.yetanotherjnovelreader.settings.preferencefragments.TapAreasFragment" />
 
 </PreferenceScreen>
