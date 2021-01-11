@@ -1,5 +1,6 @@
 package com.ytrewqwert.yetanotherjnovelreader.partreader.pagedreader
 
+import android.annotation.SuppressLint
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import com.ytrewqwert.yetanotherjnovelreader.R
+import com.ytrewqwert.yetanotherjnovelreader.Utils
 import com.ytrewqwert.yetanotherjnovelreader.databinding.FragmentPagedReaderPageBinding
 import com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel
 import com.ytrewqwert.yetanotherjnovelreader.partreader.TapListener
@@ -55,9 +57,9 @@ class PagedReaderPageFragment : Fragment() {
         // Receive via a delayed lifecycle to ensure that the posted code will be executed
         pagedReaderViewModel.fullContent.observe(delayedLifecycleOwner) {
             textView?.post {
-                val margins = partViewModel.margin.value
-                val vMargin = if (margins != null) {
-                    margins.bottom + margins.top
+                val marginsDp = partViewModel.marginsDp.value
+                val vMargin = if (marginsDp != null) {
+                    Utils.dpToPx(marginsDp.bottom + marginsDp.top, resources.displayMetrics)
                 } else 0
                 val viewHeight = view?.height ?: 0
                 val pageHeight = (viewHeight - vMargin).coerceAtLeast(0)
@@ -68,6 +70,7 @@ class PagedReaderPageFragment : Fragment() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

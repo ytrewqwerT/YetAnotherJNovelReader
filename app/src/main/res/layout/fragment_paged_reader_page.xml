@@ -27,8 +27,8 @@
             android:justificationMode="inter_word"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:readerMarginHorizontal="@{viewModel.margin}"
-            app:readerMarginVertical="@{viewModel.margin}" />
+            app:readerMarginHorizontal="@{viewModel.marginsDp}"
+            app:readerMarginVertical="@{viewModel.marginsDp}" />
 
     </ScrollView>
 </layout>

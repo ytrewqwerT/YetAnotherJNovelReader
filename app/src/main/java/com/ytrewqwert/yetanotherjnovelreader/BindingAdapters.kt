@@ -20,31 +20,39 @@ object BindingAdapters {
     /** Sets the size of the horizontal margins around a [TextView]. */
     @BindingAdapter("readerMarginHorizontal")
     @JvmStatic
-    fun textViewReaderMarginHorizontal(textView: TextView, marginsDP: ReaderPreferenceStore.Margins) {
+    fun textViewReaderMarginHorizontal(
+        textView: TextView, marginsDp: ReaderPreferenceStore.MarginsDp
+    ) {
         val displayMetrics = textView.resources.displayMetrics
-        val marginLeft = Utils.dpToPx(marginsDP.left, displayMetrics)
-        val marginRight = Utils.dpToPx(marginsDP.right, displayMetrics)
+        val marginLeft = Utils.dpToPx(marginsDp.left, displayMetrics)
+        val marginRight = Utils.dpToPx(marginsDp.right, displayMetrics)
         textView.setPadding(marginLeft, textView.paddingTop, marginRight, textView.paddingBottom)
     }
 
     /** Sets the size of the vertical margins around a [TextView]. */
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
-    fun textViewReaderMarginVertical(textView: TextView, marginsDP: ReaderPreferenceStore.Margins) {
+    fun textViewReaderMarginVertical(
+        textView: TextView, marginsDp: ReaderPreferenceStore.MarginsDp
+    ) {
         val displayMetrics = textView.resources.displayMetrics
-        val marginTop = Utils.dpToPx(marginsDP.top, displayMetrics)
-        val marginBottom = Utils.dpToPx(marginsDP.bottom, displayMetrics)
+        val marginTop = Utils.dpToPx(marginsDp.top, displayMetrics)
+        val marginBottom = Utils.dpToPx(marginsDp.bottom, displayMetrics)
         textView.setPadding(textView.paddingLeft, marginTop, textView.paddingRight, marginBottom)
     }
 
     /** Sets the size of the vertical margins around a [ScrollView]. */
     @BindingAdapter("readerMarginVertical")
     @JvmStatic
-    fun scrollViewReaderMarginVertical(scrollView: ScrollView, marginsDP: ReaderPreferenceStore.Margins) {
+    fun scrollViewReaderMarginVertical(
+        scrollView: ScrollView, marginsDp: ReaderPreferenceStore.MarginsDp
+    ) {
         val displayMetrics = scrollView.resources.displayMetrics
-        val marginTop = Utils.dpToPx(marginsDP.top, displayMetrics)
-        val marginBottom = Utils.dpToPx(marginsDP.bottom, displayMetrics)
-        scrollView.setPadding(scrollView.paddingLeft, marginTop, scrollView.paddingRight, marginBottom)
+        val marginTop = Utils.dpToPx(marginsDp.top, displayMetrics)
+        val marginBottom = Utils.dpToPx(marginsDp.bottom, displayMetrics)
+        scrollView.setPadding(
+            scrollView.paddingLeft, marginTop, scrollView.paddingRight, marginBottom
+        )
     }
 
     /** Sets a [ScrollView]'s scroll position to the given value (between 0 and 1). */

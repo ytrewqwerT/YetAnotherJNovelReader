@@ -122,7 +122,7 @@ class PartActivity : AppCompatActivity(), DialogInterface.OnDismissListener {
             setAppBarVisibility(it)
             setNavigationBarVisibility(it)
         }
-        viewModel.margin.observe(this) {
+        viewModel.marginsDp.observe(this) {
             updatePageDimens()
         }
         viewModel.horizontalReader.observe(this) { isHorizontal ->
@@ -210,10 +210,10 @@ class PartActivity : AppCompatActivity(), DialogInterface.OnDismissListener {
     }
 
     private fun updatePageDimens() {
-        val margins = viewModel.margin.value ?: return
+        val marginsDp = viewModel.marginsDp.value ?: return
         var pageWidth = readerContainer.width
-        pageWidth -= Utils.dpToPx(margins.left, resources.displayMetrics)
-        pageWidth -= Utils.dpToPx(margins.right, resources.displayMetrics)
+        pageWidth -= Utils.dpToPx(marginsDp.left, resources.displayMetrics)
+        pageWidth -= Utils.dpToPx(marginsDp.right, resources.displayMetrics)
 
         viewModel.setPageDimens(pageWidth)
     }

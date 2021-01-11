@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:scrollbars="none"
             android:fillViewport="true"
-            app:readerMarginVertical="@{viewModel.margin}"
+            app:readerMarginVertical="@{viewModel.marginsDp}"
             app:partProgress="@{viewModel.currentProgress}">
 
             <TextView
@@ -33,7 +33,7 @@
                 android:justificationMode="inter_word"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:readerMarginHorizontal="@{viewModel.margin}" />
+                app:readerMarginHorizontal="@{viewModel.marginsDp}" />
         </ScrollView>
 
     </FrameLayout>

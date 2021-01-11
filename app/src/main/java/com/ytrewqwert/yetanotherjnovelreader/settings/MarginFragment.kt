@@ -45,33 +45,33 @@ class MarginFragment : ChildPreferenceFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.margins.observe(viewLifecycleOwner) { margins ->
-            updateMarginVisibility(margins)
+        viewModel.marginsDp.observe(viewLifecycleOwner) { marginsDp ->
+            updateMarginVisibility(marginsDp)
 
             visualMarginView?.resources?.displayMetrics?.let { displayMetrics ->
                 val leftParams = leftMarginView?.layoutParams
-                leftParams?.width = Utils.dpToPx(margins.left, displayMetrics)
+                leftParams?.width = Utils.dpToPx(marginsDp.left, displayMetrics)
                 leftMarginView?.layoutParams = leftParams
 
                 val rightParams = rightMarginView?.layoutParams
-                rightParams?.width = Utils.dpToPx(margins.right, displayMetrics)
+                rightParams?.width = Utils.dpToPx(marginsDp.right, displayMetrics)
                 rightMarginView?.layoutParams = rightParams
 
                 val topParams = topMarginView?.layoutParams
-                topParams?.height = Utils.dpToPx(margins.top, displayMetrics)
+                topParams?.height = Utils.dpToPx(marginsDp.top, displayMetrics)
                 topMarginView?.layoutParams = topParams
 
                 val bottomParams = bottomMarginView?.layoutParams
-                bottomParams?.height = Utils.dpToPx(margins.bottom, displayMetrics)
+                bottomParams?.height = Utils.dpToPx(marginsDp.bottom, displayMetrics)
                 bottomMarginView?.layoutParams = bottomParams
             }
         }
     }
 
-    private fun updateMarginVisibility(margins: ReaderPreferenceStore.Margins) {
-        leftMarginView?.visibility   = if (margins.left == 0)   View.GONE else View.VISIBLE
-        rightMarginView?.visibility  = if (margins.right == 0)  View.GONE else View.VISIBLE
-        topMarginView?.visibility    = if (margins.top == 0)    View.GONE else View.VISIBLE
-        bottomMarginView?.visibility = if (margins.bottom == 0) View.GONE else View.VISIBLE
+    private fun updateMarginVisibility(marginsDp: ReaderPreferenceStore.MarginsDp) {
+        leftMarginView?.visibility   = if (marginsDp.left == 0)   View.GONE else View.VISIBLE
+        rightMarginView?.visibility  = if (marginsDp.right == 0)  View.GONE else View.VISIBLE
+        topMarginView?.visibility    = if (marginsDp.top == 0)    View.GONE else View.VISIBLE
+        bottomMarginView?.visibility = if (marginsDp.bottom == 0) View.GONE else View.VISIBLE
     }
 }

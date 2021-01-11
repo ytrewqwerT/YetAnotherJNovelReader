@@ -71,23 +71,23 @@ class ReaderPreferenceStore private constructor(private val appContext: Context)
         return appContext.resources.getFont(fontResId)
     }
 
-    private fun getMargins(): Margins {
+    private fun getMargins(): MarginsDp {
         val top = sharedPref.getInt(PrefKeys.MARGIN_TOP, PrefDefaults.MARGIN)
         val bottom = sharedPref.getInt(PrefKeys.MARGIN_BOTTOM, PrefDefaults.MARGIN)
         val left = sharedPref.getInt(PrefKeys.MARGIN_LEFT, PrefDefaults.MARGIN)
         val right = sharedPref.getInt(PrefKeys.MARGIN_RIGHT, PrefDefaults.MARGIN)
-        return Margins(top, bottom, left, right)
+        return MarginsDp(top, bottom, left, right)
     }
 
-    /** A collection of values defining how large the margins around each edge should be. */
-    data class Margins(val top: Int, val bottom: Int, val left: Int, val right: Int)
+    /** A POJO defining how large the margins around each edge should be, measured in DP. */
+    data class MarginsDp(val top: Int, val bottom: Int, val left: Int, val right: Int)
 
     /** Aggregates reader preferences to a single object. */
     data class ReaderPreferences(
         val isHorizontal: Boolean,
         val fontSize: Int,
         val fontStyle: Typeface,
-        val margin: Margins,
+        val marginsDp: MarginsDp,
         val lineSpacing: Float,
         val paraIndent: Int,
         val paraSpacing: Float
