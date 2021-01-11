@@ -6,10 +6,21 @@ import androidx.core.content.edit
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 
-/** Set's this BitmapDrawable's width to equal the given [width], retaining image aspect ratio. */
-fun Drawable.scaleToWidth(width: Int) {
-    val height = width * intrinsicHeight / intrinsicWidth
-    setBounds(0, 0, width, height)
+/**
+ * Scales this Drawable's size to fit in a rectangle with the given [width] and [height],
+ * maintaining the image aspect ratio.
+ */
+fun Drawable.scaleToSize(width: Int, height: Int) {
+    val constrainedWidth: Int
+    val constrainedHeight: Int
+    if (intrinsicHeight * width / intrinsicWidth > height) { // Constrained by height
+        constrainedWidth = intrinsicWidth * height / intrinsicHeight
+        constrainedHeight = height
+    } else { // Constrained by width
+        constrainedWidth = width
+        constrainedHeight = width * intrinsicHeight / intrinsicWidth
+    }
+    setBounds(0, 0, constrainedWidth, constrainedHeight)
 }
 
 /** Shortcut for setting the value of a boolean preference. */

@@ -211,10 +211,13 @@ class PartActivity : AppCompatActivity(), DialogInterface.OnDismissListener {
 
     private fun updatePageDimens() {
         val marginsDp = viewModel.marginsDp.value ?: return
-        var pageWidth = readerContainer.width
-        pageWidth -= Utils.dpToPx(marginsDp.left, resources.displayMetrics)
-        pageWidth -= Utils.dpToPx(marginsDp.right, resources.displayMetrics)
 
-        viewModel.setPageDimens(pageWidth)
+        var pageWidth = readerContainer.width
+        pageWidth -= Utils.dpToPx(marginsDp.left + marginsDp.right, resources.displayMetrics)
+
+        var pageHeight = readerContainer.height
+        pageHeight -= Utils.dpToPx(marginsDp.top + marginsDp.bottom, resources.displayMetrics)
+
+        viewModel.setPageDimens(pageWidth, pageHeight)
     }
 }

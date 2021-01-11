@@ -10,7 +10,7 @@ import com.ytrewqwert.yetanotherjnovelreader.SingleLiveEvent
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.htmlparser.PartHtmlParser
 import com.ytrewqwert.yetanotherjnovelreader.data.local.preferences.ReaderPreferenceStore
-import com.ytrewqwert.yetanotherjnovelreader.scaleToWidth
+import com.ytrewqwert.yetanotherjnovelreader.scaleToSize
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -25,7 +25,9 @@ class PartViewModel(
     private val partId: String
 ) : ViewModel() {
     /** The width of the page in which the part's text can be drawn. */
-    var pageWidthPx: Int private set
+    private var pageWidthPx: Int
+    /** The height of the page in which the part's text can be drawn. */
+    private var pageHeightPx: Int
 
     /** Notifies an observer of when something goes wrong, with a message of what went wrong. */
     val errorEvent = SingleLiveEvent<String>()
@@ -71,6 +73,7 @@ class PartViewModel(
 
     init {
         pageWidthPx = 0
+        pageHeightPx = 0
 
         viewModelScope.launch {
             getPartData()
@@ -99,8 +102,9 @@ class PartViewModel(
     }
 
     /** Sets the dimensions of the drawable region for a single page. */
-    fun setPageDimens(widthPx: Int) {
+    fun setPageDimens(widthPx: Int, heightPx: Int) {
         pageWidthPx = widthPx
+        pageHeightPx = heightPx
         // Update contents to have correctly sized images
         viewModelScope.launch {
             _contents.value = replaceTempImages(contentsNoImages ?: return@launch)
@@ -158,7 +162,7 @@ class PartViewModel(
 
     private suspend fun replaceTempImage(img: ImageSpan, spanBuilder: SpannableStringBuilder) {
         val drawable = repository.getImage(img.source ?: return) ?:return
-        drawable.scaleToWidth(pageWidthPx)
+        drawable.scaleToSize(pageWidthPx, pageHeightPx)
         val newImg = ImageSpan(drawable)
 
         synchronized(spanBuilder) {
