@@ -9,26 +9,16 @@
             type="com.ytrewqwert.yetanotherjnovelreader.partreader.PartViewModel" />
     </data>
 
-    <ScrollView
-        android:id="@+id/content_scroll_container"
-        android:scrollbars="none"
-        android:overScrollMode="never"
+    <TextView
+        android:id="@+id/page_contents"
+        android:textSize="@{viewModel.fontSize}"
+        android:typeface="@{viewModel.fontStyle}"
+        android:lineSpacingMultiplier="@{viewModel.lineSpacing}"
+        android:hyphenationFrequency="full"
+        android:justificationMode="inter_word"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        tools:context=".partreader.pagedreader.PagedReaderPageFragment">
-
-        <TextView
-            android:id="@+id/page_contents"
-            android:textSize="@{viewModel.fontSize}"
-            android:typeface="@{viewModel.fontStyle}"
-            android:lineSpacingMultiplier="@{viewModel.lineSpacing}"
-            android:hyphenationFrequency="full"
-            android:justificationMode="inter_word"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:readerMarginHorizontal="@{viewModel.marginsDp}"
-            app:readerMarginVertical="@{viewModel.marginsDp}" />
-
-    </ScrollView>
+        app:readerMarginHorizontal="@{viewModel.marginsDp}"
+        app:readerMarginVertical="@{viewModel.marginsDp}"
+        tools:context=".partreader.pagedreader.PagedReaderPageFragment" />
 </layout>
