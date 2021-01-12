@@ -29,13 +29,17 @@ object Paginator {
         for (span in spans) {
             var remainingSpan = span.trim()
             do {
+                var oldPageStart = 0
                 var nextPageStart = getPageEndIndex(textView, remainingSpan, pageHeight)
                 var pageText = remainingSpan.subSequence(0, nextPageStart).trim()
-                // Due to how justified text alignment works, the first trim may result in the last
-                // word in the page to be pushed into its own line, so trim the page again, this
-                // time using only the currently predicted page's text.
-                nextPageStart = getPageEndIndex(textView, pageText, pageHeight)
-                pageText = remainingSpan.subSequence(0, nextPageStart).trim()
+                // Due to how justified text alignment works, trimming the text may result in the
+                // last word in the page being pushed into its own line. To circumvent this,
+                // repeatedly trim the page until the cutoff point stabilises.
+                while (oldPageStart != nextPageStart) {
+                    oldPageStart = nextPageStart
+                    nextPageStart = getPageEndIndex(textView, pageText, pageHeight)
+                    pageText = remainingSpan.subSequence(0, nextPageStart).trim()
+                }
 
                 if (pageText.isNotBlank()) pages.add(pageText)
 
