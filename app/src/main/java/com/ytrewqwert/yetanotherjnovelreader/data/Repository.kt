@@ -138,6 +138,13 @@ class Repository private constructor(appContext: Context) {
         return true
     }
 
+    suspend fun fetchPartsProgress(): Boolean {
+        refreshLoginIfAuthExpired()
+        val userId = prefStore.userId ?: return false
+        val progresses = remote.getUserPartProgress(userId) ?: return false
+        local.upsertProgress(*progresses.toTypedArray())
+        return true
+    }
     suspend fun setPartProgress(partId: String, progress: Double) {
         val boundedProgress = progress.coerceIn(0.0, 1.0)
         local.upsertProgress(Progress(partId, boundedProgress, true))
@@ -179,18 +186,6 @@ class Repository private constructor(appContext: Context) {
             local.upsertProgress(Progress(partId, boundedProgress, false))
         }
         return progressSet
-    }
-    /**
-     * Retrieves all of the user's part progress data and saves it in the local database.
-     *
-     * @return true if successful and false otherwise.
-     */
-    private suspend fun fetchPartsProgress(): Boolean {
-        refreshLoginIfAuthExpired()
-        val userId = prefStore.userId ?: return false
-        val progresses = remote.getUserPartProgress(userId) ?: return false
-        local.upsertProgress(*progresses.toTypedArray())
-        return true
     }
 
     private suspend fun loginFromStore(): Boolean {
