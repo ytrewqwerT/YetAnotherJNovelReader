@@ -74,6 +74,34 @@ interface JNCApi {
         @Body progress: ProgressRaw
     )
 
+    /**
+     * Sets a serie as being followed.
+     *
+     * @param[authToken] A token providing authorisation to modify the user's data.
+     * @param[userId] The user's id.
+     * @param[follow] The serie to be followed.
+     */
+    @POST("api/users/{userId}/follow")
+    suspend fun followSerie(
+        @Header("Authorization") authToken: String?,
+        @Path("userId", encoded = true) userId: String,
+        @Body follow: OutboundFollowRaw
+    )
+
+    /**
+     * Sets a serie as not being followed.
+     *
+     * @param[authToken] A token providing authorisation to modify the user's data.
+     * @param[userId] The user's id.
+     * @param[follow] The serie to be unfollowed.
+     */
+    @POST("api/users/{userId}/unfollow")
+    suspend fun unfollowSerie(
+        @Header("Authorization") authToken: String?,
+        @Path("userId", encoded = true) userId: String,
+        @Body follow: OutboundFollowRaw
+    )
+
     /** Logs in using the provided [credentials], returning the logged-in user's data. */
     @POST("api/users/login?include=user")
     suspend fun login(

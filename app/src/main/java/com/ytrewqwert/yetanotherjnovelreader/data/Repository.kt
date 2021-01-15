@@ -98,19 +98,27 @@ class Repository private constructor(appContext: Context) {
     suspend fun getVolumes(vararg volumeId: String): List<VolumeFull> = local.getVolumes(*volumeId)
     suspend fun getParts(vararg partId: String): List<PartFull> = local.getParts(*partId)
 
+    // TODO: Handle failures to sync new follows/unfollows with remote.
     /** Returns true if the series with ID [serieId] is being followed by the user. */
     suspend fun isFollowed(serieId: String): Boolean =
         local.getAllFollows().find { it.serieId == serieId } != null
     /** Sets a series with ID [serieId] as being followed by the user. */
     suspend fun followSeries(serieId: String) {
+        val userId = prefStore.userId
+        if (userId != null) remote.followSerie(userId, serieId)
         val latestFinishedPart = local.getLatestFinishedPart(serieId)
         // Default the "up-next" part to the part after the latest finished part on initial follow.
         val nextPartNum = (latestFinishedPart?.part?.seriesPartNum ?: 0) + 1
         local.upsertFollows(Follow(serieId, nextPartNum))
+
     }
     // Note that Room database deletions are based on primary key only. '0' has no effect here.
     /** Sets a series with ID [serieId] as not being followed by the user. */
-    suspend fun unfollowSeries(serieId: String) { local.deleteFollows(Follow(serieId, 0)) }
+    suspend fun unfollowSeries(serieId: String) {
+        val userId = prefStore.userId
+        if (userId != null) remote.unfollowSerie(userId, serieId)
+        local.deleteFollows(Follow(serieId, 0))
+    }
 
     fun getUsername() = prefStore.username
     fun isMember() = prefStore.isMember ?: false
@@ -126,6 +134,7 @@ class Repository private constructor(appContext: Context) {
             prefStore.email = email
             prefStore.password = password
             fetchPartsProgress()
+            fetchFollowedSeries()
         }
         return userData != null
     }
@@ -167,6 +176,28 @@ class Repository private constructor(appContext: Context) {
         }
         jobs.awaitAll().contains(false).not()
     }
+
+    suspend fun fetchFollowedSeries(): Boolean {
+        refreshLoginIfAuthExpired()
+        val userId = prefStore.userId ?: return false
+        val localFollows = local.getAllFollows()
+        val remoteFollows = remote.getUserSerieFollows(userId) ?: return false
+
+        for (newId in remoteFollows) {
+            if (localFollows.find { it.serieId == newId } == null) {
+                // Duplicated code with Repository.followSeries
+                val latestFinishedPart = local.getLatestFinishedPart(newId)
+                val nextPartNum = (latestFinishedPart?.part?.seriesPartNum ?: 0) + 1
+                local.upsertFollows(Follow(newId, nextPartNum))
+            }
+        }
+        for (oldFollow in localFollows) {
+            if (!remoteFollows.contains(oldFollow.serieId)) local.deleteFollows(oldFollow)
+        }
+
+        return true
+    }
+
     private fun enqueueProgressUploadWorker() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

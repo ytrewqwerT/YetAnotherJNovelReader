@@ -11,6 +11,7 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.LoginRaw
+import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.OutboundFollowRaw
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.ProgressRaw
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
@@ -216,6 +217,40 @@ class RemoteRepository private constructor(
             jncApi.setProgress(authToken, userId, progressRaw)
         } ?: return false
         Log.d(TAG, "SaveProgressSuccess: $partId at ${progress.toFloat()}")
+        return true
+    }
+
+    /** Fetches a list containing all of the user's (identified by [userId]) followed series. */
+    suspend fun getUserSerieFollows(userId: String): List<String>? {
+        val filters = UrlParameterBuilder().apply {
+            addInclude("serieFollows")
+        }.toString()
+
+        val rawUserWithFollows = safeNetworkCall("LoadProgressFailure") {
+            jncApi.getUser(authToken, userId, filters)
+        } ?: return null
+        val rawFollows = rawUserWithFollows.serieFollows ?: return null
+        Log.d(TAG, "LoadFollowsSuccess: Found ${rawFollows.size} followed series")
+        return rawFollows.map { it.serieId }
+    }
+
+    /** Sets the series with id [serieId] as followed by the user with id [userId]. */
+    suspend fun followSerie(userId: String, serieId: String): Boolean {
+        val followRaw = OutboundFollowRaw(serieId, 1) // (I think) 1 indicates novel.
+        safeNetworkCall("FollowSerieFailure") {
+            jncApi.followSerie(authToken, userId, followRaw)
+        } ?: return false
+        Log.d(TAG, "FollowSerieSuccess: Followed serie $serieId")
+        return true
+    }
+
+    /** Sets the series with id [serieId] as not followed by the user with id [userId]. */
+    suspend fun unfollowSerie(userId: String, serieId: String): Boolean {
+        val followRaw = OutboundFollowRaw(serieId, 1) // (I think) 1 indicates novel.
+        safeNetworkCall("UnfollowSerieFailure") {
+            jncApi.unfollowSerie(authToken, userId, followRaw)
+        } ?: return false
+        Log.d(TAG, "UnfollowSerieSuccess: Unfollowed serie $serieId")
         return true
     }
 

@@ -17,8 +17,9 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         repository.isFilterFollowing.asLiveData(viewModelScope.coroutineContext)
 
     init {
-        // Sync follow data on startup
+        // Sync follow and progress data on startup
         viewModelScope.launch { repository.fetchPartsProgress() }
+        viewModelScope.launch { repository.fetchFollowedSeries() }
     }
 
     fun logout() { viewModelScope.launch { logoutEvent.value = repository.logout() } }
