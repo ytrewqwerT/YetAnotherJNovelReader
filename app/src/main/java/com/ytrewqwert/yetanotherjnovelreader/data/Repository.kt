@@ -102,22 +102,23 @@ class Repository private constructor(appContext: Context) {
     /** Returns true if the series with ID [serieId] is being followed by the user. */
     suspend fun isFollowed(serieId: String): Boolean =
         local.getAllFollows().find { it.serieId == serieId } != null
-    /** Sets a series with ID [serieId] as being followed by the user. */
-    suspend fun followSeries(serieId: String) {
+    /** Sets a series as being followed by the user. Returns true if successful. */
+    suspend fun followSeries(serieId: String): Boolean {
         val userId = prefStore.userId
-        if (userId != null) remote.followSerie(userId, serieId)
+        if (userId != null && !remote.followSerie(userId, serieId)) return false
         val latestFinishedPart = local.getLatestFinishedPart(serieId)
         // Default the "up-next" part to the part after the latest finished part on initial follow.
         val nextPartNum = (latestFinishedPart?.part?.seriesPartNum ?: 0) + 1
         local.upsertFollows(Follow(serieId, nextPartNum))
-
+        return true
     }
     // Note that Room database deletions are based on primary key only. '0' has no effect here.
-    /** Sets a series with ID [serieId] as not being followed by the user. */
-    suspend fun unfollowSeries(serieId: String) {
+    /** Sets a series as not being followed by the user. Returns true if successful. */
+    suspend fun unfollowSeries(serieId: String): Boolean {
         val userId = prefStore.userId
-        if (userId != null) remote.unfollowSerie(userId, serieId)
+        if (userId != null && !remote.unfollowSerie(userId, serieId)) return false
         local.deleteFollows(Follow(serieId, 0))
+        return true
     }
 
     fun getUsername() = prefStore.username

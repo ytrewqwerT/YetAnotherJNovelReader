@@ -1,9 +1,11 @@
 package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist
 
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListFragment
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
+import com.ytrewqwert.yetanotherjnovelreader.main.MainViewModel
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
 /** SwipeableListFragment for showing the volumes in a series. */
@@ -18,6 +20,7 @@ class SerieVolumesListFragment
     override val viewModel by viewModels<SerieVolumesListViewModel> {
         SerieVolumesListViewModelFactory(Repository.getInstance(requireContext()), serieId)
     }
+    private val mainViewModel by activityViewModels<MainViewModel>()
 
 
     override fun onVolumeClick(volume: VolumeFull) {
@@ -29,7 +32,7 @@ class SerieVolumesListFragment
     }
 
     override fun onFollowClick() {
-        viewModel.toggleFollow()
+        mainViewModel.toggleFollow(serieId)
     }
 
     companion object {

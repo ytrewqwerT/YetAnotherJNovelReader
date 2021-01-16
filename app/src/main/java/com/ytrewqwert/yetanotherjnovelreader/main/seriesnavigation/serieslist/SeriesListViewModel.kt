@@ -30,14 +30,4 @@ class SeriesListViewModel(
 
     override suspend fun performPageFetch(amount: Int, offset: Int): FetchResult? =
         repository.fetchSeries(amount, offset, isFilterFollowing)
-
-    /** Toggles the follow status of the [serie]. */
-    fun toggleFollow(serie: SerieFull) {
-        val following: Boolean = serie.isFollowed()
-        val serieId = serie.serie.id
-        viewModelScope.launch {
-            if (following) repository.unfollowSeries(serieId)
-            else repository.followSeries(serieId)
-        }
-    }
 }

@@ -12,6 +12,9 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     /** Notifies an observer of the result of a call to [logout]. */
     val logoutEvent = SingleLiveEvent<Boolean>()
 
+    val followFailureEvent = SingleLiveEvent<FollowResult>()
+    enum class FollowResult { FOLLOW_FAILURE, UNFOLLOW_FAILURE }
+
     /** Identifies whether lists should be filtered to only show stuff from followed series. */
     val isFilterFollowing =
         repository.isFilterFollowing.asLiveData(viewModelScope.coroutineContext)
@@ -31,5 +34,23 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     /** Toggles whether lists should be filtered to only show stuff from followed series. */
     fun toggleFilterFollowing() {
         repository.setIsFilterFollowing(isFilterFollowing.value == false)
+    }
+
+    /**
+     * Toggles the following status for the given series.
+     * If the action fails, the value of [followFailureEvent] is set accordingly.
+     */
+    fun toggleFollow(serieId: String) {
+        viewModelScope.launch {
+            if (repository.isFollowed(serieId)) {
+                if (!repository.unfollowSeries(serieId)) {
+                    followFailureEvent.value = FollowResult.UNFOLLOW_FAILURE
+                }
+            } else {
+                if (!repository.followSeries(serieId)) {
+                    followFailureEvent.value = FollowResult.FOLLOW_FAILURE
+                }
+            }
+        }
     }
 }

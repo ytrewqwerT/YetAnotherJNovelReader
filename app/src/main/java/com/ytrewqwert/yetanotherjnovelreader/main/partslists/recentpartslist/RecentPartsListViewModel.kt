@@ -31,17 +31,6 @@ class RecentPartsListViewModel(
         postInitialisationTasks()
     }
 
-    /** Toggles the follow status of the series that [part] belongs to. */
-    fun toggleFollow(part: PartFull) {
-        // TODO: Highly similar/duplicated code across the different lists under the 'main' package.
-        val following: Boolean = part.isFollowed()
-        val serieId = part.part.serieId
-        viewModelScope.launch {
-            if (following) repository.unfollowSeries(serieId)
-            else repository.followSeries(serieId)
-        }
-    }
-
     override suspend fun performPageFetch(amount: Int, offset: Int): FetchResult? =
         repository.fetchRecentParts(amount, offset, isFilterFollowing)
 }

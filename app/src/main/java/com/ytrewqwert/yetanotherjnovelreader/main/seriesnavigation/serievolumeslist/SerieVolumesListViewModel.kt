@@ -30,14 +30,6 @@ class SerieVolumesListViewModel(
     override suspend fun performPageFetch(amount: Int, offset: Int): FetchResult? =
         repository.fetchSerieVolumes(serieId, amount, offset)
 
-    /** Toggles the follow status of the series whose volumes are being listed. */
-    fun toggleFollow() {
-        viewModelScope.launch {
-            if (repository.isFollowed(serieId)) repository.unfollowSeries(serieId)
-            else repository.followSeries(serieId)
-        }
-    }
-
     /**
      * Fetches the parts that belong to the volume with id [volumeId] to the repository. Only
      * performs the fetch once for each given volume id.

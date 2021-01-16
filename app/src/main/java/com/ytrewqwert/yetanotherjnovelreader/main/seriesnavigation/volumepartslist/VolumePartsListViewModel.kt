@@ -38,13 +38,4 @@ class VolumePartsListViewModel(
 
     override suspend fun performPageFetch(amount: Int, offset: Int): FetchResult? =
         repository.fetchVolumeParts(volumeId, 0, 0)
-
-    /** Toggles the follow status of the series whose volume parts are being listed. */
-    fun toggleFollow() {
-        viewModelScope.launch {
-            val serieId = repository.getVolumes(volumeId).first().volume.serieId
-            if (repository.isFollowed(serieId)) repository.unfollowSeries(serieId)
-            else repository.followSeries(serieId)
-        }
-    }
 }

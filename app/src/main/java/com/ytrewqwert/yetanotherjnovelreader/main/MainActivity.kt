@@ -55,6 +55,14 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             followMenuItem?.isChecked = it
             updateMenu()
         }
+        viewModel.followFailureEvent.observe(this) {
+            val followResultText = when (it) {
+                MainViewModel.FollowResult.FOLLOW_FAILURE -> "Failed to follow series"
+                MainViewModel.FollowResult.UNFOLLOW_FAILURE -> "Failed to unfollow series"
+                else -> return@observe
+            }
+            Toast.makeText(this, followResultText, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
