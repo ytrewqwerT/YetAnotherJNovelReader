@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListAdapter
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartComparator
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import kotlinx.android.synthetic.main.list_item.view.*
 
@@ -24,7 +25,7 @@ import kotlinx.android.synthetic.main.list_item.view.*
 class PartsListAdapter(
     private val listener: Listener? = null,
     private val imageSource: ImageSource? = null
-) : SwipeableListAdapter<PartFull, PartsListAdapter.ViewHolder>() {
+) : SwipeableListAdapter<PartFull, PartsListAdapter.ViewHolder>(PartComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)

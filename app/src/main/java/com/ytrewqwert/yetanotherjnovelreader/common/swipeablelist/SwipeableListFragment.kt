@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import com.ytrewqwert.yetanotherjnovelreader.common.listfooter.ListFooterRecyclerViewAdapter
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeader
 import com.ytrewqwert.yetanotherjnovelreader.common.listheader.ListHeaderRecyclerViewAdapter
+import kotlinx.coroutines.launch
 
 /** A RecyclerView container fragment that allows for swipe-up refreshing of the list. */
 abstract class SwipeableListFragment<T : Any>
@@ -53,10 +55,12 @@ abstract class SwipeableListFragment<T : Any>
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
-        viewModel.items.observe(viewLifecycleOwner) { listContentsAdapter.setItems(it) }
         viewModel.refreshing.observe(viewLifecycleOwner) { swipeRefreshLayout?.isRefreshing = it }
         viewModel.hasMorePages.observe(viewLifecycleOwner) { listFooterAdapter.isVisible = it }
         viewModel.header.observe(viewLifecycleOwner) { listHeaderAdapter.setItems(listOf(it)) }
+        viewModel.items.observe(viewLifecycleOwner) {
+            viewLifecycleOwner.lifecycleScope.launch { listContentsAdapter.setItems(it) }
+        }
 
         return view
     }

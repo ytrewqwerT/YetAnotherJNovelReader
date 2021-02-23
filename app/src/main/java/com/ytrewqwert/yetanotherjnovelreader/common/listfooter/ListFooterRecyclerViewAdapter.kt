@@ -21,8 +21,10 @@ class ListFooterRecyclerViewAdapter(
      */
     var isVisible = false
         set(value) {
+            if (field == value) return
             field = value
-            notifyDataSetChanged()
+            if (value) notifyItemInserted(0)
+            else notifyItemRemoved(0)
         }
 
     override fun getItemCount(): Int = if (isVisible) 1 else 0

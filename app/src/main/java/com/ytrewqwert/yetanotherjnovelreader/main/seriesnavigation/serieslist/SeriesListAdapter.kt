@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListAdapter
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieComparator
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import kotlinx.android.synthetic.main.list_item.view.*
 
@@ -23,7 +24,7 @@ import kotlinx.android.synthetic.main.list_item.view.*
 class SeriesListAdapter(
     private val listener: Listener? = null,
     private val imageSource: ImageSource? = null
-) : SwipeableListAdapter<SerieFull, SeriesListAdapter.ViewHolder>() {
+) : SwipeableListAdapter<SerieFull, SeriesListAdapter.ViewHolder>(SerieComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)

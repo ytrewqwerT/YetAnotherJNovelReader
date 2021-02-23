@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListAdapter
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeComparator
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
 import kotlinx.android.synthetic.main.list_volume.view.*
 
@@ -22,7 +23,7 @@ import kotlinx.android.synthetic.main.list_volume.view.*
 class VolumesListAdapter(
     private val listener: Listener? = null,
     private val imageSource: ImageSource? = null
-) : SwipeableListAdapter<VolumeFull, VolumesListAdapter.ViewHolder>() {
+) : SwipeableListAdapter<VolumeFull, VolumesListAdapter.ViewHolder>(VolumeComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)

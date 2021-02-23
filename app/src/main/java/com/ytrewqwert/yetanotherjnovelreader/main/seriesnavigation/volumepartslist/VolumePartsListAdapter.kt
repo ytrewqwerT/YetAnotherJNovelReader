@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListAdapter
+import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartComparator
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
 import kotlinx.android.synthetic.main.list_part_title.view.*
 
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.list_part_title.view.*
  */
 class VolumePartsListAdapter(
     private val listener: Listener? = null
-) : SwipeableListAdapter<PartFull, VolumePartsListAdapter.ViewHolder>() {
+) : SwipeableListAdapter<PartFull, VolumePartsListAdapter.ViewHolder>(PartComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
