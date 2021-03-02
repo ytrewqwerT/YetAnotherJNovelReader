@@ -57,7 +57,7 @@ abstract class SwipeableListFragment<T : Any>
 
         viewModel.refreshing.observe(viewLifecycleOwner) { swipeRefreshLayout?.isRefreshing = it }
         viewModel.hasMorePages.observe(viewLifecycleOwner) { listFooterAdapter.isVisible = it }
-        viewModel.header.observe(viewLifecycleOwner) { listHeaderAdapter.setItems(listOf(it)) }
+        viewModel.header.observe(viewLifecycleOwner) { listHeaderAdapter.setItem(it) }
         viewModel.items.observe(viewLifecycleOwner) {
             viewLifecycleOwner.lifecycleScope.launch { listContentsAdapter.setItems(it) }
         }

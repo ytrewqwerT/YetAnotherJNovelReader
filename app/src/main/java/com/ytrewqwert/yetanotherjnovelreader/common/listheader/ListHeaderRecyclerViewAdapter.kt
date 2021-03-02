@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.children
+import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
@@ -20,12 +22,17 @@ class ListHeaderRecyclerViewAdapter(
     private val listener: ListHeader.InteractionListener? = null
 ) : RecyclerView.Adapter<ListHeaderRecyclerViewAdapter.ViewHolder>() {
 
-    private var items: List<ListHeader> = emptyList()
+    private var item: ListHeader? = null
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = 1
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val contents = items[position].getListHeaderContents()
+        val contents = item?.getListHeaderContents()
+        if (contents == null) {
+            hideViewHolder(holder)
+            return
+        }
+        showViewHolder(holder)
 
         holder.imageUrl = contents.mImageUrl
         holder.titleText.text = contents.mTitle
@@ -55,13 +62,25 @@ class ListHeaderRecyclerViewAdapter(
         return ViewHolder(view)
     }
 
-    /**
-     * Sets what is shown in the header. Note that it is intended for there to only be one header,
-     * although multiple headers are possible.
-     */
-    fun setItems(newItems: List<ListHeader>) {
-        items = newItems
-        notifyDataSetChanged()
+    /** Sets what is shown in the header. */
+    fun setItem(newItem: ListHeader?) {
+        val itemChanged = item != newItem
+        item = newItem
+        if (itemChanged) notifyItemChanged(0)
+    }
+
+    private var viewPadding = 0
+    private fun hideViewHolder(holder: ViewHolder) {
+        // Set top-level view padding to 0 and hide children to create the illusion of no header.
+        // Assume all edges of the header has the same padding, and save that value before setting
+        // to 0 so that it can be restored when an actual header is desired.
+        (holder.view as? ViewGroup)?.children?.forEach { it.visibility = View.GONE }
+        viewPadding = holder.view.paddingTop
+        holder.view.setPadding(0)
+    }
+    private fun showViewHolder(holder: ViewHolder) {
+        (holder.view as? ViewGroup)?.children?.forEach { it.visibility = View.VISIBLE }
+        holder.view.setPadding(viewPadding)
     }
 
     class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {

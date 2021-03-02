@@ -19,7 +19,7 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
     private val mItems = MutableLiveData<List<T>>(emptyList())
     private val mRefreshing = MutableLiveData(false)
     private val mHasMorePages = MutableLiveData(false)
-    private val mHeader = MutableLiveData<ListHeader>()
+    private val mHeader = MutableLiveData<ListHeader?>(null)
 
     /** Contains the items to be shown in the list */
     val items: LiveData<List<T>> = mItems
@@ -28,7 +28,7 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
     /** Indicates whether more pages are available for loading in. */
     val hasMorePages: LiveData<Boolean> = mHasMorePages
     /** Contains the optional header to be shown at the top of the list. */
-    val header: LiveData<ListHeader> = mHeader
+    val header: LiveData<ListHeader?> = mHeader
 
     private var itemsCap = PAGE_SIZE
     private var itemsFetcher: Job? = null
@@ -51,7 +51,7 @@ abstract class SwipeableListViewModel<T : Any>(private val repository: Repositor
     }
 
     /** Optionally sets a header to be shown at the top of the list. */
-    protected fun setHeader(newHeader: ListHeader) {
+    protected fun setHeader(newHeader: ListHeader?) {
         mHeader.value = newHeader
     }
 
