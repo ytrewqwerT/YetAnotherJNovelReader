@@ -24,12 +24,21 @@ object PartHtmlParser {
         // Initialise with a dummy top-level tag to store processed contents
         val tagStack = ArrayDeque(listOf(IncompleteTag("")))
 
-        val tagRegex = Regex("<[^>]*>")
         var searchStartIndex = 0
-        var match = tagRegex.find(html, searchStartIndex)
-        while (match != null) {
+        while (searchStartIndex < html.length) {
+            val tagRegex = Regex("<[^>]*>")
+            val match = tagRegex.find(html, searchStartIndex) ?: break
+
             // Append any skipped text to the parent tag before processing the current match.
             tagStack.first.contents.append(html.subSequence(searchStartIndex, match.range.first))
+
+            // Check for and process/skip html comments
+            if (match.value.startsWith("<!--")) {
+                val commentEndRegex = Regex("-->")
+                val endMatch = commentEndRegex.find(html, match.range.first + 4)
+                searchStartIndex = if (endMatch != null) endMatch.range.last + 1 else html.length
+                continue
+            }
 
             val fullTag = match.value.trim('<', '/', '>', ' ')
             val (tagLabel, tagArgs) = extractTagComponents(fullTag)
@@ -46,10 +55,11 @@ object PartHtmlParser {
                 else
                     tagStack.addFirst(IncompleteTag(tagLabel, tagArgs))
             }
+
             searchStartIndex = match.range.last + 1
-            match = tagRegex.find(html, searchStartIndex)
         }
 
+        // Append any trailing text then close any unclosed tags (which ideally shouldn't happen)
         val tail = html.subSequence(searchStartIndex, html.length)
         tagStack.first.contents.append(tail)
         while (tagStack.size > 1) reduceTagStackPair(tagStack, tagApplier)
