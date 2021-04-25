@@ -21,5 +21,7 @@ class App : Application() {
             context.resources.getInteger(integerRes)
         fun getFloat(@DimenRes floatRes: Int) =
             context.resources.getFloat(floatRes)
+        fun getFont(@FontRes fontRes: Int) =
+            context.resources.getFont(fontRes)
     }
 }

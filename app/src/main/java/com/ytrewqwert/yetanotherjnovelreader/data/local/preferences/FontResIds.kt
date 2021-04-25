@@ -12,13 +12,21 @@ import com.ytrewqwert.yetanotherjnovelreader.R
  * user preference).
  */
 object FontResIds {
+    const val ALEGREYA = R.font.alegreya_family
+    const val ALEGREYA_SANS = R.font.alegreya_sans_family
+    const val CRIMSON_PRO = R.font.crimson_pro
+    const val LORA = R.font.lora_family
+    const val OPEN_SANS = R.font.open_sans_family
+    const val CUTIVE_MONO = R.font.cutive_mono
+
     /** Returns the font resource id corresponding to [fontStr], or null if it doesn't exist. */
     fun getFontResourceId(fontStr: String): Int? = when (fontStr) {
-        "alegreya" -> R.font.alegreya_family
-        "alegreya_sans" -> R.font.alegreya_sans_family
-        "crimson_pro" -> R.font.crimson_pro_family
-        "lora" -> R.font.lora_family
-        "open_sans" -> R.font.open_sans_family
+        "alegreya" -> ALEGREYA
+        "alegreya_sans" -> ALEGREYA_SANS
+        "crimson_pro" -> CRIMSON_PRO
+        "lora" -> LORA
+        "open_sans" -> OPEN_SANS
+        "cutive_mono" -> CUTIVE_MONO
         else -> null
     }
 }

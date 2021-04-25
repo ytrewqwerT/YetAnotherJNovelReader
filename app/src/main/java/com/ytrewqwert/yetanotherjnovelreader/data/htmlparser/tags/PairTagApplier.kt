@@ -18,6 +18,7 @@ abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
         /** Returns the [PairTagApplier] for [tag], injecting [partId] as its source part. */
         fun getApplier(tag: CharSequence, partId: CharSequence): PairTagApplier = when(tag) {
             "b" -> BPairTagApplier(partId)
+            "code" -> CodePairTagApplier(partId)
             "em" -> EmPairTagApplier(partId)
             "h1", "h2", "h3", "h4", "h5", "h6" -> HPairTagApplier(partId, tag[1] - '0')
             "p" -> PPairTagApplier(partId)
