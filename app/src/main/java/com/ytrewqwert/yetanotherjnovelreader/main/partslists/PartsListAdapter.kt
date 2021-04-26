@@ -14,7 +14,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartComparator
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
-import kotlinx.android.synthetic.main.list_item.view.*
+import kotlinx.android.synthetic.main.list_item_compact.view.*
 
 /**
  * A SwipeableListAdapter for lists containing parts mixed across series/volumes.
