@@ -24,6 +24,8 @@
     <string name="reader">Reader</string>
     <string name="reader_margin">Reader Margin</string>
     <string name="right_margin">Right Margin</string>
+    <string name="search_query">Search Query</string>
+    <string name="search_series">Search Series</string>
     <string name="right_tap_area_size">Right Tap Area Size</string>
     <string name="settings">Settings</string>
     <string name="tap_regions">Tap Regions</string>
