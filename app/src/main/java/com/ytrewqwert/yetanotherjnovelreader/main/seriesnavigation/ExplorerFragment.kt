@@ -11,7 +11,7 @@ import androidx.fragment.app.commit
 import com.ytrewqwert.yetanotherjnovelreader.R
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.SerieFull
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.VolumeFull
-import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serieslist.SeriesListFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serieslist.SearchableSeriesListFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serievolumeslist.SerieVolumesListFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumepartslist.VolumePartsListFragment
 
@@ -23,7 +23,7 @@ class ExplorerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setChildFragment(SeriesListFragment::class.java)
+        setChildFragment(SearchableSeriesListFragment::class.java)
     }
 
     override fun onCreateView(

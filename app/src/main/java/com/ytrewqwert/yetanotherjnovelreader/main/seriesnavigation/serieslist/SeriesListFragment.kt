@@ -16,13 +16,15 @@ class SeriesListFragment : SwipeableListFragment<SerieFull>(), SeriesListAdapter
         SeriesListAdapter(this, this)
     }
 
-    override val viewModel by viewModels<SeriesListViewModel> {
-        RepositoriedViewModelFactory(Repository.getInstance(requireContext()))
-    }
+    override val viewModel by viewModels<SeriesListViewModel>(
+        ownerProducer = { requireParentFragment() },
+        factoryProducer = { RepositoriedViewModelFactory(Repository.getInstance(requireContext())) }
+    )
     private val mainViewModel by activityViewModels<MainViewModel>()
 
     override fun onSerieClick(serie: SerieFull) {
-        (parentFragment as? ExplorerFragment)?.onSeriesListItemInteraction(serie) // Hmmm...
+        // *shudders*
+        (parentFragment?.parentFragment as? ExplorerFragment)?.onSeriesListItemInteraction(serie)
     }
 
     override fun onSerieFollowClick(serie: SerieFull) {
