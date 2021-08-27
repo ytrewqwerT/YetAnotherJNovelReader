@@ -112,6 +112,23 @@ class RemoteRepository private constructor(
     }
 
     /**
+     * Fetches the volume with the given [volumeId].
+     * @return The requested volume, or null if the fetch failed.
+     */
+    suspend fun getVolume(volumeId: String): Volume? {
+        val filters = UrlParameterBuilder().apply {
+            addWhere("id", "\"$volumeId\"")
+        }.toString()
+
+        val rawVolumes = safeNetworkCall("VolumeFailure") {
+            jncApi.getVolumes(filters)
+        } ?: return null
+        Log.d(TAG, "VolumeSuccess: Found ${rawVolumes.size} volumes")
+        val rawVolume = rawVolumes.firstOrNull() ?: return null
+        return Volume.fromVolumeRaw(rawVolume)
+    }
+
+    /**
      * Fetches a list of the parts in a volume.
      *
      * @param[volumeId] The id of the volume to fetch parts from.

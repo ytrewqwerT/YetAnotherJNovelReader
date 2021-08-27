@@ -42,18 +42,23 @@ class ExplorerFragment : Fragment() {
 
     fun onSeriesListItemInteraction(serie: SerieFull) {
         Log.d(TAG, "Series clicked: ${serie.serie.title}")
-
+        onSeriesListItemInteraction(serie.serie.id)
+    }
+    fun onSeriesListItemInteraction(serieId: String) {
         setChildFragment(
             SerieVolumesListFragment::class.java,
-            bundleOf(SerieVolumesListFragment.ARG_SERIE_ID to serie.serie.id)
+            bundleOf(SerieVolumesListFragment.ARG_SERIE_ID to serieId)
         )
     }
+
     fun onVolumesListItemInteraction(volume: VolumeFull) {
         Log.d(TAG, "Volume clicked: ${volume.volume.title}")
-
+        onVolumesListItemInteraction(volume.volume.id)
+    }
+    fun onVolumesListItemInteraction(volumeId: String) {
         setChildFragment(
             VolumePartsListFragment::class.java,
-            bundleOf(VolumePartsListFragment.ARG_VOLUME_ID to volume.volume.id)
+            bundleOf(VolumePartsListFragment.ARG_VOLUME_ID to volumeId)
         )
     }
 

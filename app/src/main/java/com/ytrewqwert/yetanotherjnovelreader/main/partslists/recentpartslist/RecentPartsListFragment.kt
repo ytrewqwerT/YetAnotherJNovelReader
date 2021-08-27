@@ -32,4 +32,8 @@ class RecentPartsListFragment : SwipeableListFragment<PartFull>(), PartsListAdap
     override fun onPartFollowClick(part: PartFull) {
         mainViewModel.toggleFollow(part.part.serieId)
     }
+
+    override fun onContextMenuCreatedForPart(part: PartFull) {
+        mainViewModel.contextMenuTarget = part
+    }
 }

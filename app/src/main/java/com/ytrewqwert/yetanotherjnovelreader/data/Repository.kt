@@ -199,6 +199,12 @@ class Repository private constructor(appContext: Context) {
         return true
     }
 
+    suspend fun fetchVolume(volumeId: String): Boolean {
+        val volume = remote.getVolume(volumeId) ?: return false
+        local.upsertVolumes(volume)
+        return true
+    }
+
     private fun enqueueProgressUploadWorker() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

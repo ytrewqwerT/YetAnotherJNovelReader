@@ -1,9 +1,7 @@
 package com.ytrewqwert.yetanotherjnovelreader.main.partslists
 
 import android.graphics.drawable.ColorDrawable
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -14,6 +12,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.ImageSource
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListAdapter
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartComparator
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.part.PartFull
+import com.ytrewqwert.yetanotherjnovelreader.main.MainViewModel
 import kotlinx.android.synthetic.main.list_item_compact.view.*
 
 /**
@@ -34,6 +33,8 @@ class PartsListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, item: PartFull) {
+        holder.part = item
+
         holder.titleText.text = item.part.title
         holder.imageUrl = item.part.coverUrl
 
@@ -70,12 +71,35 @@ class PartsListAdapter(
     }
 
     /** RecyclerView.ViewHolder for the PartsListAdapter. */
-    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    inner class ViewHolder(val view: View)
+        : RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
+
         val titleText: TextView = view.title
         val imageView: ImageView = view.image
         val progressBar: ProgressBar = view.progress
         val following: ImageView = view.following
         var imageUrl: String? = null
+
+        var part: PartFull? = null
+
+        init { view.setOnCreateContextMenuListener(this) }
+
+        override fun onCreateContextMenu(
+            menu: ContextMenu,
+            v: View,
+            menuInfo: ContextMenu.ContextMenuInfo?
+        ) {
+            part?.let { part ->
+                val isRead = part.progress?.progress == 1.0
+                val readText = if (isRead) "Mark As Unread" else "Mark As Read"
+
+                menu.add(Menu.NONE, MainViewModel.CONTEXT_TO_VOLUME, Menu.NONE, "To Volume")
+                menu.add(Menu.NONE, MainViewModel.CONTEXT_TO_SERIES, Menu.NONE, "To Series")
+                menu.add(Menu.NONE, MainViewModel.CONTEXT_TOGGLE_READ, Menu.NONE, readText)
+
+                listener?.onContextMenuCreatedForPart(part)
+            }
+        }
     }
 
     /** Interface for objects that wish to respond to events acting on items in the list. */
@@ -84,5 +108,7 @@ class PartsListAdapter(
         fun onPartClick(part: PartFull)
         /** Called when a [PartFull]'s 'follow' button is clicked by the user. */
         fun onPartFollowClick(part: PartFull)
+        /** Called when a context menu for [part] is created. */
+        fun onContextMenuCreatedForPart(part: PartFull)
     }
 }

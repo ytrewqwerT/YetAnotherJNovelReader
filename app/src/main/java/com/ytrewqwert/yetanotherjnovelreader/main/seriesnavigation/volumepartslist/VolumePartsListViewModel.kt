@@ -17,7 +17,8 @@ class VolumePartsListViewModel(
 
     override val itemsSourceFlow = repository.getVolumePartsFlow(volumeId).map { parts ->
         // Don't show the volume title in the volume parts list.
-        val volumeTitle = repository.getVolumes(volumeId).first().volume.title
+        if (repository.getVolumes(volumeId).isEmpty()) repository.fetchVolume(volumeId)
+        val volumeTitle = repository.getVolumes(volumeId).firstOrNull()?.volume?.title ?: ""
         parts.map { part ->
             val partTitle = part.part.title
             val trimmedTitle = partTitle.removePrefix(volumeTitle).trim()

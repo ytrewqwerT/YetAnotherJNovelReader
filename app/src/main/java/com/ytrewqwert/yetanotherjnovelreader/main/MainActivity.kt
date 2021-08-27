@@ -16,6 +16,7 @@ import com.ytrewqwert.yetanotherjnovelreader.common.RepositoriedViewModelFactory
 import com.ytrewqwert.yetanotherjnovelreader.data.Repository
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginDialog
 import com.ytrewqwert.yetanotherjnovelreader.login.LoginResultListener
+import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
 
 /** The app's entry point. Shows the user lists of available parts for reading. */
 class MainActivity : AppCompatActivity(), LoginResultListener {
@@ -63,6 +64,18 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
             }
             Toast.makeText(this, followResultText, Toast.LENGTH_LONG).show()
         }
+        viewModel.changePageEvent.observe(this) {
+            val explorerPageId = MainPagerAdapter.ChildFragments.EXPLORER.ordinal
+            viewPager.currentItem = explorerPageId
+            val explorerFragment =
+                viewPagerAdapter.getItem(explorerPageId) as? ExplorerFragment
+            when (it) {
+                is MainViewModel.PageContent.SeriePage ->
+                    explorerFragment?.onSeriesListItemInteraction(it.serieId)
+                is MainViewModel.PageContent.VolumePage ->
+                    explorerFragment?.onVolumesListItemInteraction(it.volumeId)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -97,6 +110,9 @@ class MainActivity : AppCompatActivity(), LoginResultListener {
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean =
+        viewModel.processContextMenuSelection(item.itemId) || super.onContextItemSelected(item)
 
     private fun updateMenu() {
         val nameHolder = appBarMenu?.findItem(R.id.account_name)
