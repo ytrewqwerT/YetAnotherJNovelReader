@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumepartslist
+package com.ytrewqwert.yetanotherjnovelreader.main.volumepartslist
 
 import androidx.lifecycle.viewModelScope
 import com.ytrewqwert.yetanotherjnovelreader.common.swipeablelist.SwipeableListViewModel

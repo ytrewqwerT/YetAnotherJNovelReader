@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.volumepartslist
+package com.ytrewqwert.yetanotherjnovelreader.main.volumepartslist
 
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater

@@ -1,4 +1,4 @@
-package com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.serieslist
+package com.ytrewqwert.yetanotherjnovelreader.main.serieslist
 
 import android.view.LayoutInflater
 import android.view.View

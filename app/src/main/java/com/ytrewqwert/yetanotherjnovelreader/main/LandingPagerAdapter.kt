@@ -5,21 +5,21 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.ytrewqwert.yetanotherjnovelreader.main.partslists.recentpartslist.RecentPartsListFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.partslists.upnextpartslist.UpNextPartsListFragment
-import com.ytrewqwert.yetanotherjnovelreader.main.seriesnavigation.ExplorerFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.serieslist.SeriesListFragment
 
 /** An adapter for the ViewPager in the [MainActivity]. */
-class MainPagerAdapter(fm: FragmentManager)
+class LandingPagerAdapter(fm: FragmentManager)
     : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     /** Defines what pages are available and the order they are shown in. */
     enum class ChildFragments {
         RECENT_PARTS,
-        EXPLORER,
+        SERIES,
         UP_NEXT_PARTS
     }
 
     private val recentPartsFragment by lazy { RecentPartsListFragment() }
-    private val explorerFragment by lazy { ExplorerFragment() }
+    private val seriesFragment by lazy { SeriesListFragment() }
     private val upNextPartsFragment by lazy { UpNextPartsListFragment() }
 
     override fun getCount(): Int = ChildFragments.values().size
@@ -27,15 +27,15 @@ class MainPagerAdapter(fm: FragmentManager)
     override fun getItem(position: Int): Fragment {
         return when (ChildFragments.values()[position]) {
             ChildFragments.RECENT_PARTS -> recentPartsFragment
-            ChildFragments.EXPLORER -> explorerFragment
+            ChildFragments.SERIES -> seriesFragment
             ChildFragments.UP_NEXT_PARTS -> upNextPartsFragment
         }
     }
 
-    override fun getPageTitle(position: Int): CharSequence? {
+    override fun getPageTitle(position: Int): CharSequence {
         return when (ChildFragments.values()[position]) {
             ChildFragments.RECENT_PARTS -> "Recent"
-            ChildFragments.EXPLORER -> "Explore"
+            ChildFragments.SERIES -> "Series"
             ChildFragments.UP_NEXT_PARTS -> "Up Next"
         }
     }
