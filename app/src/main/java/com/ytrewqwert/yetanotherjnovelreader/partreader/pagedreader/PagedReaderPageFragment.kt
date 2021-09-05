@@ -56,6 +56,7 @@ class PagedReaderPageFragment : Fragment() {
         // Receive via a delayed lifecycle to ensure that the posted code will be executed
         pagedReaderViewModel.fullContent.observe(delayedLifecycleOwner) {
             textView?.post {
+                if (context == null) return@post
                 val marginsDp = partViewModel.marginsDp.value
                 val vMargin = if (marginsDp != null) {
                     Utils.dpToPx(marginsDp.bottom + marginsDp.top, resources.displayMetrics)

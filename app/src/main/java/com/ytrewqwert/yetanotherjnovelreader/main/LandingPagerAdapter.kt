@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.ytrewqwert.yetanotherjnovelreader.main.partslists.recentpartslist.RecentPartsListFragment
 import com.ytrewqwert.yetanotherjnovelreader.main.partslists.upnextpartslist.UpNextPartsListFragment
-import com.ytrewqwert.yetanotherjnovelreader.main.serieslist.SeriesListFragment
+import com.ytrewqwert.yetanotherjnovelreader.main.serieslist.SearchableSeriesListFragment
 
 /** An adapter for the ViewPager in the [MainActivity]. */
 class LandingPagerAdapter(fm: FragmentManager)
@@ -19,7 +19,7 @@ class LandingPagerAdapter(fm: FragmentManager)
     }
 
     private val recentPartsFragment by lazy { RecentPartsListFragment() }
-    private val seriesFragment by lazy { SeriesListFragment() }
+    private val seriesFragment by lazy { SearchableSeriesListFragment() }
     private val upNextPartsFragment by lazy { UpNextPartsListFragment() }
 
     override fun getCount(): Int = ChildFragments.values().size
