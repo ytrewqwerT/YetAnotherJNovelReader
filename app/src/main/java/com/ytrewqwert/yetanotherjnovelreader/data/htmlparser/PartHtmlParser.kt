@@ -40,6 +40,12 @@ object PartHtmlParser {
                 continue
             }
 
+            // Skip the initial "<!DOCTYPE html>
+            if (match.value.startsWith("<!DOCTYPE")) {
+                searchStartIndex = match.range.last + 1
+                continue
+            }
+
             val fullTag = match.value.trim('<', '/', '>', ' ')
             val (tagLabel, tagArgs) = extractTagComponents(fullTag)
 

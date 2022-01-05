@@ -47,6 +47,7 @@ class RemoteRepository private constructor(
     }
 
     private val jncApi = JNCApiFactory.jncApi
+    private val jncApiNew = JNCApiNewFactory.jncApi
     private val imageLoader = Coil.imageLoader(appContext)
 
     /** Fetches the image referenced by the [source] url. */
@@ -61,10 +62,10 @@ class RemoteRepository private constructor(
     /** Retrieves the contents of the part with id [partId] as a string formatted with html. */
     suspend fun getPartHtml(partId: String): String? {
         val rawPartContent = safeNetworkCall("PartFailure") {
-            jncApi.getPartHtml(authToken, partId)
+            jncApiNew.getPartHtml("Bearer $authToken", partId)
         } ?: return null
         Log.d(TAG, "PartSuccess: Found part $partId")
-        return rawPartContent.dataHTML
+        return rawPartContent.clearData
     }
 
     /**

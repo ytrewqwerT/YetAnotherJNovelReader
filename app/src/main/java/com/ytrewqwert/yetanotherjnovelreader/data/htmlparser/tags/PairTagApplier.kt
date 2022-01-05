@@ -26,6 +26,8 @@ abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
             "sub" -> SubPairTagApplier(partId)
             "sup" -> SupPairTagApplier(partId)
             "u" -> UPairTagApplier(partId)
+            "head" -> HeadPairTagApplier(partId)
+            "html", "title", "body", "section", "div" -> UselessPairTagApplier(partId, tag)
             else -> DummyPairTagApplier(partId, tag)
         }
     }
