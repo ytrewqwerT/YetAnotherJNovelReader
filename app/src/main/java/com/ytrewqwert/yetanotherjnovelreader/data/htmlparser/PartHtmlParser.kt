@@ -14,9 +14,24 @@ object PartHtmlParser {
      * @param[partId] The ID of the part, used for logging unexpected html tags/args.
      */
     fun parse(html: String, partId: String): Spanned {
-        val noNewLines = html.replace("\n", "")
-        val noTags = parseTags(noNewLines, partId)
+        val noXmlWhitespace = cleanXmlWhitespace(html)
+        val noTags = parseTags(noXmlWhitespace, partId)
         return HtmlCharCodeConverter(partId).processHtml(noTags)
+    }
+
+    private fun cleanXmlWhitespace(html: String): String {
+        val cleaned = StringBuilder(html)
+        var i = 0
+        while (i < cleaned.length) {
+            if (cleaned[i] == '\n') {
+                var j = i + 1
+                while (j < cleaned.length && cleaned[j] == ' ') j++
+                cleaned.deleteRange(i, j)
+            } else {
+                i++
+            }
+        }
+        return cleaned.toString()
     }
 
     private fun parseTags(html: String, partId: String): SpannableStringBuilder {
@@ -37,6 +52,12 @@ object PartHtmlParser {
                 val commentEndRegex = Regex("-->")
                 val endMatch = commentEndRegex.find(html, match.range.first + 4)
                 searchStartIndex = if (endMatch != null) endMatch.range.last + 1 else html.length
+                continue
+            }
+
+            // Skip the initial "<?xml ...>
+            if (match.value.startsWith("<?xml")) {
+                searchStartIndex = match.range.last + 1
                 continue
             }
 
