@@ -21,11 +21,13 @@ abstract class PairTagApplier(partId: CharSequence) : TagApplier(partId) {
             "code" -> CodePairTagApplier(partId)
             "em" -> EmPairTagApplier(partId)
             "h1", "h2", "h3", "h4", "h5", "h6" -> HPairTagApplier(partId, tag[1] - '0')
+            "li" -> LiPairTagApplier(partId)
             "p" -> PPairTagApplier(partId)
             "s" -> SPairTagApplier(partId)
             "sub" -> SubPairTagApplier(partId)
             "sup" -> SupPairTagApplier(partId)
             "u" -> UPairTagApplier(partId)
+            "ul" -> UlPairTagApplier(partId)
             else -> DummyPairTagApplier(partId, tag)
         }
     }
