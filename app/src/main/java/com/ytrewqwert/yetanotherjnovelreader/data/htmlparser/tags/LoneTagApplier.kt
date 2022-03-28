@@ -18,6 +18,7 @@ abstract class LoneTagApplier(partId: CharSequence) : TagApplier(partId) {
             "br" -> BrLoneTagApplier(partId)
             "hr" -> HrLoneTagApplier(partId)
             "img" -> ImgLoneTagApplier(partId)
+            "meta", "link" -> UselessLoneTagApplier(partId, tag)
             else -> DummyLoneTagApplier(partId, tag)
         }
 

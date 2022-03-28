@@ -61,10 +61,10 @@ class RemoteRepository private constructor(
     /** Retrieves the contents of the part with id [partId] as a string formatted with html. */
     suspend fun getPartHtml(partId: String): String? {
         val rawPartContent = safeNetworkCall("PartFailure") {
-            jncApi.getPartHtml(authToken, partId)
+            JNCApiRaw.getPartHtml(authToken, partId)
         } ?: return null
         Log.d(TAG, "PartSuccess: Found part $partId")
-        return rawPartContent.dataHTML
+        return rawPartContent
     }
 
     /**
