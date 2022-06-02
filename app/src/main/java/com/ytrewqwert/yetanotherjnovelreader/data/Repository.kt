@@ -105,7 +105,7 @@ class Repository private constructor(appContext: Context) {
     /** Sets a series as being followed by the user. Returns true if successful. */
     suspend fun followSeries(serieId: String): Boolean {
         val userId = prefStore.userId
-        if (userId != null && !remote.followSerie(userId, serieId)) return false
+        if (userId != null && !remote.followSerie(serieId)) return false
         val latestFinishedPart = local.getLatestFinishedPart(serieId)
         // Default the "up-next" part to the part after the latest finished part on initial follow.
         val nextPartNum = (latestFinishedPart?.part?.seriesPartNum ?: 0) + 1
@@ -116,7 +116,7 @@ class Repository private constructor(appContext: Context) {
     /** Sets a series as not being followed by the user. Returns true if successful. */
     suspend fun unfollowSeries(serieId: String): Boolean {
         val userId = prefStore.userId
-        if (userId != null && !remote.unfollowSerie(userId, serieId)) return false
+        if (userId != null && !remote.unfollowSerie(serieId)) return false
         local.deleteFollows(Follow(serieId, 0))
         return true
     }
@@ -217,9 +217,9 @@ class Repository private constructor(appContext: Context) {
         )
     }
     private suspend fun setRemotePartProgress(partId: String, progress: Double): Boolean {
+        if (prefStore.userId == null) return true
         val boundedProgress = progress.coerceIn(0.0, 1.0)
-        val userId = prefStore.userId ?: return true
-        val progressSet = remote.setUserPartProgress(userId, partId, boundedProgress)
+        val progressSet = remote.setUserPartProgress(partId, boundedProgress)
         if (progressSet) {
             local.upsertProgress(Progress(partId, boundedProgress, false))
         }

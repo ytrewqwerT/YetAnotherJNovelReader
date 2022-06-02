@@ -11,8 +11,6 @@ import com.ytrewqwert.yetanotherjnovelreader.data.local.database.progress.Progre
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.serie.Serie
 import com.ytrewqwert.yetanotherjnovelreader.data.local.database.volume.Volume
 import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.LoginRaw
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.OutboundFollowRaw
-import com.ytrewqwert.yetanotherjnovelreader.data.remote.model.ProgressRaw
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 
@@ -46,7 +44,8 @@ class RemoteRepository private constructor(
             }
     }
 
-    private val jncApi = JNCApiFactory.jncApi
+    private val oldJncApi = JNCApiFactory.OLD_JNC_API
+    private val newJncApi = JNCApiFactory.NEW_JNC_API
     private val imageLoader = Coil.imageLoader(appContext)
 
     /** Fetches the image referenced by the [source] url. */
@@ -83,7 +82,7 @@ class RemoteRepository private constructor(
         }.toString()
 
         val rawSeries = safeNetworkCall("SeriesFailure") {
-            jncApi.getSeries(filters)
+            oldJncApi.getSeries(filters)
         } ?: return null
         Log.d(TAG, "SeriesSuccess: Found ${rawSeries.size} series")
         return rawSeries.map { Serie.fromSerieRaw(it) }
@@ -105,7 +104,7 @@ class RemoteRepository private constructor(
         }.toString()
 
         val rawVolumes = safeNetworkCall("SerieVolumesFailure") {
-            jncApi.getVolumes(filters)
+            oldJncApi.getVolumes(filters)
         } ?: return null
         Log.d(TAG, "SerieVolumesSuccess: Found ${rawVolumes.size} volumes")
         return rawVolumes.map { Volume.fromVolumeRaw(it) }
@@ -121,7 +120,7 @@ class RemoteRepository private constructor(
         }.toString()
 
         val rawVolumes = safeNetworkCall("VolumeFailure") {
-            jncApi.getVolumes(filters)
+            oldJncApi.getVolumes(filters)
         } ?: return null
         Log.d(TAG, "VolumeSuccess: Found ${rawVolumes.size} volumes")
         val rawVolume = rawVolumes.firstOrNull() ?: return null
@@ -144,7 +143,7 @@ class RemoteRepository private constructor(
         }.toString()
 
         val rawParts = safeNetworkCall("VolumePartsFailure") {
-            jncApi.getParts(filters)
+            oldJncApi.getParts(filters)
         } ?: return null
         Log.d(TAG, "VolumePartsSuccess: Found ${rawParts.size} parts")
         return rawParts.map { Part.fromPartRaw(it) }
@@ -167,7 +166,7 @@ class RemoteRepository private constructor(
         }.toString()
 
         val rawParts = safeNetworkCall("RecentPartsFailure") {
-            jncApi.getParts(filters)
+            oldJncApi.getParts(filters)
         } ?: return null
         Log.d(TAG, "RecentPartsSuccess: Found ${rawParts.size} parts")
         return rawParts.map { Part.fromPartRaw(it) }
@@ -191,7 +190,7 @@ class RemoteRepository private constructor(
                     }.toString()
 
                     val rawPart = safeNetworkCall("UpNextPartFailure") {
-                        jncApi.getPart(filters)
+                        oldJncApi.getPart(filters)
                     } ?: return@async null
                     Part.fromPartRaw(rawPart)
                 }
@@ -213,7 +212,7 @@ class RemoteRepository private constructor(
         }.toString()
 
         val rawUserWithProgress = safeNetworkCall("LoadProgressFailure") {
-            jncApi.getUser(authToken, userId, filters)
+            oldJncApi.getUser(authToken, userId, filters)
         } ?: return null
         val rawProgress = rawUserWithProgress.readParts ?: return null
         Log.d(TAG, "LoadProgressSuccess: Found ${rawProgress.size} parts")
@@ -223,16 +222,14 @@ class RemoteRepository private constructor(
     /**
      * Stores the user's progress in a part in the remote server.
      *
-     * @param[userId] The id of the user who's progress is to be set.
      * @param[partId] The id of the part to be setting the progress of.
      * @param[progress] A number in the range [0,1] indicating the percentage progress to be set.
      * @return true if the progress was successfully set and false otherwise.
      */
-    suspend fun setUserPartProgress(userId: String, partId: String, progress: Double): Boolean {
-        val progressRaw = ProgressRaw(partId, progress.toFloat())
+    suspend fun setUserPartProgress(partId: String, progress: Double): Boolean {
         safeNetworkCall("SaveProgressFailure") {
-            jncApi.setProgress(authToken, userId, progressRaw)
-        } ?: return false
+            newJncApi.setProgress("Bearer $authToken", partId, progress)
+        }?.code()?.takeIf { it == 204 } ?: return false
         Log.d(TAG, "SaveProgressSuccess: $partId at ${progress.toFloat()}")
         return true
     }
@@ -244,29 +241,27 @@ class RemoteRepository private constructor(
         }.toString()
 
         val rawUserWithFollows = safeNetworkCall("LoadProgressFailure") {
-            jncApi.getUser(authToken, userId, filters)
+            oldJncApi.getUser(authToken, userId, filters)
         } ?: return null
         val rawFollows = rawUserWithFollows.serieFollows ?: return null
         Log.d(TAG, "LoadFollowsSuccess: Found ${rawFollows.size} followed series")
         return rawFollows.map { it.serieId }
     }
 
-    /** Sets the series with id [serieId] as followed by the user with id [userId]. */
-    suspend fun followSerie(userId: String, serieId: String): Boolean {
-        val followRaw = OutboundFollowRaw(serieId, 1) // (I think) 1 indicates novel.
+    /** Sets the series with id [serieId] as followed by the user. */
+    suspend fun followSerie(serieId: String): Boolean {
         safeNetworkCall("FollowSerieFailure") {
-            jncApi.followSerie(authToken, userId, followRaw)
-        } ?: return false
+            newJncApi.followSerie("Bearer $authToken", serieId)
+        }?.code()?.takeIf { it == 204 } ?: return false
         Log.d(TAG, "FollowSerieSuccess: Followed serie $serieId")
         return true
     }
 
-    /** Sets the series with id [serieId] as not followed by the user with id [userId]. */
-    suspend fun unfollowSerie(userId: String, serieId: String): Boolean {
-        val followRaw = OutboundFollowRaw(serieId, 1) // (I think) 1 indicates novel.
+    /** Sets the series with id [serieId] as not followed by the user. */
+    suspend fun unfollowSerie(serieId: String): Boolean {
         safeNetworkCall("UnfollowSerieFailure") {
-            jncApi.unfollowSerie(authToken, userId, followRaw)
-        } ?: return false
+            newJncApi.unfollowSerie("Bearer $authToken", serieId)
+        }?.code()?.takeIf { it == 204 } ?: return false
         Log.d(TAG, "UnfollowSerieSuccess: Unfollowed serie $serieId")
         return true
     }
@@ -279,7 +274,7 @@ class RemoteRepository private constructor(
     suspend fun login(email: String, password: String): UserData? {
         val credentials = LoginRaw(email, password)
         val rawUser = safeNetworkCall("LoginFailure") {
-            jncApi.login(credentials)
+            oldJncApi.login(credentials)
         } ?: return null
         Log.d(TAG, "LoginSuccess")
         authToken = rawUser.authToken
@@ -288,7 +283,7 @@ class RemoteRepository private constructor(
 
     /** Attempts to log the user out of the system. Returns true if successful, false otherwise. */
     suspend fun logout(): Boolean {
-        safeNetworkCall("LogoutFailure") { jncApi.logout(authToken) }
+        safeNetworkCall("LogoutFailure") { oldJncApi.logout(authToken) }
         Log.d(TAG, "LogoutSuccess")
         authToken = null
         return true
